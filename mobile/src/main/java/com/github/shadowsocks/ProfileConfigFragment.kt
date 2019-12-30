@@ -82,9 +82,15 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
             activity.finish()
             return
         }
-        addPreferencesFromResource(R.xml.pref_profile)
-        findPreference<EditTextPreference>(Key.remotePort)!!.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
-        findPreference<EditTextPreference>(Key.password)!!.summaryProvider = PasswordSummaryProvider
+        var thisprofile: Profile = ProfileManager.getProfile(profileId) ?: return
+        if(thisprofile.isBuiltin())
+            addPreferencesFromResource(R.xml.pref_profile_vpn)
+        else {
+            addPreferencesFromResource(R.xml.pref_profile)
+            findPreference<EditTextPreference>(Key.remotePort)!!.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+            findPreference<EditTextPreference>(Key.password)!!.summaryProvider = PasswordSummaryProvider
+        }
+
         val serviceMode = DataStore.serviceMode
         findPreference<Preference>(Key.remoteDns)!!.isEnabled = serviceMode != Key.modeProxy
         findPreference<Preference>(Key.ipv6)!!.isEnabled = serviceMode == Key.modeVpn

@@ -19,7 +19,7 @@
  *******************************************************************************/
 
 package com.github.shadowsocks
-
+import SpeedUpVPN.VpnEncrypt
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -111,7 +111,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
         }.asSequence().toList().reversed()) {
             val viewHolder = profilesList.findViewHolderForAdapterPosition(i) as ProfileViewHolder
-            if (viewHolder.item.isSponsored) {
+            if (viewHolder.item.isBuiltin()) {
                 viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
                 // might be in the middle of a layout after scrolling, need to wait
                 withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
@@ -162,6 +162,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         private val traffic = itemView.findViewById<TextView>(R.id.traffic)
         private val edit = itemView.findViewById<View>(R.id.edit)
         private val adContainer = itemView.findViewById<LinearLayout>(R.id.ad_container)
+        private val share = itemView.findViewById<View>(R.id.share)
 
         init {
             edit.setOnClickListener {
@@ -170,7 +171,6 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             TooltipCompat.setTooltipText(edit, edit.contentDescription)
             itemView.setOnClickListener(this)
-            val share = itemView.findViewById<View>(R.id.share)
             share.setOnClickListener {
                 val popup = PopupMenu(requireContext(), share)
                 popup.menuInflater.inflate(R.menu.profile_share_popup, popup.menu)
@@ -233,15 +233,16 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             // This method tells the Google Mobile Ads SDK that you have finished populating your
             // native ad view with this native ad.
             adView.setNativeAd(nativeAd)
+            adContainer.setPadding(0,5,0,0)
             adContainer.addView(adView)
             adHost = this
         }
 
         fun attach() {
-            if (adHost != null || !item.isSponsored) return
+            if (adHost != null || !item.isBuiltin()) return
             if (nativeAdView == null) {
                 nativeAdView = layoutInflater.inflate(R.layout.ad_unified, adContainer, false) as UnifiedNativeAdView
-                AdLoader.Builder(context, "ca-app-pub-3283768469187309/8632513739").apply {
+                AdLoader.Builder(context, "ca-app-pub-2194043486084479/8267385919").apply {
                     forUnifiedNativeAd { unifiedNativeAd ->
                         // You must call destroy on old ads when you are done with them,
                         // otherwise you will have a memory leak.
@@ -273,6 +274,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             this.item = item
             val editable = isProfileEditable(item.id)
             edit.isEnabled = editable
+            share.isEnabled = !item.isBuiltin()
             edit.alpha = if (editable) 1F else .5F
             var tx = item.tx
             var rx = item.rx
@@ -282,7 +284,8 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             text1.text = item.formattedName
             text2.text = ArrayList<String>().apply {
-                if (!item.name.isNullOrEmpty()) this += item.formattedAddress
+                if (item.url_group.isNotEmpty()) this += item.url_group	    
+                else if (!item.name.isNullOrEmpty()) this += item.formattedAddress
                 val id = PluginConfiguration(item.plugin ?: "").selected
                 if (id.isNotEmpty()) this += getString(R.string.profile_plugin, id)
             }.joinToString("\n")
@@ -448,7 +451,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
         ItemTouchHelper.START or ItemTouchHelper.END) {
             override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
-                    if (isProfileEditable((viewHolder as ProfileViewHolder).item.id))
+                    if (isProfileEditable((viewHolder as ProfileViewHolder).item.id) && !(viewHolder as ProfileViewHolder).item.isBuiltin())
                         super.getSwipeDirs(recyclerView, viewHolder) else 0
             override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
                     if (isEnabled) super.getDragDirs(recyclerView, viewHolder) else 0
@@ -515,7 +518,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
             R.id.action_export_clipboard -> {
-                val profiles = ProfileManager.getAllProfiles()
+                val profiles = ProfileManager.getAllProfilesIgnoreGroup(VpnEncrypt.vpnGroupName)
                 (activity as MainActivity).snackbar().setText(if (profiles != null) {
                     clipboard.setPrimaryClip(ClipData.newPlainText(null, profiles.joinToString("\n")))
                     R.string.action_export_msg
@@ -565,7 +568,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 }
             }
             REQUEST_EXPORT_PROFILES -> {
-                val profiles = ProfileManager.serializeToJson()
+                val profiles = ProfileManager.serializeToJsonIgnoreVPN()
                 if (profiles != null) try {
                     requireContext().contentResolver.openOutputStream(data?.data!!)!!.bufferedWriter().use {
                         it.write(profiles.toString(2))

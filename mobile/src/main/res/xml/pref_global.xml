@@ -21,6 +21,16 @@
         app:icon="@drawable/ic_maps_menu_book"
         app:title="hosts"/>
 
+    <Preference
+        app:icon="@drawable/ic_baseline_rss_feed"
+        app:key="ssrSub"
+        app:title="@string/ssrsub_manage" />
+    <SwitchPreference
+        app:icon="@drawable/ic_baseline_autorenew"
+        app:key="ssrsub_autoupdate"
+        app:summary="@string/ssrsub_autoupdate_summary"
+        app:title="@string/ssrsub_autoupdate" />
+
     <com.takisoft.preferencex.SimpleMenuPreference
         app:key="serviceMode"
         app:icon="@drawable/ic_device_developer_mode"

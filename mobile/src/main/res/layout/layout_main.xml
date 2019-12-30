@@ -62,19 +62,18 @@
                     android:layout_gravity="fill_horizontal"
                     android:layout_columnWeight="1"/>
 
-                <TextView
+                <WebView
+                    android:text="@string/recommended_site_1"
                     android:id="@+id/txRate"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="marquee"
+                    android:layout_height="30dp"
                     android:singleLine="true"
                     android:gravity="end"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
                     android:layout_gravity="fill_horizontal"
                     android:layout_row="0"
                     android:layout_column="2"
-                    android:layout_columnWeight="1"/>
+                    android:layout_columnWeight="1"
+                    tools:ignore="WebViewLayout" />
 
                 <TextView
                     android:id="@+id/rx"
@@ -89,19 +88,18 @@
                     android:layout_columnWeight="1"
                     android:layout_row="1"/>
 
-                <TextView
+                <WebView
+                    android:text="@string/recommended_site_2"
                     android:id="@+id/rxRate"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="marquee"
+                    android:layout_height="15dp"
                     android:singleLine="true"
                     android:gravity="end"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
                     android:layout_gravity="fill_horizontal"
                     android:layout_column="2"
                     android:layout_columnWeight="1"
-                    android:layout_row="1"/>
+                    android:layout_row="1"
+                    tools:ignore="WebViewLayout" />
 
                 <TextView
                     android:id="@+id/status"

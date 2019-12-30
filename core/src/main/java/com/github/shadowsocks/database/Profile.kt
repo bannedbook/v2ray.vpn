@@ -20,6 +20,7 @@
 
 package com.github.shadowsocks.database
 
+import SpeedUpVPN.VpnEncrypt
 import android.annotation.TargetApi
 import android.net.Uri
 import android.os.Parcelable
@@ -60,6 +61,7 @@ data class Profile(
         var proxyApps: Boolean = false,
         var bypass: Boolean = false,
         var udpdns: Boolean = false,
+        var url_group: String = "",
         var ipv6: Boolean = false,
         @TargetApi(28)
         var metered: Boolean = false,
@@ -81,6 +83,102 @@ data class Profile(
                 """(?i)ss://[-a-zA-Z0-9+&@#/%?=.~*'()|!:,;\[\]]*[-a-zA-Z0-9+&@#/%=.~*'()|\[\]]""".toRegex()
         private val userInfoPattern = "^(.+?):(.*)$".toRegex()
         private val legacyPattern = "^(.+?):(.*)@(.+?):(\\d+?)$".toRegex()
+
+        private val pattern_ssr = "(?i)ssr://([A-Za-z0-9_=-]+)".toRegex()
+        private val decodedPattern_ssr = "(?i)^((.+):(\\d+?):(.*):(.+):(.*):(.+)/(.*))".toRegex()
+        private val decodedPattern_ssr_obfsparam = "(?i)(.*)[?&]obfsparam=([A-Za-z0-9_=-]*)(.*)".toRegex()
+        private val decodedPattern_ssr_remarks = "(?i)(.*)[?&]remarks=([A-Za-z0-9_=-]*)(.*)".toRegex()
+        private val decodedPattern_ssr_protocolparam = "(?i)(.*)[?&]protoparam=([A-Za-z0-9_=-]*)(.*)".toRegex()
+        private val decodedPattern_ssr_groupparam = "(?i)(.*)[?&]group=([A-Za-z0-9_=-]*)(.*)".toRegex()
+
+        private fun base64Decode(data: String) = String(Base64.decode(data.replace("=", ""), Base64.URL_SAFE), Charsets.UTF_8)
+
+        fun findAllSSRUrls(data: CharSequence?, feature: Profile? = null) = pattern_ssr.findAll(data
+                ?: "").map {
+            val uri = base64Decode(it.groupValues[1])
+            try {
+                val match = decodedPattern_ssr.matchEntire(uri)
+                if (match != null) {
+                    val profile = Profile()
+                    feature?.copyFeatureSettingsTo(profile)
+                    profile.host = match.groupValues[2].toLowerCase(Locale.ENGLISH)
+                    profile.remotePort = match.groupValues[3].toInt()
+                    profile.method = match.groupValues[5].toLowerCase(Locale.ENGLISH)
+                    profile.password = base64Decode(match.groupValues[7])
+
+                    val match1 = decodedPattern_ssr_obfsparam.matchEntire(match.groupValues[8])
+
+                    val match2 = decodedPattern_ssr_protocolparam.matchEntire(match.groupValues[8])
+
+                    val match3 = decodedPattern_ssr_remarks.matchEntire(match.groupValues[8])
+                    if (match3 != null) profile.name = base64Decode(match3.groupValues[2])
+
+                    val match4 = decodedPattern_ssr_groupparam.matchEntire(match.groupValues[8])
+                    if (match4 != null) profile.url_group = base64Decode(match4.groupValues[2])
+
+                    profile
+                } else {
+                    null
+                }
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Invalid SSR URI: ${it.value}")
+                null
+            }
+        }.filterNotNull().toMutableSet()
+
+        private fun findAllSSUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data
+                ?: "").map {
+            val uri = it.value.toUri()
+            try {
+                if (uri.userInfo == null) {
+                    val match = legacyPattern.matchEntire(String(Base64.decode(uri.host, Base64.NO_PADDING)))
+                    if (match != null) {
+                        val profile = Profile()
+                        feature?.copyFeatureSettingsTo(profile)
+                        profile.method = match.groupValues[1].toLowerCase(Locale.ENGLISH)
+                        profile.password = match.groupValues[2]
+                        profile.host = match.groupValues[3]
+                        profile.remotePort = match.groupValues[4].toInt()
+                        profile.plugin = uri.getQueryParameter(Key.plugin)
+                        profile.name = uri.fragment.toString()
+                        profile
+                    } else {
+                        Log.e(TAG, "Unrecognized URI: ${it.value}")
+                        null
+                    }
+                } else {
+                    val match = userInfoPattern.matchEntire(String(Base64.decode(uri.userInfo,
+                            Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE)))
+                    if (match != null) {
+                        val profile = Profile()
+                        feature?.copyFeatureSettingsTo(profile)
+                        profile.method = match.groupValues[1]
+                        profile.password = match.groupValues[2]
+                        // bug in Android: https://code.google.com/p/android/issues/detail?id=192855
+                        try {
+                            val javaURI = URI(it.value)
+                            profile.host = javaURI.host ?: ""
+                            if (profile.host.firstOrNull() == '[' && profile.host.lastOrNull() == ']') {
+                                profile.host = profile.host.substring(1, profile.host.length - 1)
+                            }
+                            profile.remotePort = javaURI.port
+                            profile.plugin = uri.getQueryParameter(Key.plugin)
+                            profile.name = uri.fragment ?: ""
+                            profile
+                        } catch (e: URISyntaxException) {
+                            Log.e(TAG, "Invalid URI: ${it.value}")
+                            null
+                        }
+                    } else {
+                        Log.e(TAG, "Unknown user info: ${it.value}")
+                        null
+                    }
+                }
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Invalid base64 detected: ${it.value}")
+                null
+            }
+        }.filterNotNull().toMutableSet()
 
         fun findAllUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data ?: "").map {
             val uri = it.value.toUri()
@@ -227,6 +325,12 @@ data class Profile(
         @Query("SELECT * FROM `Profile` ORDER BY `userOrder`")
         fun list(): List<Profile>
 
+        @Query("SELECT * FROM `Profile` WHERE `url_group` = :group")
+        fun listByGroup(group: String): List<Profile>
+
+        @Query("SELECT * FROM `Profile` WHERE `url_group` != :group")
+        fun listIgnoreGroup(group: String): List<Profile>
+
         @Query("SELECT MAX(`userOrder`) + 1 FROM `Profile`")
         fun nextOrder(): Long?
 
@@ -273,6 +377,10 @@ data class Profile(
         if (!name.isNullOrEmpty()) builder.fragment(name)
         return builder.build()
     }
+
+    fun isSameAs(other: Profile): Boolean = other.host == host && other.remotePort == remotePort &&
+            other.password == password && other.method == method
+
     override fun toString() = toUri().toString()
 
     fun toJson(profiles: LongSparseArray<Profile>? = null): JSONObject = JSONObject().apply {
@@ -310,6 +418,7 @@ data class Profile(
     fun serialize() {
         DataStore.editingId = id
         DataStore.privateStore.putString(Key.name, name)
+        DataStore.privateStore.putString(Key.group, url_group)
         DataStore.privateStore.putString(Key.host, host)
         DataStore.privateStore.putString(Key.remotePort, remotePort.toString())
         DataStore.privateStore.putString(Key.password, password)
@@ -332,6 +441,7 @@ data class Profile(
         DataStore.editingId = null
         // It's assumed that default values are never used, so 0/false/null is always used even if that isn't the case
         name = DataStore.privateStore.getString(Key.name) ?: ""
+        url_group = DataStore.privateStore.getString(Key.group) ?: ""
         // It's safe to trim the hostname, as we expect no leading or trailing whitespaces here
         host = (DataStore.privateStore.getString(Key.host) ?: "").trim()
         remotePort = parsePort(DataStore.privateStore.getString(Key.remotePort), 8388, 1)
@@ -347,5 +457,8 @@ data class Profile(
         individual = DataStore.individual
         plugin = DataStore.plugin
         udpFallback = DataStore.udpFallback
+    }
+    fun isBuiltin(): Boolean {
+        return VpnEncrypt.vpnGroupName == url_group
     }
 }

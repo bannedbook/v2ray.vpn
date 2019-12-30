@@ -21,9 +21,11 @@
 package com.github.shadowsocks.widget
 
 import android.content.Context
+import android.graphics.Color
 import android.text.format.Formatter
 import android.util.AttributeSet
 import android.view.View
+import android.webkit.WebView
 import android.widget.TextView
 import androidx.appcompat.widget.TooltipCompat
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -45,8 +47,8 @@ class StatsBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private lateinit var statusText: TextView
     private lateinit var txText: TextView
     private lateinit var rxText: TextView
-    private lateinit var txRateText: TextView
-    private lateinit var rxRateText: TextView
+    private lateinit var txRateText: WebView
+    private lateinit var rxRateText: WebView
     private val tester = ViewModelProvider(context as MainActivity).get<HttpsTest>()
     private lateinit var behavior: Behavior
     override fun getBehavior(): Behavior {
@@ -67,6 +69,14 @@ class StatsBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         txRateText = findViewById(R.id.txRate)
         rxText = findViewById(R.id.rx)
         rxRateText = findViewById(R.id.rxRate)
+
+        var recsite1= getResources().getString(R.string.recommended_site_1)
+        var recsite2= getResources().getString(R.string.recommended_site_2)
+        txRateText.setBackgroundColor(Color.TRANSPARENT);
+        rxRateText.setBackgroundColor(Color.TRANSPARENT);
+        txRateText.loadData(recsite1,"text/html; charset=utf-8",  "UTF-8")
+        rxRateText.loadData(recsite2,"text/html; charset=utf-8",  "UTF-8")
+
         super.setOnClickListener(l)
     }
 
@@ -97,10 +107,9 @@ class StatsBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     }
 
     fun updateTraffic(txRate: Long, rxRate: Long, txTotal: Long, rxTotal: Long) {
-        txText.text = "▲ ${Formatter.formatFileSize(context, txTotal)}"
-        rxText.text = "▼ ${Formatter.formatFileSize(context, rxTotal)}"
-        txRateText.text = context.getString(R.string.speed, Formatter.formatFileSize(context, txRate))
-        rxRateText.text = context.getString(R.string.speed, Formatter.formatFileSize(context, rxRate))
+        txText.text = "▲ ${Formatter.formatFileSize(context, txTotal)}"+"("+ context.getString(R.string.speed, Formatter.formatFileSize(context, txRate)) +")"
+        rxText.text = "▼ ${Formatter.formatFileSize(context, rxTotal)}"+"("+ context.getString(R.string.speed, Formatter.formatFileSize(context, rxRate)) +")"
+
     }
 
     fun testConnection() = tester.testConnection()

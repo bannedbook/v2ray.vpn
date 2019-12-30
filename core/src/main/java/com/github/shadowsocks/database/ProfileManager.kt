@@ -20,6 +20,7 @@
 
 package com.github.shadowsocks.database
 
+import SpeedUpVPN.VpnEncrypt
 import android.database.sqlite.SQLiteCantOpenDatabaseException
 import android.util.LongSparseArray
 import com.github.shadowsocks.Core
@@ -43,6 +44,7 @@ object ProfileManager {
         fun onRemove(profileId: Long)
         fun onCleared()
     }
+
     var listener: Listener? = null
 
     @Throws(SQLException::class)
@@ -52,6 +54,26 @@ object ProfileManager {
         profile.id = PrivateDatabase.profileDao.create(profile)
         listener?.onAdd(profile)
         return profile
+    }
+
+    fun deletProfiles(profiles: List<Profile>) {
+        val first: Long = Core.currentProfile?.first?.id ?: -1
+        val second: Long = Core.currentProfile?.second?.id ?: -1
+        profiles.forEach {
+            if (it.id != first && it.id != second) delProfile(it.id)
+        }
+    }
+
+    fun createProfilesFromSub(profiles: List<Profile>, group: String) {
+        val old = getAllProfilesByGroup(group).toMutableList()
+        profiles.filter {
+            for (i: Profile in old) if (it.isSameAs(i)) {
+                old.remove(i)
+                return@filter false
+            }
+            return@filter true
+        }.forEach { createProfile(it) }
+        deletProfiles(old)
     }
 
     fun createProfilesFromJson(jsons: Sequence<InputStream>, replace: Boolean = false) {
@@ -74,7 +96,13 @@ object ProfileManager {
             }
         }
     }
+
     fun serializeToJson(profiles: List<Profile>? = getAllProfiles()): JSONArray? {
+        if (profiles == null) return null
+        val lookup = LongSparseArray<Profile>(profiles.size).apply { profiles.forEach { put(it.id, it) } }
+        return JSONArray(profiles.map { it.toJson(lookup) }.toTypedArray())
+    }
+    fun serializeToJsonIgnoreVPN(profiles: List<Profile>? = getAllProfilesIgnoreGroup(VpnEncrypt.vpnGroupName)): JSONArray? {
         if (profiles == null) return null
         val lookup = LongSparseArray<Profile>(profiles.size).apply { profiles.forEach { put(it.id, it) } }
         return JSONArray(profiles.map { it.toJson(lookup) }.toTypedArray())
@@ -134,5 +162,25 @@ object ProfileManager {
     } catch (ex: SQLException) {
         printLog(ex)
         null
+    }
+
+    @Throws(IOException::class)
+    fun getAllProfilesIgnoreGroup(group: String): List<Profile>? = try {
+        PrivateDatabase.profileDao.listIgnoreGroup(group)
+    } catch (ex: SQLiteCantOpenDatabaseException) {
+        throw IOException(ex)
+    } catch (ex: SQLException) {
+        printLog(ex)
+        null
+    }
+
+    @Throws(IOException::class)
+    fun getAllProfilesByGroup(group: String): List<Profile> = try {
+        PrivateDatabase.profileDao.listByGroup(group)
+    } catch (ex: SQLiteCantOpenDatabaseException) {
+        throw IOException(ex)
+    } catch (ex: SQLException) {
+        printLog(ex)
+        emptyList()
     }
 }

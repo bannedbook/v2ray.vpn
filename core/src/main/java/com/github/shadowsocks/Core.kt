@@ -43,8 +43,10 @@ import com.github.shadowsocks.aidl.ShadowsocksConnection
 import com.github.shadowsocks.core.R
 import com.github.shadowsocks.database.Profile
 import com.github.shadowsocks.database.ProfileManager
+import com.github.shadowsocks.database.SSRSubManager
 import com.github.shadowsocks.net.TcpFastOpen
 import com.github.shadowsocks.preference.DataStore
+import com.github.shadowsocks.work.SSRSubSyncer
 import com.github.shadowsocks.utils.*
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -109,6 +111,16 @@ object Core {
             setExecutor { GlobalScope.launch { it.run() } }
             setTaskExecutor { GlobalScope.launch { it.run() } }
         }.build())
+        //UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
+         //Import built-in subscription
+        GlobalScope.launch {
+            var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
+            for (i in 0 until builtinSubUrls.size) {
+                var builtinSub=SSRSubManager.create(builtinSubUrls.get(i),"aes")
+                if (builtinSub != null) break
+            }
+        }
+        if (DataStore.ssrSubAutoUpdate) SSRSubSyncer.enqueue()
 
         // handle data restored/crash
         if (Build.VERSION.SDK_INT >= 24 && DataStore.directBootAware &&

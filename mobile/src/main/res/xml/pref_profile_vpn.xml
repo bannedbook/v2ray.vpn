@@ -3,44 +3,10 @@
                   xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <EditTextPreference
-        android:icon="@drawable/ic_baseline_group_work"
-        app:key="groupName"
-        app:title="@string/group_name"
-        app:useSimpleSummaryProvider="true" />
-
-    <EditTextPreference
             app:key="profileName"
             app:icon="@drawable/ic_social_emoji_symbols"
             app:title="@string/profile_name"
             app:useSimpleSummaryProvider="true"/>
-
-    <PreferenceCategory
-            app:title="@string/proxy_cat">
-
-        <EditTextPreference
-                app:key="proxy"
-                app:icon="@drawable/ic_hardware_router"
-                app:title="@string/proxy"
-                app:useSimpleSummaryProvider="true"/>
-        <EditTextPreference
-                app:key="remotePortNum"
-                app:icon="@drawable/ic_maps_directions_boat"
-                app:title="@string/remote_port"
-                app:useSimpleSummaryProvider="true"/>
-        <EditTextPreference
-                app:dialogLayout="@layout/preference_dialog_password"
-                app:key="sitekey"
-                app:icon="@drawable/ic_settings_password"
-                app:title="@string/sitekey"/>
-        <com.takisoft.preferencex.SimpleMenuPreference
-                app:key="encMethod"
-                app:icon="@drawable/ic_notification_enhanced_encryption"
-                app:entries="@array/enc_method_entry"
-                app:entryValues="@array/enc_method_value"
-                app:title="@string/enc_method"
-                app:useSimpleSummaryProvider="true"/>
-
-    </PreferenceCategory>
 
     <PreferenceCategory
             app:title="@string/feature_cat">

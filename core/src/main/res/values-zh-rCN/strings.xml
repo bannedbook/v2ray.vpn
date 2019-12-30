@@ -33,6 +33,7 @@
     <string name="connection_test_error_status_code">"状态码无效（#%d）"</string>
 
     <!-- proxy category -->
+    <string name="group_name">"群组名"</string>
     <string name="profile_name">"配置名称"</string>
     <string name="proxy">"服务器"</string>
     <string name="remote_port">"远程端口"</string>
@@ -76,7 +77,6 @@
     <string name="settings">"设置选项"</string>
     <string name="faq">"常见问题"</string>
     <string name="about">"关于"</string>
-    <string name="about_title">"影梭 (Shadowsocks) %s"</string>
     <string name="edit">"编辑"</string>
     <string name="share">"分享"</string>
     <string name="add_profile">"添加配置文件"</string>
@@ -93,7 +93,7 @@
     <string name="delete">"删除"</string>
     <string name="delete_confirm_prompt">"您确定要删除此配置文件？"</string>
     <string name="share_qr_nfc">"二维码"</string>
-    <string name="add_profile_dialog">"为影梭添加此配置文件？"</string>
+    <string name="add_profile_dialog">"添加此配置文件？"</string>
     <string name="add_profile_methods_scan_qr_code">"扫描二维码"</string>
     <plurals name="removed">
         <item quantity="other">"已删除 %d 项"</item>
@@ -181,4 +181,31 @@
     <plurals name="hosts_summary">
         <item quantity="other">"配置了 %d 个主机名"</item>
     </plurals>
+    <!-- ssrsub -->
+    <string name="ssrsub_manage">管理 SS 订阅</string>
+    <plurals name="ssrsub_manage_summary">
+        <item quantity="other">添加了 %d 个订阅</item>
+    </plurals>
+    <string name="ssrsub_autoupdate">自动更新 SS 订阅</string>
+    <string name="ssrsub_autoupdate_summary">每天检查订阅</string>
+    <string name="ssrsub_add">添加订阅地址</string>
+    <string name="ssrsub_list">订阅列表</string>
+    <string name="ssrsub_remove_tip_title">删除</string>
+    <string name="ssrsub_remove_tip">同时删除此订阅的节点？</string>
+    <string name="ssrsub_remove_tip_direct">仅删除订阅</string>
+    <string name="ssrsub_remove_tip_delete">与节点一起删除</string>
+    <string name="recommended_site_1"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'http://dongtaiwang.com/loc/mobile/\' style=\'color:#e4f2fd\'>动态网</a>
+    </body>
+    </html>
+  ]]></string>
+    <string name="recommended_site_2"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/?utm_source=speedup.vpn.cn\' style=\'color:#e4f2fd\'>看禁闻</a>
+    </body>
+    </html>
+  ]]></string>
 </resources>

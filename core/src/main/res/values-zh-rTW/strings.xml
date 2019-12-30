@@ -22,7 +22,6 @@
 -->
 
 <resources>
-    <string name="app_name">"影梭"</string>
     <string name="quick_toggle">"切換"</string>
     <string name="remote_dns">"遠程 DNS"</string>
     <string name="stat_summary">"傳送: \t%3$s\t↑\t%1$s/s
@@ -167,4 +166,18 @@
     <string name="service_transproxy">"透明代理服務"</string>
     <string name="vpn_permission_denied">"没有權限創建 VPN 服務"</string>
     <string name="auto_connect_summary_v24">"允許 Shadowsocks 隨系統啟動，建議使用始終開啟的 VPN"</string>
+    <string name="recommended_site_1"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/bnews/zh-tw/?utm_source=speedup.vpn.b5\' style=\'color:#e4f2fd\'>禁聞網</a>
+    </body>
+    </html>
+  ]]></string>
+    <string name="recommended_site_2"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.bannedbook.org/b5/?utm_source=speedup.vpn.b5\' style=\'color:#e4f2fd\'>禁書網</a>
+    </body>
+    </html>
+  ]]></string>
 </resources>
