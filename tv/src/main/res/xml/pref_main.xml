@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+                  app:title="@string/app_name">
+    <!-- profileId is stored in privateStore so its value needs to be populated manually -->
+    <ListPreference
+        app:key="profileId"
+        app:title="@string/connect"
+        app:persistent="false"
+        app:useSimpleSummaryProvider="true"/>
+    <Preference
+        app:key="control.stats"
+        app:title="@string/connection_test_pending"
+        app:summary="@string/stat_summary"/>
+    <Preference
+        app:key="control.import"
+        app:title="@string/action_replace_file"/>
+    <Preference
+        app:key="control.export"
+        app:title="@string/action_export_file"/>
+    <PreferenceCategory
+        app:key="settings"
+        app:title="@string/settings"
+        app:initialExpandedChildrenCount="3">
+        <SwitchPreference
+            app:key="isAutoConnect"
+            app:summary="@string/auto_connect_summary"
+            app:title="@string/auto_connect"/>
+        <SwitchPreference
+            app:key="tcp_fastopen"
+            app:summary="@string/tcp_fastopen_summary"
+            app:title="TCP Fast Open"/>
+        <EditTextPreference
+            app:key="hosts"
+            app:title="hosts"/>
+
+        <ListPreference
+            app:key="serviceMode"
+            app:entries="@array/service_modes"
+            app:entryValues="@array/service_mode_values"
+            app:defaultValue="vpn"
+            app:title="@string/service_mode"
+            app:useSimpleSummaryProvider="true"/>
+        <SwitchPreference
+            app:key="shareOverLan"
+            app:title="@string/share_over_lan"/>
+        <EditTextPreference
+            app:key="portProxy"
+            app:title="@string/port_proxy"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            app:key="portLocalDns"
+            app:title="@string/port_local_dns"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            app:key="portTransproxy"
+            app:title="@string/port_transproxy"
+            app:useSimpleSummaryProvider="true"/>
+    </PreferenceCategory>
+
+    <Preference
+        app:key="about"
+        app:title="@string/about"/>
+
+</PreferenceScreen>

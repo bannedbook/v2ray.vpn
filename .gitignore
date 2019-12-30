@@ -1,0 +1,13 @@
+# Gradle & Android Studio
+local.properties
+.gradle/
+.externalNativeBuild/
+build/
+captures/
+release/
+
+.idea/
+*.iml
+
+# release apks
+*.apk

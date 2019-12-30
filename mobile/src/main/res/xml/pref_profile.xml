@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+            app:key="profileName"
+            app:icon="@drawable/ic_social_emoji_symbols"
+            app:title="@string/profile_name"
+            app:useSimpleSummaryProvider="true"/>
+
+    <PreferenceCategory
+            app:title="@string/proxy_cat">
+
+        <EditTextPreference
+                app:key="proxy"
+                app:icon="@drawable/ic_hardware_router"
+                app:title="@string/proxy"
+                app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+                app:key="remotePortNum"
+                app:icon="@drawable/ic_maps_directions_boat"
+                app:title="@string/remote_port"
+                app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+                app:dialogLayout="@layout/preference_dialog_password"
+                app:key="sitekey"
+                app:icon="@drawable/ic_settings_password"
+                app:title="@string/sitekey"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+                app:key="encMethod"
+                app:icon="@drawable/ic_notification_enhanced_encryption"
+                app:entries="@array/enc_method_entry"
+                app:entryValues="@array/enc_method_value"
+                app:title="@string/enc_method"
+                app:useSimpleSummaryProvider="true"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            app:title="@string/feature_cat">
+
+        <com.takisoft.preferencex.SimpleMenuPreference
+                app:key="route"
+                app:icon="@drawable/ic_maps_directions"
+                app:entries="@array/route_entry"
+                app:entryValues="@array/route_value"
+                app:title="@string/route_list"
+                app:useSimpleSummaryProvider="true"/>
+        <SwitchPreference
+                app:key="isIpv6"
+                app:icon="@drawable/ic_image_looks_6"
+                app:summary="@string/ipv6_summary"
+                app:title="@string/ipv6"/>
+        <SwitchPreference
+                app:key="isProxyApps"
+                app:icon="@drawable/ic_navigation_apps"
+                app:summary="@string/proxied_apps_summary"
+                app:title="@string/proxied_apps"/>
+        <SwitchPreference
+                app:key="metered"
+                app:icon="@drawable/ic_device_data_usage"
+                app:summary="@string/metered_summary"
+                app:title="@string/metered"/>
+        <EditTextPreference
+                app:key="remoteDns"
+                app:icon="@drawable/ic_action_dns"
+                app:title="@string/remote_dns"
+                app:useSimpleSummaryProvider="true"/>
+        <SwitchPreference
+            app:key="isUdpDns"
+            app:icon="@drawable/ic_action_dns"
+            app:summary="@string/udp_dns_summary"
+            app:title="@string/udp_dns"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            app:title="@string/plugin">
+
+        <com.github.shadowsocks.preference.IconListPreference
+                app:key="plugin"
+                app:persistent="false"
+                app:title="@string/plugin"
+                app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+                app:key="plugin.configure"
+                app:icon="@drawable/ic_action_settings"
+                app:persistent="false"
+                app:title="@string/plugin_configure"
+                app:useSimpleSummaryProvider="true"/>
+        <Preference
+                app:key="udpFallback"
+                app:icon="@drawable/ic_maps_360"
+                app:title="@string/udp_fallback"
+                app:summary="@string/plugin_disabled">
+            <intent android:targetPackage="com.github.shadowsocks"
+                    android:targetClass="com.github.shadowsocks.UdpFallbackProfileActivity"/>
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
