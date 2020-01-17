@@ -69,7 +69,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
     companion object {
         private const val REQUEST_BROWSE = 1
     }
-
+/*
     inner class SSRSubViewHolder(view: View) : RecyclerView.ViewHolder(view),
             View.OnClickListener, View.OnLongClickListener {
         internal lateinit var item: SSRSub
@@ -143,6 +143,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
     }
 
     private val ssrsub by lazy { findPreference<Preference>(Key.ssrSub)!! }
+*/
     private val hosts by lazy { findPreference<EditTextPreference>(Key.hosts)!! }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -212,7 +213,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         listener((activity as MainActivity).state)
         MainActivity.stateListener = listener
         serviceMode.onPreferenceChangeListener = onServiceModeChange
-
+/*
         ssrsub.onPreferenceClickListener = Preference.OnPreferenceClickListener { ssrSubDialog(); true }
         val count = SSRSubManager.getAllSSRSub().count()
         ssrsub.summary = resources.getQuantityString(R.plurals.ssrsub_manage_summary, count, count)
@@ -220,6 +221,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             SSRSubSyncer.run { if (newValue as Boolean) enqueue() else cancel() }
             true
         }
+*/
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -233,7 +235,6 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             setTargetFragment(this@GlobalSettingsPreferenceFragment, REQUEST_BROWSE)
         }.show(parentFragmentManager, hosts.key) else super.onDisplayPreferenceDialog(preference)
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
@@ -255,7 +256,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         MainActivity.stateListener = null
         super.onDestroy()
     }
-
+/*
     private fun ssrSubDialog(waitUpdate: String = "") {
         val view = View.inflate(requireContext(), R.layout.layout_ssr_sub, null)
         val ssusubsList = view.findViewById<RecyclerView>(R.id.ssrsubList)
@@ -349,4 +350,6 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             }
         }
     }
+
+ */
 }

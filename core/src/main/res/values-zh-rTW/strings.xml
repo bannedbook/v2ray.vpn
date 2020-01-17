@@ -156,6 +156,7 @@
     <string name="advanced">"高級"</string>
 
     <!-- misc -->
+    <string name="update_servers">更新服務器</string>
     <string name="service_mode">"服務模式"</string>
     <string name="service_mode_proxy">"仅代理"</string>
     <string name="service_mode_transproxy">"透明代理"</string>

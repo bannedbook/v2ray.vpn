@@ -18,6 +18,7 @@ def getCurrentFlavor() {
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
+    archivesBaseName = "ssvpn"
     defaultConfig {
         applicationId "free.shadowsocks.proxy.VPN"
         minSdkVersion rootProject.minSdkVersion

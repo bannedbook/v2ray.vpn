@@ -32,6 +32,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.UserManager
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -86,6 +87,18 @@ object Core {
         DataStore.profileId = result.id
         return result
     }
+    
+    //Import built-in subscription
+    fun updateBuiltinServers(){
+        Log.e("updateBuiltinServers ","...")
+        GlobalScope.launch {
+            var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
+            for (i in 0 until builtinSubUrls.size) {
+                var builtinSub=SSRSubManager.create(builtinSubUrls.get(i),"aes")
+                if (builtinSub != null) break
+            }
+        }
+    }
 
     fun init(app: Application, configureClass: KClass<out Any>) {
         this.app = app
@@ -112,14 +125,6 @@ object Core {
             setTaskExecutor { GlobalScope.launch { it.run() } }
         }.build())
         //UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
-         //Import built-in subscription
-        GlobalScope.launch {
-            var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
-            for (i in 0 until builtinSubUrls.size) {
-                var builtinSub=SSRSubManager.create(builtinSubUrls.get(i),"aes")
-                if (builtinSub != null) break
-            }
-        }
         if (DataStore.ssrSubAutoUpdate) SSRSubSyncer.enqueue()
 
         // handle data restored/crash

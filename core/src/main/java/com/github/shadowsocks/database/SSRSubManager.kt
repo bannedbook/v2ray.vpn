@@ -125,8 +125,8 @@ object SSRSubManager {
             val new = SSRSub(url = url, url_group = profiles[0].url_group)
             getAllSSRSub().forEach {
                 if (it.url_group == new.url_group) {
-                    //update(it, response)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
-                    Log.println(Log.ERROR,"------","ssrsub existed, do nothing.")
+                    update(it, response)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    Log.println(Log.ERROR,"------","ssrsub existed, update.")
                     return it
                 }
             }

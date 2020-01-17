@@ -73,7 +73,7 @@
     <string name="connect">"连接"</string>
 
     <!-- menu category -->
-    <string name="profiles">"配置文件"</string>
+    <string name="profiles">"服务器"</string>
     <string name="settings">"设置选项"</string>
     <string name="faq">"常见问题"</string>
     <string name="about">"关于"</string>
@@ -186,6 +186,7 @@
     <plurals name="ssrsub_manage_summary">
         <item quantity="other">添加了 %d 个订阅</item>
     </plurals>
+    <string name="update_servers">更新服务器</string>
     <string name="ssrsub_autoupdate">自动更新 SS 订阅</string>
     <string name="ssrsub_autoupdate_summary">每天检查订阅</string>
     <string name="ssrsub_add">添加订阅地址</string>

@@ -182,6 +182,8 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         changeState(BaseService.State.Idle) // reset everything to init state
         connection.connect(this, this)
         DataStore.publicStore.registerChangeListener(this)
+        //updateBuiltinServers
+        Core.updateBuiltinServers()
     }
 
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {

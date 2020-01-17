@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/update_servers"
+        android:icon="@drawable/ic_baseline_autorenew"
+        android:title="@string/update_servers"
+        app:showAsAction="always"/>
+    <item
         android:alphabeticShortcut="n"
         android:icon="@drawable/ic_action_note_add"
         android:title="@string/add_profile"

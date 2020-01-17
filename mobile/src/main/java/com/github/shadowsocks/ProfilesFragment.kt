@@ -30,6 +30,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.Formatter
+import android.util.Log
 import android.util.LongSparseArray
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -57,6 +58,7 @@ import com.github.shadowsocks.utils.printLog
 import com.github.shadowsocks.utils.readableMessage
 import com.github.shadowsocks.widget.ListHolderListener
 import com.github.shadowsocks.widget.MainListListener
+import com.github.shadowsocks.widget.RecyclerViewNoBugLinearLayoutManager
 import com.github.shadowsocks.widget.UndoSnackbarManager
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -98,25 +100,34 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
     private var nativeAdView: UnifiedNativeAdView? = null
     private var adHost: ProfileViewHolder? = null
     private fun tryBindAd() = lifecycleScope.launchWhenStarted {
-        val fp = layoutManager.findFirstVisibleItemPosition()
-        if (fp < 0) return@launchWhenStarted
-        for (i in object : Iterator<Int> {
-            var first = fp
-            var last = layoutManager.findLastCompletelyVisibleItemPosition()
-            var flipper = false
-            override fun hasNext() = first <= last
-            override fun next(): Int {
-                flipper = !flipper
-                return if (flipper) first++ else last--
+        try {
+            val fp = layoutManager.findFirstVisibleItemPosition()
+            if (fp < 0) return@launchWhenStarted
+            for (i in object : Iterator<Int> {
+                var first = fp
+                var last = layoutManager.findLastCompletelyVisibleItemPosition()
+                var flipper = false
+                override fun hasNext() = first <= last
+                override fun next(): Int {
+                    flipper = !flipper
+                    return if (flipper) first++ else last--
+                }
+            }.asSequence().toList().reversed()) {
+                try {
+                    val viewHolder = profilesList.findViewHolderForAdapterPosition(i) as ProfileViewHolder
+                    if (viewHolder.item.isBuiltin()) {
+                        viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
+                        // might be in the middle of a layout after scrolling, need to wait
+                        withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
+                        break
+                    }
+                }catch (ex:Exception){
+                    Log.e("ssvpn",ex.message,ex)
+                    continue
+                }
             }
-        }.asSequence().toList().reversed()) {
-            val viewHolder = profilesList.findViewHolderForAdapterPosition(i) as ProfileViewHolder
-            if (viewHolder.item.isBuiltin()) {
-                viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
-                // might be in the middle of a layout after scrolling, need to wait
-                withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
-                break
-            }
+        }catch (e:Exception){
+            Log.e("ssvpn",e.message,e)
         }
     }
 
@@ -347,7 +358,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             undoManager.flush()
             val pos = itemCount
             profiles += profile
+            (activity as MainActivity).runOnUiThread({
             notifyItemInserted(pos)
+            })
         }
 
         fun move(from: Int, to: Int) {
@@ -401,7 +414,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             val index = profiles.indexOfFirst { it.id == profileId }
             if (index < 0) return
             profiles.removeAt(index)
+            (activity as MainActivity).runOnUiThread({
             notifyItemRemoved(index)
+            })
             if (profileId == DataStore.profileId) DataStore.profileId = 0   // switch to null profile
         }
 
@@ -415,7 +430,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
     val profilesAdapter by lazy { ProfilesAdapter() }
     private lateinit var profilesList: RecyclerView
-    private val layoutManager by lazy { LinearLayoutManager(context, RecyclerView.VERTICAL, false) }
+    private val layoutManager by lazy { RecyclerViewNoBugLinearLayoutManager(context, RecyclerView.VERTICAL, false) }
     private lateinit var undoManager: UndoSnackbarManager<Profile>
     private val statsCache = LongSparseArray<TrafficStats>()
 
@@ -435,7 +450,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         toolbar.setTitle(R.string.profiles)
         toolbar.inflateMenu(R.menu.profile_manager_menu)
         toolbar.setOnMenuItemClickListener(this)
-        ProfileManager.ensureNotEmpty()
+        //ProfileManager.ensureNotEmpty() // don't create 198.199.101.152 server
         profilesList = view.findViewById(R.id.list)
         profilesList.setOnApplyWindowInsetsListener(MainListListener)
         profilesList.layoutManager = layoutManager
@@ -475,6 +490,10 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.update_servers -> {
+                Core.updateBuiltinServers()
+                true
+            }
             R.id.action_scan_qr_code -> {
                 startActivity(Intent(context, ScannerActivity::class.java))
                 true

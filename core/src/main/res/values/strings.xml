@@ -159,6 +159,7 @@
   <plurals name="ssrsub_manage_summary">
     <item quantity="other">Number of subscriptions: %d</item>
   </plurals>
+  <string name="update_servers">Update Servers</string>
   <string name="ssrsub_autoupdate">Auto update SS subscriptions</string>
   <string name="ssrsub_autoupdate_summary">Auto update daily</string>
   <string name="ssrsub_add">Add URL</string>
@@ -171,6 +172,6 @@
   <string name="recommended_site_1"></string>
   <string name="recommended_site_2"></string>
   <string-array name="builtinSubUrls">
-    <item>https://raw.githubusercontent.com/bannedbook/fanqiang/master/gae/go.py</item>
+    <item>https://your-builtin-sub-url</item>
   </string-array>
 </resources>
