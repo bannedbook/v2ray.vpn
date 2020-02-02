@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 
 set(PROJECT_NAME shadowsocks-libev)
-set(RELEASE_DATE 2019-03-09)
-set(PROJECT_VERSION "3.2.5")
+set(RELEASE_DATE 2020-01-10)
+set(PROJECT_VERSION "3.3.4")
 set(PROJECT_DESC "a lightweight secured socks5 proxy")
 set(PROJECT_URL "https://shadowsocks.org")
 set(PROJECT_ISSUES_URL "https://github.com/shadowsocks/shadowsocks-libev")
@@ -18,6 +18,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 set(RUNTIME_SHARED_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/shared/bin)
 
 set(CMAKE_MACOSX_RPATH TRUE)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)

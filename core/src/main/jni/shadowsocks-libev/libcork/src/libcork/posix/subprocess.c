@@ -457,49 +457,6 @@ cork_subprocess_start(struct cork_subprocess *self)
     }
 }
 
-static int
-cork_subprocess_reap(struct cork_subprocess *self, int flags, bool *progress)
-{
-    int  pid;
-    int  status;
-    rii_check_posix(pid = waitpid(self->pid, &status, flags));
-    if (pid == self->pid) {
-        *progress = true;
-        self->pid = 0;
-        if (self->exit_code != NULL) {
-            *self->exit_code = WEXITSTATUS(status);
-        }
-    }
-    return 0;
-}
-
-int
-cork_subprocess_abort(struct cork_subprocess *self)
-{
-    if (self->pid > 0) {
-        CORK_ATTR_UNUSED bool  progress = false;
-        DEBUG("Terminating child process %d\n", (int) self->pid);
-        kill(self->pid, SIGTERM);
-        int exitcode = cork_subprocess_reap(self, WNOHANG, &progress);
-        if (progress) {
-            return exitcode;
-        } else {
-            kill(self->pid, SIGKILL);
-            return 0;
-        }
-    } else {
-        return 0;
-    }
-}
-
-bool
-cork_subprocess_is_finished(struct cork_subprocess *self)
-{
-    return (self->pid == 0)
-        && cork_read_pipe_is_finished(&self->stdout_pipe)
-        && cork_read_pipe_is_finished(&self->stderr_pipe);
-}
-
 #if defined(__APPLE__)
 #include <pthread.h>
 #define THREAD_YIELD   pthread_yield_np
@@ -538,6 +495,55 @@ cork_subprocess_yield(unsigned int *spin_count)
     }
 
     (*spin_count)++;
+}
+
+
+static int
+cork_subprocess_reap(struct cork_subprocess *self, int flags, bool *progress)
+{
+    int  pid;
+    int  status;
+    rii_check_posix(pid = waitpid(self->pid, &status, flags));
+    if (pid == self->pid) {
+        *progress = true;
+        self->pid = 0;
+        if (self->exit_code != NULL) {
+            *self->exit_code = WEXITSTATUS(status);
+        }
+    }
+    return 0;
+}
+
+int
+cork_subprocess_abort(struct cork_subprocess *self)
+{
+    if (self->pid > 0) {
+        CORK_ATTR_UNUSED bool  progress = false;
+        DEBUG("Terminating child process %d\n", (int) self->pid);
+        kill(self->pid, SIGTERM);
+        unsigned int  spin_count = 0;
+        int exitcode = cork_subprocess_reap(self, WNOHANG, &progress);
+        while (!progress && spin_count < 50) {
+            cork_subprocess_yield(&spin_count);
+            exitcode = cork_subprocess_reap(self, WNOHANG, &progress);
+        }
+        if (progress) {
+            return exitcode;
+        } else {
+            kill(self->pid, SIGKILL);
+            return 0;
+        }
+    } else {
+        return 0;
+    }
+}
+
+bool
+cork_subprocess_is_finished(struct cork_subprocess *self)
+{
+    return (self->pid == 0)
+        && cork_read_pipe_is_finished(&self->stdout_pipe)
+        && cork_read_pipe_is_finished(&self->stderr_pipe);
 }
 
 static int

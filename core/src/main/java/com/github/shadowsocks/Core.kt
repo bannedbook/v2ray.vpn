@@ -20,10 +20,7 @@
 
 package com.github.shadowsocks
 
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
@@ -34,6 +31,7 @@ import android.os.Build
 import android.os.UserManager
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.work.Configuration
@@ -48,6 +46,7 @@ import com.github.shadowsocks.database.SSRSubManager
 import com.github.shadowsocks.net.TcpFastOpen
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.work.SSRSubSyncer
+import com.github.shadowsocks.subscription.SubscriptionService
 import com.github.shadowsocks.utils.*
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -64,8 +63,11 @@ object Core {
     const val TAG = "Core"
 
     lateinit var app: Application
+        @VisibleForTesting set
     lateinit var configureIntent: (Context) -> PendingIntent
+    val activity by lazy { app.getSystemService<ActivityManager>()!! }
     val connectivity by lazy { app.getSystemService<ConnectivityManager>()!! }
+    val notification by lazy { app.getSystemService<NotificationManager>()!! }
     val packageInfo: PackageInfo by lazy { getPackageInfo(app.packageName) }
     val deviceStorage by lazy { if (Build.VERSION.SDK_INT < 24) app else DeviceStorageApp(app) }
     val analytics: FirebaseAnalytics by lazy { FirebaseAnalytics.getInstance(deviceStorage) }
@@ -125,7 +127,6 @@ object Core {
             setTaskExecutor { GlobalScope.launch { it.run() } }
         }.build())
         //UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
-        if (DataStore.ssrSubAutoUpdate) SSRSubSyncer.enqueue()
 
         // handle data restored/crash
         if (Build.VERSION.SDK_INT >= 24 && DataStore.directBootAware &&
@@ -147,16 +148,16 @@ object Core {
 
     fun updateNotificationChannels() {
         if (Build.VERSION.SDK_INT >= 26) @RequiresApi(26) {
-            val nm = app.getSystemService<NotificationManager>()!!
-            nm.createNotificationChannels(listOf(
+            notification.createNotificationChannels(listOf(
                     NotificationChannel("service-vpn", app.getText(R.string.service_vpn),
                             if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
                             else NotificationManager.IMPORTANCE_LOW),   // #1355
                     NotificationChannel("service-proxy", app.getText(R.string.service_proxy),
                             NotificationManager.IMPORTANCE_LOW),
                     NotificationChannel("service-transproxy", app.getText(R.string.service_transproxy),
-                            NotificationManager.IMPORTANCE_LOW)))
-            nm.deleteNotificationChannel("service-nat") // NAT mode is gone for good
+                            NotificationManager.IMPORTANCE_LOW),
+                    SubscriptionService.notificationChannel))
+            notification.deleteNotificationChannel("service-nat")   // NAT mode is gone for good
         }
     }
 

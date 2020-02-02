@@ -3,16 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.vanniktech.maven.publish'
 
-@SuppressWarnings("GroovyUnusedDeclaration")
-def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
-}
-
-@SuppressWarnings("GroovyUnusedDeclaration")
-def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
-}
-
 android {
     compileSdkVersion rootProject.compileSdkVersion
 
@@ -44,12 +34,13 @@ androidExtensions {
 }
 
 mavenPublish {
+
     targets {
         uploadArchives {
             releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             snapshotRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            repositoryUsername = getRepositoryUsername()
-            repositoryPassword = getRepositoryPassword()
+            repositoryUsername = findProperty('NEXUS_USERNAME') ?: ''
+            repositoryPassword = findProperty('NEXUS_PASSWORD') ?: ''
         }
     }
 }
@@ -57,7 +48,7 @@ mavenPublish {
 dependencies {
     api 'androidx.core:core-ktx:1.1.0'
     api 'androidx.drawerlayout:drawerlayout:1.1.0-alpha03'  // https://android-developers.googleblog.com/2019/07/android-q-beta-5-update.html
-    api 'com.google.android.material:material:1.1.0-beta02'
+    api 'com.google.android.material:material:1.1.0-rc02'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test:runner:$androidTestVersion"

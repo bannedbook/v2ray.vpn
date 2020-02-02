@@ -36,7 +36,7 @@
 #ifdef __ANDROID__
 
 #include <misc/socks_proto.h>
-#define CONNECTION_UDP_BUFFER_SIZE 1
+#define CONNECTION_UDP_BUFFER_SIZE 8
 
 #else
 
@@ -53,9 +53,10 @@ static void udpgw_handler_received (SocksUdpGwClient *o, BAddr local_addr, BAddr
 static void dgram_handler (SocksUdpGwClient_connection *o, int event);
 static void dgram_handler_received (SocksUdpGwClient_connection *o, uint8_t *data, int data_len);
 static int conaddr_comparator (void *unused, SocksUdpGwClient_conaddr *v1, SocksUdpGwClient_conaddr *v2);
-static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr);
-static SocksUdpGwClient_connection * reuse_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns);
-static void connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len);
+static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns);
+static void remove_lru_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns);
+static void reset_connection (SocksUdpGwClient *o, SocksUdpGwClient_connection *con, SocksUdpGwClient_conaddr conaddr, int is_dns);
+static int connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len);
 static void connection_first_job_handler (SocksUdpGwClient_connection *con);
 static SocksUdpGwClient_connection *connection_init (SocksUdpGwClient *client, SocksUdpGwClient_conaddr conaddr, const uint8_t *data, int data_len, int is_dns);
 static void connection_free (SocksUdpGwClient_connection *o);
@@ -154,57 +155,47 @@ static int conaddr_comparator (void *unused, SocksUdpGwClient_conaddr *v1, Socks
     return BAddr_CompareOrder(&v1->local_addr, &v2->local_addr);
 }
 
-static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr)
+static SocksUdpGwClient_connection * find_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns)
 {
     BAVLNode *tree_node = BAVL_LookupExact(&o->connections_tree, &conaddr);
     if (!tree_node) {
         return NULL;
     }
 
-    return UPPER_OBJECT(tree_node, SocksUdpGwClient_connection, connections_tree_node);
+    SocksUdpGwClient_connection *con = UPPER_OBJECT(tree_node, SocksUdpGwClient_connection, connections_tree_node);
+    if (!con && con->is_dns != is_dns) {
+        return NULL;
+    }
+
+    return con;
 }
 
-static SocksUdpGwClient_connection * reuse_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns)
+static void remove_lru_connection (SocksUdpGwClient *o, SocksUdpGwClient_conaddr conaddr, int is_dns)
 {
-    ASSERT(!find_connection(o, conaddr))
+    ASSERT(!find_connection(o, conaddr, is_dns))
     ASSERT(o->num_connections > 0)
 
     // get least recently used connection
     SocksUdpGwClient_connection *con = UPPER_OBJECT(LinkedList1_GetFirst(&o->connections_list), SocksUdpGwClient_connection, connections_list_node);
 
-    // remove from connections tree by conaddr
-    BAVL_Remove(&o->connections_tree, &con->connections_tree_node);
+    // free connection
+    connection_free(con);
+}
 
+static void reset_connection (SocksUdpGwClient *o, SocksUdpGwClient_connection *con, SocksUdpGwClient_conaddr conaddr, int is_dns)
+{
     // set new conaddr
     con->conaddr = conaddr;
     con->is_dns = is_dns;
-
-    // set UDP dgram send address
-    BIPAddr ipaddr;
-    memset(&ipaddr, 0, sizeof(ipaddr));
-
-    // reset remote addr
-    if (con->is_dns) {
-        ipaddr.type = o->dnsgw.type;
-        BDatagram_SetSendAddrs(&con->udp_dgram, o->dnsgw, ipaddr);
-    } else {
-        ipaddr.type = o->socks_server_addr.type;
-        BDatagram_SetSendAddrs(&con->udp_dgram, o->socks_server_addr, ipaddr);
-    }
-
-    // insert to connections tree by conaddr
-    ASSERT_EXECUTE(BAVL_Insert(&o->connections_tree, &con->connections_tree_node, NULL))
-
-    return con;
 }
 
-static void connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len)
+static int connection_send (SocksUdpGwClient_connection *o, const uint8_t *data, int data_len)
 {
     // get buffer location
     uint8_t *out;
     if (!BufferWriter_StartPacket(&o->udp_send_writer, &out)) {
         BLog(BLOG_ERROR, "out of UDP buffer");
-        return;
+        return 1;
     }
     int out_pos = 0;
 
@@ -248,6 +239,8 @@ static void connection_send (SocksUdpGwClient_connection *o, const uint8_t *data
 
     // submit written message
     BufferWriter_EndPacket(&o->udp_send_writer, out_pos);
+
+    return 0;
 }
 
 static void connection_first_job_handler (SocksUdpGwClient_connection *con)
@@ -351,6 +344,8 @@ fail:
 
 static void connection_free (SocksUdpGwClient_connection *o)
 {
+    ASSERT(o)
+
     SocksUdpGwClient *client = o->client;
 
     // decrement number of connections
@@ -611,26 +606,38 @@ void SocksUdpGwClient_SubmitPacket (SocksUdpGwClient *o, BAddr local_addr, BAddr
     conaddr.remote_addr = remote_addr;
 
     // lookup connection
-    SocksUdpGwClient_connection *con = find_connection(o, conaddr);
+    SocksUdpGwClient_connection *con = find_connection(o, conaddr, is_dns);
 
     // if no connection and can't create a new one, reuse the least recently used une
     if (!con && o->num_connections == o->max_connections) {
-        con = reuse_connection(o, conaddr, is_dns);
+        remove_lru_connection(o, conaddr, is_dns);
     }
 
     if (!con) {
         // create new connection
         con = connection_init(o, conaddr, data, data_len, is_dns);
-    } else {
-        // reset remote addr
-        con->conaddr.remote_addr = remote_addr;
 
-        // move connection to front of the list
-        LinkedList1_Remove(&o->connections_list, &con->connections_list_node);
-        LinkedList1_Append(&o->connections_list, &con->connections_list_node);
+    } else {
+        // reset the connection
+        reset_connection(o, con, conaddr, is_dns);
 
         // send packet to existing connection
-        connection_send(con, data, data_len);
+        int res = connection_send(con, data, data_len);
+        if (res == 1) {
+            BLog(BLOG_ERROR, "The current UDP connection is broken, recreating a new one");
+
+            // free broken connection
+            connection_free(con);
+
+            // create new connection
+            con = connection_init(o, conaddr, data, data_len, is_dns);
+        } else {
+            // remove connection from list
+            LinkedList1_Remove(&o->connections_list, &con->connections_list_node);
+
+            // move connection to front of the list
+            LinkedList1_Append(&o->connections_list, &con->connections_list_node);
+        }
     }
 #else
     // submit to udpgw client

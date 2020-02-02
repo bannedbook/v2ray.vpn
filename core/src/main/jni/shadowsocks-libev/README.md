@@ -1,6 +1,6 @@
 # shadowsocks-libev
 
-[![Travis CI](https://travis-ci.org/shadowsocks/shadowsocks-libev.svg?branch=master)](https://travis-ci.org/shadowsocks/shadowsocks-libev) [![Snap Status](https://build.snapcraft.io/badge/shadowsocks/shadowsocks-libev.svg)](https://build.snapcraft.io/user/shadowsocks/shadowsocks-libev)
+[![Build Status](https://travis-ci.com/shadowsocks/shadowsocks-libev.svg?branch=master)](https://travis-ci.com/shadowsocks/shadowsocks-libev) [![Snap Status](https://build.snapcraft.io/badge/shadowsocks/shadowsocks-libev.svg)](https://build.snapcraft.io/user/shadowsocks/shadowsocks-libev)
 
 ## Intro
 
@@ -11,7 +11,7 @@ It is a port of [Shadowsocks](https://github.com/shadowsocks/shadowsocks)
 created by [@clowwindy](https://github.com/clowwindy), and maintained by
 [@madeye](https://github.com/madeye) and [@linusyang](https://github.com/linusyang).
 
-Current version: 3.2.5 | [Changelog](debian/changelog)
+Current version: 3.3.4 | [Changelog](debian/changelog)
 
 ## Features
 
@@ -21,21 +21,27 @@ to be a lightweight implementation of shadowsocks protocol, in order to keep the
 For a full list of feature comparison between different versions of shadowsocks,
 refer to the [Wiki page](https://github.com/shadowsocks/shadowsocks/wiki/Feature-Comparison-across-Different-Versions).
 
-## Prerequisites
+## Quick Start
 
-### Get the latest source code
+Snap is the recommended way to install the latest binaries.
 
-To get the latest source code, you should also update the submodules as following:
+### Install snap core
+
+https://snapcraft.io/core
+
+### Install from snapcraft.io
+
+Stable channel:
 
 ```bash
-git clone https://github.com/shadowsocks/shadowsocks-libev.git
-cd shadowsocks-libev
-git submodule update --init --recursive
+sudo snap install shadowsocks-libev
 ```
 
-### Build and install with recent libsodium
+Edge channel:
 
-You have to install libsodium at least 1.0.8, but recommended 1.0.12 or later version before building. See [Directly build and install on UNIX-like system](#linux).
+```bash
+sudo snap install shadowsocks-libev --edge
+```
 
 ## Installation
 
@@ -48,11 +54,15 @@ You have to install libsodium at least 1.0.8, but recommended 1.0.12 or later ve
 - [Fedora & RHEL](#fedora--rhel)
     + [Build from source with centos](#build-from-source-with-centos)
     + [Install from repository](#install-from-repository-1)
-- [Archlinux](#archlinux)
+- [Archlinux & Manjaro](#archlinux--manjaro)
 - [NixOS](#nixos)
 - [Nix](#nix)
 - [Directly build and install on UNIX-like system](#linux)
 - [FreeBSD](#freebsd)
+    + [Install](#install)
+    + [Configuration](#configuration)
+    + [Run](#run)
+    + [Run as client](#run-as-client)
 - [OpenWRT](#openwrt)
 - [OS X](#os-x)
 - [Windows (MinGW)](#windows-mingw)
@@ -71,23 +81,12 @@ try `configure --help`.
 
 Shadowsocks-libev is available in the official repository for following distributions:
 
-* Debian 8 or higher, including oldstable (jessie), stable (stretch), testing (buster) and unstable (sid)
+* Debian 8 or higher, including oldoldstable (jessie), old stable (stretch), stable (buster), testing (bullseye) and unstable (sid)
 * Ubuntu 16.10 or higher
 
 ```bash
 sudo apt update
 sudo apt install shadowsocks-libev
-```
-
-For **Debian 8 (Jessie)** users, please install it from `jessie-backports-sloppy`:
-We strongly encourage you to install shadowsocks-libev from `jessie-backports-sloppy`.
-For more info about backports, you can refer [Debian Backports](https://backports.debian.org).
-
-```bash
-sudo sh -c 'printf "deb http://deb.debian.org/debian jessie-backports main\n" > /etc/apt/sources.list.d/jessie-backports.list'
-sudo sh -c 'printf "deb http://deb.debian.org/debian jessie-backports-sloppy main" >> /etc/apt/sources.list.d/jessie-backports.list'
-sudo apt update
-sudo apt -t jessie-backports-sloppy install shadowsocks-libev
 ```
 
 For **Debian 9 (Stretch)** users, please install it from `stretch-backports`:
@@ -98,15 +97,6 @@ For more info about backports, you can refer [Debian Backports](https://backport
 sudo sh -c 'printf "deb http://deb.debian.org/debian stretch-backports main" > /etc/apt/sources.list.d/stretch-backports.list'
 sudo apt update
 sudo apt -t stretch-backports install shadowsocks-libev
-```
-
-For **Ubuntu 14.04 and 16.04** users, please install from PPA:
-
-```bash
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository ppa:max-c-lv/shadowsocks-libev -y
-sudo apt-get update
-sudo apt install shadowsocks-libev
 ```
 
 #### Build deb package from source
@@ -216,7 +206,7 @@ su -c 'yum install shadowsocks-libev'
 ```
 The repository is maintained by [@librehat](https://github.com/librehat), any issues, please report [here](https://github.com/librehat/shadowsocks-libev/issues)
 
-### Archlinux
+### Archlinux & Manjaro
 
 ```bash
 sudo pacman -S shadowsocks-libev
@@ -297,26 +287,48 @@ sudo make install
 You may need to manually install missing softwares.
 
 ### FreeBSD
+#### Install
+Shadowsocks-libev is available in FreeBSD Ports Collection. You can install it in either way, `pkg` or `ports`.
+
+**pkg (recommended)**
 
 ```bash
-su
+pkg install shadowsocks-libev
+```
+
+**ports**
+
+```bash
 cd /usr/ports/net/shadowsocks-libev
 make install
 ```
 
-Edit your config.json file. By default, it's located in /usr/local/etc/shadowsocks-libev.
+#### Configuration
+Edit your `config.json` file. By default, it's located in `/usr/local/etc/shadowsocks-libev`.
 
-To enable shadowsocks-libev, add the following rc variable to your /etc/rc.conf file:
+To enable shadowsocks-libev, add the following rc variable to your `/etc/rc.conf` file:
 
 ```
 shadowsocks_libev_enable="YES"
 ```
+
+#### Run
 
 Start the Shadowsocks server:
 
 ```bash
 service shadowsocks_libev start
 ```
+
+#### Run as client
+By default, shadowsocks-libev is running as a server in FreeBSD. If you would like to start shadowsocks-libev in client mode, you can modify the rc script (`/usr/local/etc/rc.d/shadowsocks_libev`) manually.
+
+```
+# modify the following line from "ss-server" to "ss-local"
+command="/usr/local/bin/ss-local"
+```
+
+Note that is simply a workaround, each time you upgrade the port your changes will be overwritten by the new version.
 
 ### OpenWRT
 

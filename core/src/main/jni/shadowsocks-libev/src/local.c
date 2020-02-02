@@ -89,7 +89,7 @@ uint64_t rx    = 0;
 ev_tstamp last = 0;
 
 int is_remote_dns = 1; // resolve hostname remotely
-char *stat_path = NULL;
+char *stat_path   = NULL;
 #endif
 
 static crypto_t *crypto;
@@ -97,7 +97,7 @@ static crypto_t *crypto;
 static int acl       = 0;
 static int mode      = TCP_ONLY;
 static int ipv6first = 0;
-       int fast_open = 0;
+int fast_open        = 0;
 static int no_delay  = 0;
 static int udp_fd    = 0;
 static int ret_val   = 0;
@@ -353,7 +353,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
         }
         return server_handshake_reply(EV_A_ w, 1, &response);
     } else if (request->cmd != SOCKS5_CMD_CONNECT) {
-        LOGE("unsupported cmd: %d", request->cmd);
+        LOGE("unsupported command: %d", request->cmd);
         response.rep = SOCKS5_REP_CMD_NOT_SUPPORTED;
         char *send_buf = (char *)&response;
         send(server->fd, send_buf, 4, 0);
@@ -362,7 +362,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
         return -1;
     }
 
-    char host[MAX_HOSTNAME_LEN+1], ip[INET6_ADDRSTRLEN], port[16];
+    char host[MAX_HOSTNAME_LEN + 1], ip[INET6_ADDRSTRLEN], port[16];
 
     buffer_t *abuf = server->abuf;
     abuf->idx = 0;
@@ -381,7 +381,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
         abuf->len += in_addr_len + 2;
 
         if (acl || verbose) {
-            uint16_t p = ntohs(*(uint16_t *)(buf->data + request_len + in_addr_len));
+            uint16_t p = load16_be(buf->data + request_len + in_addr_len);
             if (!inet_ntop(AF_INET, (const void *)(buf->data + request_len),
                            ip, INET_ADDRSTRLEN)) {
                 LOGI("inet_ntop(AF_INET): %s", strerror(errno));
@@ -399,8 +399,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
         abuf->len += name_len + 2;
 
         if (acl || verbose) {
-            uint16_t p =
-                ntohs(*(uint16_t *)(buf->data + request_len + 1 + name_len));
+            uint16_t p = load16_be(buf->data + request_len + 1 + name_len);
             memcpy(host, buf->data + request_len + 1, name_len);
             host[name_len] = '\0';
             sprintf(port, "%d", p);
@@ -414,7 +413,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
         abuf->len += in6_addr_len + 2;
 
         if (acl || verbose) {
-            uint16_t p = ntohs(*(uint16_t *)(buf->data + request_len + in6_addr_len));
+            uint16_t p = load16_be(buf->data + request_len + in6_addr_len);
             if (!inet_ntop(AF_INET6, (const void *)(buf->data + request_len),
                            ip, INET6_ADDRSTRLEN)) {
                 LOGI("inet_ntop(AF_INET6): %s", strerror(errno));
@@ -437,15 +436,15 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
     int hostname_len = 0;
 
     char *hostname;
-    uint16_t dst_port = ntohs(*(uint16_t *)(abuf->data + abuf->len - 2));
+    uint16_t dst_port = load16_be(abuf->data + abuf->len - 2);
 
     if (atyp == SOCKS5_ATYP_IPV4 || atyp == SOCKS5_ATYP_IPV6) {
         if (dst_port == http_protocol->default_port)
             hostname_len = http_protocol->parse_packet(buf->data + 3 + abuf->len,
-                                              buf->len - 3 - abuf->len, &hostname);
+                                                       buf->len - 3 - abuf->len, &hostname);
         else if (dst_port == tls_protocol->default_port)
             hostname_len = tls_protocol->parse_packet(buf->data + 3 + abuf->len,
-                                             buf->len - 3 - abuf->len, &hostname);
+                                                      buf->len - 3 - abuf->len, &hostname);
         if (hostname_len == -1 && buf->len < SOCKET_BUF_SIZE && server->stage != STAGE_SNI) {
             if (server_handshake_reply(EV_A_ w, 0, &response) < 0)
                 return -1;
@@ -530,7 +529,7 @@ server_handshake(EV_P_ ev_io *w, buffer_t *buf)
             }
 
             int ip_match = (resolved || atyp == SOCKS5_ATYP_IPV4
-                    || atyp == SOCKS5_ATYP_IPV6) ? acl_match_host(ip) : 0;
+                            || atyp == SOCKS5_ATYP_IPV6) ? acl_match_host(ip) : 0;
 
             switch (get_acl_mode()) {
             case BLACK_LIST:
@@ -876,6 +875,13 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
             // all processed
             return;
         } else if (server->stage == STAGE_INIT) {
+            if (verbose) {
+                struct sockaddr_in peer_addr;
+                socklen_t peer_addr_len = sizeof peer_addr;
+                if (getpeername(server->fd, (struct sockaddr *)&peer_addr, &peer_addr_len) == 0) {
+                    LOGI("connection from %s:%hu", inet_ntoa(peer_addr.sin_addr), ntohs(peer_addr.sin_port));
+                }
+            }
             if (buf->len < 1)
                 return;
             if (buf->data[0] != SVERSION) {
@@ -1359,6 +1365,11 @@ create_remote(listen_ctx_t *listener,
     memcpy(&(remote->addr), remote_addr, remote->addr_len);
     remote->direct = direct;
 
+    if (verbose) {
+        struct sockaddr_in *sockaddr = (struct sockaddr_in *)&remote->addr;
+        LOGI("remote: %s:%hu", inet_ntoa(sockaddr->sin_addr), ntohs(sockaddr->sin_port));
+    }
+
     return remote;
 }
 
@@ -1480,7 +1491,7 @@ main(int argc, char **argv)
         { "password",    required_argument, NULL, GETOPT_VAL_PASSWORD    },
         { "key",         required_argument, NULL, GETOPT_VAL_KEY         },
         { "help",        no_argument,       NULL, GETOPT_VAL_HELP        },
-        { NULL,                          0, NULL,                      0 }
+        { NULL,          0,                 NULL, 0                      }
     };
 
     opterr = 0;
@@ -1685,12 +1696,22 @@ main(int argc, char **argv)
         }
     }
 
-    if (remote_num == 0 || remote_port == NULL ||
+    if (remote_num == 0) {
+        fprintf(stderr, "remote_num is 0\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!remote_port) {
+        fprintf(stderr, "remote_port is NULL\n");
+        exit(EXIT_FAILURE);
+    }
 #ifndef HAVE_LAUNCHD
-        local_port == NULL ||
+    if (!local_port) {
+        fprintf(stderr, "local_port is NULL\n");
+        exit(EXIT_FAILURE);
+    }
 #endif
-        (password == NULL && key == NULL)) {
-        usage();
+    if (!password && !key) {
+        fprintf(stderr, "both password and key are NULL\n");
         exit(EXIT_FAILURE);
     }
 

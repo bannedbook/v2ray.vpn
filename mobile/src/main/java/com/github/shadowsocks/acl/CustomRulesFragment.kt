@@ -72,8 +72,9 @@ class CustomRulesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, 
         private const val SELECTED_HOSTNAMES = "com.github.shadowsocks.acl.CustomRulesFragment.SELECTED_HOSTNAMES"
         private const val SELECTED_URLS = "com.github.shadowsocks.acl.CustomRulesFragment.SELECTED_URLS"
 
-        // unescaped: (?<=^(\(\^\|\\\.\)|\^\(\.\*\\\.\)\?)).*(?=\$$)
-        private val domainPattern = "(?<=^(\\(\\^\\|\\\\\\.\\)|\\^\\(\\.\\*\\\\\\.\\)\\?)).*(?=\\\$\$)".toRegex()
+        // unescaped lol: (?<=^(?:\(\^\|\\\.\)|\^\(\.\*\\\.\)\?|\(\?:\^\|\\\.\))).*(?=\$$)
+        private val domainPattern =
+                "(?<=^(?:\\(\\^\\|\\\\\\.\\)|\\^\\(\\.\\*\\\\\\.\\)\\?|\\(\\?:\\^\\|\\\\\\.\\))).*(?=\\\$\$)".toRegex()
 
         @Suppress("FunctionName")
         private fun AclItem(item: Any) = when (item) {
@@ -179,7 +180,7 @@ class CustomRulesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, 
                     when (Template.values()[templateSelector.selectedItemPosition]) {
                         Template.Generic -> AclItem(text)
                         Template.Domain -> AclItem(IDN.toASCII(text, IDN.ALLOW_UNASSIGNED or IDN.USE_STD3_ASCII_RULES)
-                                .replace(".", "\\.").let { "(^|\\.)$it\$" })
+                                .replace(".", "\\.").let { "(?:^|\\.)$it\$" })
                         Template.Url -> AclItem(text, true)
                     }
                 }, arg)
@@ -381,7 +382,7 @@ class CustomRulesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, 
         view.setOnApplyWindowInsetsListener(ListHolderListener)
         if (savedInstanceState != null) {
             selectedItems.addAll(savedInstanceState.getStringArray(SELECTED_SUBNETS)
-                    ?.mapNotNull(Subnet.Companion::fromString) ?: listOf())
+                    ?.mapNotNull { Subnet.fromString(it) } ?: listOf())
             selectedItems.addAll(savedInstanceState.getStringArray(SELECTED_HOSTNAMES)
                     ?: arrayOf())
             selectedItems.addAll(savedInstanceState.getStringArray(SELECTED_URLS)?.map { URL(it) }
@@ -399,7 +400,7 @@ class CustomRulesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, 
         list.adapter = adapter
         FastScrollerBuilder(list).useMd2Style().build()
         undoManager = UndoSnackbarManager(activity, adapter::undo)
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START or ItemTouchHelper.END) {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START) {
             override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int =
                     if (isEnabled && selectedItems.isEmpty()) super.getSwipeDirs(recyclerView, viewHolder) else 0
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) =

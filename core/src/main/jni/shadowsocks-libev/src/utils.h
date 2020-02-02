@@ -24,6 +24,7 @@
 #define _UTILS_H
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -231,23 +232,23 @@ void *ss_aligned_malloc(size_t size);
 void *ss_realloc(void *ptr, size_t new_size);
 
 #define ss_free(ptr) \
-{ \
-    free(ptr); \
-    ptr = NULL; \
-}
+    { \
+        free(ptr); \
+        ptr = NULL; \
+    }
 
 #ifdef __MINGW32__
 #define ss_aligned_free(ptr) \
-{ \
-    _aligned_free(ptr); \
-    ptr = NULL; \
-}
+    { \
+        _aligned_free(ptr); \
+        ptr = NULL; \
+    }
 #else
 #define ss_aligned_free(ptr) ss_free(ptr)
 #endif
 
 int ss_is_ipv6addr(const char *addr);
-
 char *get_default_conf(void);
+uint16_t load16_be(const void *s);
 
 #endif // _UTILS_H

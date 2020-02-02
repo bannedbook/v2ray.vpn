@@ -32,6 +32,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenCreated
 import androidx.preference.*
 import com.github.shadowsocks.database.Profile
 import com.github.shadowsocks.database.ProfileManager
@@ -124,6 +125,18 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         initPlugins()
         udpFallback = findPreference(Key.udpFallback)!!
         DataStore.privateStore.registerChangeListener(this)
+
+        val profile = ProfileManager.getProfile(profileId) ?: Profile()
+        if (profile.subscription == Profile.SubscriptionStatus.Active) {
+            findPreference<Preference>(Key.name)!!.isEnabled = false
+            findPreference<Preference>(Key.host)!!.isEnabled = false
+            findPreference<Preference>(Key.password)!!.isEnabled = false
+            findPreference<Preference>(Key.method)!!.isEnabled = false
+            findPreference<Preference>(Key.remotePort)!!.isEnabled = false
+            plugin.isEnabled = false
+            pluginConfigure.isEnabled = false
+            udpFallback.isEnabled = false
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -148,7 +161,7 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         PluginConfigurationDialogFragment().apply {
             setArg(Key.pluginConfigure, pluginConfiguration.selected)
             setTargetFragment(this@ProfileConfigFragment, 0)
-        }.show(parentFragmentManager, Key.pluginConfigure)
+        }.showAllowingStateLoss(parentFragmentManager, Key.pluginConfigure)
     }
 
     private fun saveAndExit() {
@@ -165,7 +178,7 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         super.onAttach(context)
         receiver = context.listenForPackageChanges(false) {
             lifecycleScope.launch(Dispatchers.Main) {   // wait until changes were flushed
-                lifecycleScope.launchWhenCreated { initPlugins() }
+                whenCreated { initPlugins() }
             }
         }
     }
@@ -199,7 +212,7 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
             Key.plugin -> BottomSheetPreferenceDialogFragment().apply {
                 setArg(Key.plugin)
                 setTargetFragment(this@ProfileConfigFragment, 0)
-            }.show(parentFragmentManager, Key.plugin)
+            }.showAllowingStateLoss(parentFragmentManager, Key.plugin)
             Key.pluginConfigure -> {
                 val intent = PluginManager.buildIntent(pluginConfiguration.selected, PluginContract.ACTION_CONFIGURE)
                 if (intent.resolveActivity(requireContext().packageManager) == null) showPluginEditor() else {

@@ -181,20 +181,16 @@
     <plurals name="hosts_summary">
         <item quantity="other">"配置了 %d 个主机名"</item>
     </plurals>
-    <!-- ssrsub -->
-    <string name="ssrsub_manage">管理 SS 订阅</string>
-    <plurals name="ssrsub_manage_summary">
-        <item quantity="other">添加了 %d 个订阅</item>
-    </plurals>
+
+    <!-- subscriptions -->
+    <string name="subscriptions">"订阅"</string>
+    <string name="add_subscription">"添加订阅"</string>
+    <string name="edit_subscription">"编辑订阅"</string>
+    <string name="update_subscription">"更新订阅"</string>
+    <string name="service_subscription">"订阅服务"</string>
+    <string name="service_subscription_working">"正在更新订阅 (%d / %d)"</string>
+    <string name="service_subscription_finishing">"订阅更新中"</string>
     <string name="update_servers">更新服务器</string>
-    <string name="ssrsub_autoupdate">自动更新 SS 订阅</string>
-    <string name="ssrsub_autoupdate_summary">每天检查订阅</string>
-    <string name="ssrsub_add">添加订阅地址</string>
-    <string name="ssrsub_list">订阅列表</string>
-    <string name="ssrsub_remove_tip_title">删除</string>
-    <string name="ssrsub_remove_tip">同时删除此订阅的节点？</string>
-    <string name="ssrsub_remove_tip_direct">仅删除订阅</string>
-    <string name="ssrsub_remove_tip_delete">与节点一起删除</string>
     <string name="recommended_site_1"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
@@ -205,7 +201,7 @@
     <string name="recommended_site_2"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
-      <a href=\'https://www.bannedbook.org/?utm_source=speedup.vpn.cn\' style=\'color:#e4f2fd\'>看禁闻</a>
+      <a href=\'https://www.bannedbook.org/?utm_source=ss.vpn.cn\' style=\'color:#e4f2fd\'>看禁闻</a>
     </body>
     </html>
   ]]></string>
