@@ -48,6 +48,7 @@ import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.work.SSRSubSyncer
 import com.github.shadowsocks.subscription.SubscriptionService
 import com.github.shadowsocks.utils.*
+import com.github.shadowsocks.work.UpdateCheck
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.fabric.sdk.android.Fabric
@@ -126,7 +127,7 @@ object Core {
             setExecutor { GlobalScope.launch { it.run() } }
             setTaskExecutor { GlobalScope.launch { it.run() } }
         }.build())
-        //UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
+        UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
 
         // handle data restored/crash
         if (Build.VERSION.SDK_INT >= 24 && DataStore.directBootAware &&

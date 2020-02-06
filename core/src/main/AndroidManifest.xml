@@ -33,7 +33,7 @@
         <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
                    android:value="true" />
         <meta-data android:name="com.google.android.backup.api_key"
-                   android:value="AEdPqrEAAAAI_zVxZthz2HDuz9toTvkYvL0L5GA-OjeUIfBeXg"/>
+                   android:value="AEdPqrEAAAAIENnFBzugt9171NjZ_etNgRcwZ93KmEl3HN8tXQ"/>
 
         <service
             android:name="com.github.shadowsocks.bg.VpnService"

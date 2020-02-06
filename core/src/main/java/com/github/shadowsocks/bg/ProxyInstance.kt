@@ -52,36 +52,6 @@ class ProxyInstance(val profile: Profile, private val route: String = profile.ro
     private var scheduleConfigUpdate = false
 
     suspend fun init(service: BaseService.Interface, hosts: HostsFile) {
-        if (profile.isSponsored) {
-            scheduleConfigUpdate = true
-            val mdg = MessageDigest.getInstance("SHA-1")
-            mdg.update(Core.packageInfo.signaturesCompat.first().toByteArray())
-            val (config, success) = RemoteConfig.fetch()
-            scheduleConfigUpdate = !success
-            val conn = withContext(Dispatchers.IO) {
-                // Network.openConnection might use networking, see https://issuetracker.google.com/issues/135242093
-                service.openConnection(URL(config.getString("proxy_url"))) as HttpURLConnection
-            }
-            conn.requestMethod = "POST"
-            conn.doOutput = true
-
-            val proxies = conn.useCancellable {
-                try {
-                    outputStream.bufferedWriter().use {
-                        it.write("sig=" + Base64.encodeToString(mdg.digest(), Base64.DEFAULT))
-                    }
-                    inputStream.bufferedReader().readText()
-                } catch (e: IOException) {
-                    throw BaseService.ExpectedExceptionWrapper(e)
-                }
-            }.split('|').toMutableList()
-            proxies.shuffle()
-            val proxy = proxies.first().split(':')
-            profile.host = proxy[0].trim()
-            profile.remotePort = proxy[1].trim().toInt()
-            profile.password = proxy[2].trim()
-            profile.method = proxy[3].trim()
-        }
 
         // it's hard to resolve DNS on a specific interface so we'll do it here
         if (profile.host.parseNumericAddress() == null) {

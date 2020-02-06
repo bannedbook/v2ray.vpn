@@ -60,8 +60,8 @@ data class Profile(
         var password: String = "u1rRWTssNv0p",
         var method: String = "aes-256-cfb",
 
-        var route: String = "all",
-        var remoteDns: String = "dns.google",
+        var route: String = "bypass-lan-china",
+        var remoteDns: String = "1.1.1.1",
         var proxyApps: Boolean = false,
         var bypass: Boolean = false,
         var udpdns: Boolean = false,
