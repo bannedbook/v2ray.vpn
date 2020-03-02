@@ -2,6 +2,11 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
                   app:initialExpandedChildrenCount="4">
     <SwitchPreference
+        app:key="isAutoUpdateServers"
+        app:icon="@drawable/ic_baseline_autorenew"
+        app:summary="@string/auto_update_servers_summary"
+        app:title="@string/auto_update_servers"/>
+    <SwitchPreference
         app:key="isAutoConnect"
         app:icon="@drawable/ic_communication_phonelink_ring"
         app:summary="@string/auto_connect_summary"

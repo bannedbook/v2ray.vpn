@@ -162,11 +162,30 @@
   <string name="plugin_unknown">Unknown plugin %s</string>
   <string name="plugin_untrusted">Warning: This plugin does not seem to come from a known trusted source.</string>
   <string name="profile_plugin">Plugin: %s</string>
-
+  <string name="plugin_auto_connect_unlock_only">This plugin might not work with Auto Connect</string>
+  
   <string name="update_servers">Update Servers</string>
-  <string name="recommended_site_1"></string>
-  <string name="recommended_site_2"></string>
+  <string name = "auto_update_servers">Automatic Update Servers</string>
+  <string name = "auto_update_servers_summary">Automatically update VPN servers when App launch</string>
+  <string name="recommended_site_1">"<![CDATA[
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head profile='http://gmpg.org/xfn/11'>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+</head>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://www.theepochtimes.com/?utm_source=ss.vpn\' style=\'color:#e4f2fd\'>News</a>
+    </body>
+    </html>
+  ]]>"</string>
+  <string name="recommended_site_2"><![CDATA[
+    <html>
+    <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
+      <a href=\'https://github.com/killgcd/justmysocks/blob/master/en.md#head\' style=\'color:#e4f2fd\'>Ad:SS Servers</a>
+    </body>
+    </html>
+  ]]></string>
   <string-array name="builtinSubUrls">
     <item>https://your-builtin-sub-url</item>
   </string-array>
+  <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/ssvpn/master/update.json</string>
 </resources>

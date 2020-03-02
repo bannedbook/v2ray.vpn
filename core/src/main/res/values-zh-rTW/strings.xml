@@ -203,7 +203,8 @@
     <string name="service_subscription">"訂閱服務"</string>
     <string name="service_subscription_working">"正在更新訂閱 (%d / %d)"</string>
     <string name="service_subscription_finishing">"訂閱更新中"</string>
-
+    <string name="auto_update_servers">"自動更新服務器"</string>
+    <string name="auto_update_servers_summary">"應用啟動後自動更新VPN服務器"</string>
     <string name="recommended_site_1"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
@@ -218,4 +219,5 @@
     </body>
     </html>
   ]]></string>
+    <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/ssvpn/master/update-zh.json</string>
 </resources>

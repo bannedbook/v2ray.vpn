@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         connection.connect(this, this)
         DataStore.publicStore.registerChangeListener(this)
         //updateBuiltinServers
-        Core.updateBuiltinServers()
+        if(DataStore.isAutoUpdateServers)Core.updateBuiltinServers()
     }
 
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {

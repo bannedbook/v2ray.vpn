@@ -102,8 +102,9 @@
             android:textColor="?android:attr/textColorSecondary"
             tools:text="@string/traffic"/>
     </RelativeLayout>
-
+<!-- android:background="#cccccc" Adding dividing line for ads -->
     <LinearLayout
+        android:background="#cccccc"
         android:id="@+id/ad_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

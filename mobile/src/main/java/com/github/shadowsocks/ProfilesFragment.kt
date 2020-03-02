@@ -254,7 +254,8 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             // This method tells the Google Mobile Ads SDK that you have finished populating your
             // native ad view with this native ad.
             adView.setNativeAd(nativeAd)
-            adContainer.setPadding(0,5,0,0)
+            adView.setBackgroundColor(Color.WHITE) //Adding dividing line for ads
+            adContainer.setPadding(0,1,0,0)  //Adding dividing line for ads
             adContainer.addView(adView)
             adHost = this
         }

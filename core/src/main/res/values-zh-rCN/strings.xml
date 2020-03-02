@@ -191,13 +191,18 @@
     <string name="service_subscription_working">"正在更新订阅 (%d / %d)"</string>
     <string name="service_subscription_finishing">"订阅更新中"</string>
     <string name="update_servers">更新服务器</string>
-    <string name="recommended_site_1"><![CDATA[
-    <html>
+    <string name="auto_update_servers">"自动更新服务器"</string>
+    <string name="auto_update_servers_summary">"应用启动后自动更新VPN服务器"</string>
+    <string name="recommended_site_1">"<![CDATA[
+<html xmlns='http://www.w3.org/1999/xhtml' dir='ltr' lang='zh-CN'>
+<head profile='http://gmpg.org/xfn/11'>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+</head>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
       <a href=\'http://dongtaiwang.com/loc/mobile/\' style=\'color:#e4f2fd\'>动态网</a>
     </body>
     </html>
-  ]]></string>
+  ]]>"</string>
     <string name="recommended_site_2"><![CDATA[
     <html>
     <body style=\'margin:0;padding:0;font-size:14px;text-align:right\'>
@@ -205,4 +210,5 @@
     </body>
     </html>
   ]]></string>
+    <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/ssvpn/master/update-zh.json</string>
 </resources>

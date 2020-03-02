@@ -53,6 +53,12 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.publicStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.pref_global)
+
+        findPreference<SwitchPreference>(Key.isAutoUpdateServers)!!.setOnPreferenceChangeListener { _, value ->
+            DataStore.publicStore.putBoolean(Key.isAutoUpdateServers,  value as Boolean)
+            true
+        }
+
         findPreference<SwitchPreference>(Key.persistAcrossReboot)!!.setOnPreferenceChangeListener { _, value ->
             BootReceiver.enabled = value as Boolean
             true
