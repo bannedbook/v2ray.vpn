@@ -11,3 +11,5 @@ release/
 
 # release apks
 *.apk
+*.bak
+gitupdate.bat
