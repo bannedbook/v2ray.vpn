@@ -8,6 +8,7 @@ Compatible with Shadowsocks, based on shadowsocks-android, only added free built
 ### Feedback
 <a target="_blank" href="https://github.com/bannedbook/ssvpn/issues">Issues</a>、<a target="_blank" href="https://t.me/fqchat">Telegram Group</a>
 
+更多翻墙信息，请访问[bannedbook翻墙主页](https://github.com/bannedbook/fanqiang/wiki)。
 
 ### PREREQUISITES
 
