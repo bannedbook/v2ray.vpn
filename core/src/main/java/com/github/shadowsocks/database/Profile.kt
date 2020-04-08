@@ -77,6 +77,7 @@ data class Profile(
         var subscription: SubscriptionStatus = SubscriptionStatus.UserConfigured,
         var tx: Long = 0,
         var rx: Long = 0,
+        var elapsed: Long = 0,
         var userOrder: Long = 0,
 
         @Ignore // not persisted in db, only used by direct boot
@@ -358,6 +359,10 @@ data class Profile(
 
         @Query("SELECT * FROM `Profile`")
         fun listAll(): List<Profile>
+
+        @Query("SELECT * FROM `Profile` ORDER BY `url_group`,`elapsed`")
+        fun listAllbySpeed(): List<Profile>
+
         @Query("SELECT * FROM `Profile` WHERE `url_group` = :group")
         fun listByGroup(group: String): List<Profile>
 

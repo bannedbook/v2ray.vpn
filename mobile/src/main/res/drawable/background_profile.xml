@@ -10,7 +10,7 @@
                   android:exitFadeDuration="@android:integer/config_mediumAnimTime">
             <item android:state_selected="true">
                 <shape android:shape="rectangle">
-                    <solid android:color="@color/material_green_700" />
+                    <solid android:color="@color/material_green_800" />
                 </shape>
             </item>
         </selector>

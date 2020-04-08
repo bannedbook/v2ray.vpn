@@ -58,7 +58,11 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             DataStore.publicStore.putBoolean(Key.isAutoUpdateServers,  value as Boolean)
             true
         }
-
+        findPreference<SwitchPreference>(Key.is_get_free_servers)!!.setOnPreferenceChangeListener { _, value ->
+            DataStore.publicStore.putBoolean(Key.is_get_free_servers,  value as Boolean)
+            if(value)Core.importFreeSubs()
+            true
+        }
         findPreference<SwitchPreference>(Key.persistAcrossReboot)!!.setOnPreferenceChangeListener { _, value ->
             BootReceiver.enabled = value as Boolean
             true
@@ -90,12 +94,16 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         hosts.setOnBindEditTextListener(EditTextPreferenceModifiers.Monospace)
         hosts.summaryProvider = HostsSummaryProvider
         val serviceMode = findPreference<Preference>(Key.serviceMode)!!
+        val shareOverLan = findPreference<SwitchPreference>(Key.shareOverLan)!!
         val portProxy = findPreference<EditTextPreference>(Key.portProxy)!!
         portProxy.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         val portLocalDns = findPreference<EditTextPreference>(Key.portLocalDns)!!
         portLocalDns.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         val portTransproxy = findPreference<EditTextPreference>(Key.portTransproxy)!!
         portTransproxy.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+        val portHttpProxy = findPreference<EditTextPreference>(Key.portHttpProxy)!!
+        portHttpProxy.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+        portHttpProxy.isEnabled=false
         val onServiceModeChange = Preference.OnPreferenceChangeListener { _, newValue ->
             val (enabledLocalDns, enabledTransproxy) = when (newValue as String?) {
                 Key.modeProxy -> Pair(false, false)
@@ -112,6 +120,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             val stopped = it == BaseService.State.Stopped
             tfo.isEnabled = stopped
             serviceMode.isEnabled = stopped
+            shareOverLan.isEnabled = stopped
             portProxy.isEnabled = stopped
             if (stopped) onServiceModeChange.onPreferenceChange(null, DataStore.serviceMode) else {
                 hosts.isEnabled = false

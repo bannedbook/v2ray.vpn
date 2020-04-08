@@ -19,7 +19,7 @@
  *******************************************************************************/
 
 package com.github.shadowsocks.preference
-
+import SpeedUpVPN.VpnEncrypt
 import android.os.Binder
 import androidx.preference.PreferenceDataStore
 import com.github.shadowsocks.BootReceiver
@@ -66,6 +66,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     val directBootAware: Boolean get() = Core.directBootSupported && canToggleLocked
     val tcpFastOpen: Boolean get() = TcpFastOpen.sendEnabled && publicStore.getBoolean(Key.tfo, false)
     val isAutoUpdateServers: Boolean get() = publicStore.getBoolean(Key.isAutoUpdateServers, true)
+    val is_get_free_servers: Boolean get() = publicStore.getBoolean(Key.is_get_free_servers, false)
     val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
     var portProxy: Int
@@ -78,6 +79,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var portTransproxy: Int
         get() = getLocalPort(Key.portTransproxy, 8200)
         set(value) = publicStore.putString(Key.portTransproxy, value.toString())
+    var portHttpProxy: Int
+        get() = getLocalPort(Key.portHttpProxy, VpnEncrypt.HTTP_PROXY_PORT)
+        set(value) = publicStore.putString(Key.portHttpProxy, value.toString())
 
     /**
      * Initialize settings that have complicated default values.
@@ -86,9 +90,11 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         persistAcrossReboot
         if (publicStore.getBoolean(Key.tfo) == null) publicStore.putBoolean(Key.tfo, tcpFastOpen)
         if (publicStore.getBoolean(Key.isAutoUpdateServers) == null) publicStore.putBoolean(Key.isAutoUpdateServers, isAutoUpdateServers)
+        if (publicStore.getBoolean(Key.is_get_free_servers) == null) publicStore.putBoolean(Key.is_get_free_servers, is_get_free_servers)
         if (publicStore.getString(Key.portProxy) == null) portProxy = portProxy
         if (publicStore.getString(Key.portLocalDns) == null) portLocalDns = portLocalDns
         if (publicStore.getString(Key.portTransproxy) == null) portTransproxy = portTransproxy
+        if (publicStore.getString(Key.portHttpProxy) == null) portHttpProxy = portHttpProxy
     }
 
     var editingId: Long?

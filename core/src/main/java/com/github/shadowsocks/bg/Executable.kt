@@ -33,8 +33,9 @@ object Executable {
     const val REDSOCKS = "libredsocks.so"
     const val SS_LOCAL = "libss-local.so"
     const val TUN2SOCKS = "libtun2socks.so"
+    const val POLIPO = "libpolipo.so"
 
-    private val EXECUTABLES = setOf(SS_LOCAL, REDSOCKS, TUN2SOCKS)
+    private val EXECUTABLES = setOf(SS_LOCAL, REDSOCKS, TUN2SOCKS,POLIPO)
 
     fun killAll() {
         for (process in File("/proc").listFiles { _, name -> TextUtils.isDigitsOnly(name) } ?: return) {

@@ -14,6 +14,7 @@
   <string name="port_proxy">SOCKS5 proxy port</string>
   <string name="port_local_dns">Local DNS port</string>
   <string name="port_transproxy">Transproxy port</string>
+  <string name="port_http">HTTP proxy port</string>
 
   <string name="remote_dns">Remote DNS</string>
   <string name="traffic">%1$s↑\t%2$s↓</string>
@@ -167,6 +168,15 @@
   <string name="update_servers">Update Servers</string>
   <string name = "auto_update_servers">Automatic Update Servers</string>
   <string name = "auto_update_servers_summary">Automatically update VPN servers when App launch</string>
+  <string name = "get_free_servers">Enable 3rd-party servers</string>
+  <string name = "get_free_servers_summary">Crawl 3rd-party free servers from internet, security unknown.</string>
+  <string name="title_ping_all_server">Tcping all servers</string>
+  <string name="title_real_ping_all_server">Real test all servers</string>
+  <string name="title_retest_invalid_servers">Re-test invalid servers</string>
+  <string name="title_remove_invalid_servers">Remove invalid servers</string>
+  <string name="title_sort_servers_by_speed">Sort servers by speed</string>
+  <string name="toast_test_ended">The test ended successfully</string>
+  <string name="toast_test_interrupted">Server:%s or the previous one caused the test to be interrupted, please check them. And please make sure that the simple-obfs plugin is installed.</string>
   <string name="recommended_site_1">"<![CDATA[
 <html xmlns='http://www.w3.org/1999/xhtml'>
 <head profile='http://gmpg.org/xfn/11'>
@@ -184,8 +194,21 @@
     </body>
     </html>
   ]]></string>
+  <string name="recommended_news">"<![CDATA[
+<html xmlns='http://www.w3.org/1999/xhtml' dir='ltr' lang='zh-CN'>
+<head profile='http://gmpg.org/xfn/11'>
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+</head>
+    <body style=\'margin:0 auto;padding:5px 0;font-size:14px;text-align:center\'>
+      <a href=\'https://play.google.com/store/apps/details?id=com.theepochtimes.news\' style=\'color:#e4f2fd\'>The Epoch Times: Live & Breaking News</a>
+    </body>
+    </html>
+  ]]>"</string>
   <string-array name="builtinSubUrls">
     <item>https://your-builtin-sub-url</item>
+  </string-array>
+  <string-array name="freesuburl">
+    <item>https://your-free-sub-url</item>
   </string-array>
   <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/ssvpn/master/update.json</string>
 </resources>

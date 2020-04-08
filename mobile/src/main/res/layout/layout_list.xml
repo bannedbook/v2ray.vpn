@@ -6,6 +6,11 @@
               android:orientation="vertical"
               android:fitsSystemWindows="true">
     <include layout="@layout/toolbar_light_dark"/>
+    <WebView
+        android:layout_above="@id/list"
+        android:id="@+id/recommended_news2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/list"
                                             tools:listitem="@layout/layout_profile"
                                             android:layout_width="match_parent"

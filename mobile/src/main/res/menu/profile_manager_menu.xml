@@ -35,12 +35,26 @@
                 app:alphabeticModifiers="CTRL|SHIFT"/>
         </menu>
     </item>
-    <item
-        android:alphabeticShortcut="s"
-        android:icon="@drawable/ic_file_file_upload"
-        android:title="@string/action_export_more"
-        app:showAsAction="always">
-        <menu>
+            <item
+                android:id="@+id/ping_all"
+                android:title="@string/title_ping_all_server"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/real_ping_all"
+                android:title="@string/title_real_ping_all_server"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/retest_invalid_servers"
+                android:title="@string/title_retest_invalid_servers"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/remove_invalid_servers"
+                android:title="@string/title_remove_invalid_servers"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/sort_servers_by_speed"
+                android:title="@string/title_sort_servers_by_speed"
+                app:showAsAction="never"/>
             <item
                 android:id="@+id/action_export_clipboard"
                 android:alphabeticShortcut="c"
@@ -50,6 +64,4 @@
                 android:title="@string/action_export_file"
                 android:alphabeticShortcut="s"
                 app:alphabeticModifiers="CTRL|SHIFT"/>
-        </menu>
-    </item>
 </menu>

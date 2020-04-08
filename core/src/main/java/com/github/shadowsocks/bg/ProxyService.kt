@@ -22,7 +22,10 @@ package com.github.shadowsocks.bg
 
 import android.app.Service
 import android.content.Intent
-
+import android.util.Log
+import com.github.shadowsocks.preference.DataStore
+import org.bannedbook.app.service.NativeCall
+import java.io.*
 /**
  * Shadowsocks service at its minimum.
  */
@@ -38,5 +41,55 @@ class ProxyService : Service(), BaseService.Interface {
     override fun onDestroy() {
         super.onDestroy()
         data.binder.close()
+        //关闭app时so资源不会自动释放，app再启动会出错，所以需要执行下面这句
+        android.os.Process.killProcess(android.os.Process.myPid())
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        System.loadLibrary("polipo")   //defaultConfig.ndk.moduleName
+        Log.e("ProxyService", "onCreate...")
+        val rootDataDir = filesDir
+        val toPath = rootDataDir.toString()
+
+        var confFilename = "config.conf"
+        if (DataStore.listenAddress=="0.0.0.0")confFilename = "configLanShare.conf"
+
+        var configFile = "$toPath/$confFilename"
+        Log.e("configFile is: ", configFile)
+
+        val file = File(configFile)
+        if (!file.exists()) copyAssets(confFilename, toPath)
+
+        Thread(Runnable { NativeCall.execPolipo(configFile) }).start()
+    }
+
+    private fun copyAssets(configFile: String, toPath: String) {
+        val assetManager = assets
+        Log.e("---", "Copy file:  $configFile")
+        var `in`: InputStream? = null
+        var out: OutputStream? = null
+        try {
+            `in` = assetManager.open(configFile)
+            val outFile = File(toPath, configFile)
+            out = FileOutputStream(outFile)
+            copyFile(`in`, out)
+            `in`.close()
+            `in` = null
+            out.flush()
+            out.close()
+            out = null
+        } catch (e: IOException) {
+            Log.e("tag", "Failed to copy asset file: $configFile", e)
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun copyFile(`in`: InputStream, out: OutputStream) {
+        val buffer = ByteArray(1024)
+        var read: Int
+        while (`in`.read(buffer).also { read = it } != -1) {
+            out.write(buffer, 0, read)
+        }
     }
 }

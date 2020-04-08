@@ -7,7 +7,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_above="@id/adDividerLine"
         android:id="@+id/snackbar"
         android:clipChildren="false"
         android:layout_width="match_parent"
@@ -19,7 +23,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"/>
-
+            <!--<WebView
+                android:layout_above="@id/fab"
+                android:id="@+id/recommended_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />-->
         <com.github.shadowsocks.widget.ServiceButton
             android:id="@+id/fab"
             android:layout_width="wrap_content"
@@ -92,7 +100,7 @@
                     android:text="@string/recommended_site_2"
                     android:id="@+id/rxRate"
                     android:layout_width="0dp"
-                    android:layout_height="15dp"
+                    android:layout_height="30dp"
                     android:singleLine="true"
                     android:gravity="end"
                     android:layout_gravity="fill_horizontal"
@@ -120,7 +128,22 @@
         </com.github.shadowsocks.widget.StatsBar>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+	<View android:id="@+id/adDividerLine"
+	    android:layout_above="@id/adView"
+	    android:layout_width="match_parent"
+	    android:layout_height="5dp"
+	    android:background="@color/material_green_800"/>
+	<com.google.android.gms.ads.AdView
+	    android:id="@+id/adView"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:layout_centerHorizontal="true"
+	    android:layout_gravity="bottom"
+	    android:background="@android:color/transparent"
+	    app:adSize="SMART_BANNER"
+	    app:adUnitId="ca-app-pub-2194043486084479/4292721507" />
+    </RelativeLayout>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"

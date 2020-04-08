@@ -19,10 +19,11 @@
  *******************************************************************************/
 
 package com.github.shadowsocks
-
+import SpeedUpVPN.VpnEncrypt
 import android.app.*
 import android.app.admin.DevicePolicyManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -30,6 +31,8 @@ import android.net.ConnectivityManager
 import android.os.Build
 import android.os.UserManager
 import android.util.Log
+import android.view.Gravity
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
@@ -59,7 +62,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import kotlin.reflect.KClass
-
+import com.github.shadowsocks.bg.ProxyService
 object Core {
     const val TAG = "Core"
 
@@ -101,6 +104,24 @@ object Core {
                 if (builtinSub != null) break
             }
         }
+    }
+    /**
+     * import free sub
+     */
+    fun importFreeSubs(): Boolean {
+        try {
+            GlobalScope.launch {
+                var  freesuburl  = app.resources.getStringArray(R.array.freesuburl)
+                for (i in freesuburl.indices) {
+                    var freeSub=SSRSubManager.createSSSub(freesuburl[i])
+                    if (freeSub != null) break
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
+        return true
     }
 
     fun init(app: Application, configureClass: KClass<out Any>) {
@@ -169,4 +190,21 @@ object Core {
     fun startService() = ContextCompat.startForegroundService(app, Intent(app, ShadowsocksConnection.serviceClass))
     fun reloadService() = app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
     fun stopService() = app.sendBroadcast(Intent(Action.CLOSE).setPackage(app.packageName))
+    fun startServiceForTest() = app.startService(Intent(app, ProxyService::class.java).putExtra("test","go"))
+    fun showMessage(msg: String) {
+        var toast = Toast.makeText(app, msg, Toast.LENGTH_LONG)
+        toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 150)
+        toast.show()
+    }
+
+    fun alertMessage(msg: String,activity:Context) {
+        val builder: AlertDialog.Builder? = activity.let {
+            AlertDialog.Builder(activity)
+        }
+        builder?.setMessage(msg)?.setTitle("SS VPN")?.setPositiveButton("ok", DialogInterface.OnClickListener {
+            _, _ ->
+        })
+        val dialog: AlertDialog? = builder?.create()
+        dialog?.show()
+    }
 }
