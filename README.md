@@ -32,7 +32,7 @@ You can check whether the latest commit builds under UNIX environment by checkin
 </ul>
 
 ### LICENSE
-Copyright (C) [bannedbook](https://github.com/bannedbook/fanqiang/wiki)
+Copyright (C) [bannedbook fanqiang](https://github.com/bannedbook/fanqiang/wiki)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
