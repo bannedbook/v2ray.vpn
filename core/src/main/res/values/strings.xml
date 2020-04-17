@@ -94,7 +94,7 @@
   <string name="faq">FAQ</string>
   <string name="faq_url">https://github.com/bannedbook/ssvpn/blob/master/.github/faq.md</string>
   <string name="about">About</string>
-  <string name="about_title">Shadowsocks VPN %s</string>
+  <string name="about_title">SS VPN %s</string>
   <string name="edit">Edit</string>
   <string name="share">Share</string>
   <string name="add_profile">Add Profile</string>
@@ -176,7 +176,7 @@
   <string name="title_remove_invalid_servers">Remove invalid servers</string>
   <string name="title_sort_servers_by_speed">Sort servers by speed</string>
   <string name="toast_test_ended">The test ended successfully</string>
-  <string name="toast_test_interrupted">Server:%s or the previous one caused the test to be interrupted, please check them. And please make sure that the simple-obfs plugin is installed.</string>
+  <string name="toast_test_interrupted">Server: %s or the previous one caused the test to be interrupted, please check them. And please make sure that the simple-obfs plugin is installed.</string>
   <string name="recommended_site_1">"<![CDATA[
 <html xmlns='http://www.w3.org/1999/xhtml'>
 <head profile='http://gmpg.org/xfn/11'>

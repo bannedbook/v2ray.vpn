@@ -28,7 +28,9 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.format.Formatter
 import android.util.Log
 import android.util.LongSparseArray
@@ -36,6 +38,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
@@ -56,7 +60,10 @@ import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.plugin.PluginConfiguration
 import com.github.shadowsocks.plugin.showAllowingStateLoss
 import com.github.shadowsocks.preference.DataStore
-import com.github.shadowsocks.utils.*
+import com.github.shadowsocks.utils.Action
+import com.github.shadowsocks.utils.datas
+import com.github.shadowsocks.utils.printLog
+import com.github.shadowsocks.utils.readableMessage
 import com.github.shadowsocks.widget.ListHolderListener
 import com.github.shadowsocks.widget.MainListListener
 import com.github.shadowsocks.widget.RecyclerViewNoBugLinearLayoutManager
@@ -72,16 +79,12 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.nio.charset.StandardCharsets
-import android.os.Build
-import android.os.SystemClock
-import android.webkit.WebView
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.*
-
+import java.nio.charset.StandardCharsets
 
 class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
     companion object {
@@ -324,8 +327,6 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 if (id.isNotEmpty()) this += getString(R.string.profile_plugin, id)
             }.joinToString("\n")
             val context = requireContext()
-            //traffic.text = if (tx <= 0 && rx <= 0) null else getString(R.string.traffic,
-                    //Formatter.formatFileSize(context, tx), Formatter.formatFileSize(context, rx))
             traffic.text =ArrayList<String>().apply {
                 if (item.elapsed > 0L ) this += String.format("%dms", item.elapsed)
                 if (item.elapsed == -1L ) this += "failed"
@@ -385,12 +386,28 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
         override fun onViewAttachedToWindow(holder: ProfileViewHolder) = holder.attach()
         override fun onViewDetachedFromWindow(holder: ProfileViewHolder) = holder.detach()
-        override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) = holder.bind(profiles[position])
+        override fun onBindViewHolder(holder: ProfileViewHolder, position: Int) {
+            try {
+                holder.bind(profiles[position])
+            }
+            catch (e:Exception){
+                Log.e("speedup.vpn","",e)
+            }
+
+        }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfileViewHolder = ProfileViewHolder(
                 LayoutInflater.from(parent.context).inflate(R.layout.layout_profile, parent, false))
 
         override fun getItemCount(): Int = profiles.size
-        override fun getItemId(position: Int): Long = profiles[position].id
+        override fun getItemId(position: Int): Long {
+            try {
+                return profiles[position].id
+            }
+            catch (e:Exception){
+                Log.e("speedup.vpn","",e)
+                return 0
+            }
+        }
 
         override fun onAdd(profile: Profile) {
             undoManager.flush()
@@ -505,6 +522,13 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         var recommendedNewsView: WebView = view.findViewById(R.id.recommended_news2)
         //recommendedNewsView.settings.javaScriptEnabled = true
         recommendedNewsView.setBackgroundColor(Color.BLACK);
+        recommendedNewsView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                if(url.isNullOrEmpty() || url.isBlank()) return false
+                (activity as MainActivity).launchUrl(url)
+                return true
+            }
+        }
         recommendedNewsView.loadDataWithBaseURL(null,recnews,"text/html; charset=utf-8",  "UTF-8",null)
 
         profilesList = view.findViewById(R.id.list)
@@ -703,7 +727,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                         while (tcping("127.0.0.1", DataStore.portProxy) < 0 || tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) < 0) {
                             Log.e("starting", "$k try $ttt ...")
                             if (ttt == 5) {
-                                activity?.runOnUiThread() {Core.alertMessage(getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
+                                activity?.runOnUiThread() {Core.alertMessage(activity.getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
                                 Log.e("realTestProfiles","Server: "+profilesAdapter.profiles[k].name+" or the one before it caused the test to be interrupted.")
                                 Core.stopService()
                                 return@launch
