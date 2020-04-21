@@ -130,7 +130,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     var viewHolder = profilesList.findViewHolderForAdapterPosition(i)
 					if(viewHolder==null)continue
 					viewHolder = viewHolder  as ProfileViewHolder
-                    if (i<9 /*viewHolder.item.isBuiltin()*/) {
+                    if (true /*viewHolder.item.isBuiltin()*/) {
                         viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
                         // might be in the middle of a layout after scrolling, need to wait
                         withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
@@ -678,6 +678,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                             //profilesAdapter.remove(k)
                         }
                     }
+                    val list=profilesAdapter.profiles.sortedWith(compareBy({ it.url_group }, { it.elapsed }))
+                    profilesAdapter.profiles.clear()
+                    profilesAdapter.profiles.addAll(list)
                     profilesAdapter.notifyDataSetChanged()
                 }
                 catch (e:Exception){

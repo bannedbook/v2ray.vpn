@@ -85,7 +85,12 @@ object Core {
     }
     val currentProfile: Pair<Profile, Profile?>? get() {
         if (DataStore.directBootAware) DirectBoot.getDeviceProfile()?.apply { return this }
-        return ProfileManager.expand(ProfileManager.getProfile(DataStore.profileId) ?: return null)
+        var theOne=ProfileManager.getProfile(DataStore.profileId)
+        if (theOne==null){
+            theOne=ProfileManager.getRandomVPNServer()
+            if (theOne!=null)DataStore.profileId=theOne.id
+        }
+        return ProfileManager.expand(theOne ?: return null)
     }
 
     fun switchProfile(id: Long): Profile {
@@ -198,6 +203,8 @@ object Core {
     }
 
     fun alertMessage(msg: String,activity:Context) {
+        try {
+            if(activity==null || (activity as Activity).isFinishing)return
         val builder: AlertDialog.Builder? = activity.let {
             AlertDialog.Builder(activity)
         }
@@ -206,5 +213,7 @@ object Core {
         })
         val dialog: AlertDialog? = builder?.create()
         dialog?.show()
+        }
+        catch (t:Throwable){}
     }
 }

@@ -173,7 +173,7 @@
   <string name="title_ping_all_server">Tcping all servers</string>
   <string name="title_real_ping_all_server">Real test all servers</string>
   <string name="title_retest_invalid_servers">Re-test invalid servers</string>
-  <string name="title_remove_invalid_servers">Remove invalid servers</string>
+  <string name="title_remove_invalid_servers">Remove invalid/Sort By Group</string>
   <string name="title_sort_servers_by_speed">Sort servers by speed</string>
   <string name="toast_test_ended">The test ended successfully</string>
   <string name="toast_test_interrupted">Server: %s or the previous one caused the test to be interrupted, please check them. And please make sure that the simple-obfs plugin is installed.</string>

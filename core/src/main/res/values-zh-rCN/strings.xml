@@ -199,7 +199,7 @@
     <string name="title_ping_all_server">测试全部配置Tcping</string>
     <string name="title_real_ping_all_server">测试全部配置真连接</string>
     <string name="title_retest_invalid_servers">再测无效服务器</string>
-    <string name="title_remove_invalid_servers">删除无效服务器</string>
+    <string name="title_remove_invalid_servers">删除无效/按组排序</string>
     <string name="title_sort_servers_by_speed">按测速结果排序</string>
     <string name="toast_test_ended">啊!测试结束啦!</string>
     <string name="toast_test_interrupted">"服务器：%s或前一个服务器导致测试中断，请检查之。并请确保安装了simple-obfs插件"</string>

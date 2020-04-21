@@ -211,7 +211,7 @@
     <string name="title_ping_all_server">測試全部配置Tcping</string>
     <string name="title_real_ping_all_server">測試全部配置真連接</string>
     <string name="title_retest_invalid_servers">再測無效伺服器</string>
-    <string name="title_remove_invalid_servers">刪除無效伺服器</string>
+    <string name="title_remove_invalid_servers">刪除無效/按組排序</string>
     <string name="title_sort_servers_by_speed">按測速結果排序</string>
     <string name="toast_test_ended">啊!測試結束啦!</string>
     <string name="toast_test_interrupted">"伺服器：%s或前一個伺服器導致測試中斷，請檢查之。並請確保安裝了simple-obfs插件。"</string>
