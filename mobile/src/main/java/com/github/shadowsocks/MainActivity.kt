@@ -53,6 +53,7 @@ import com.github.shadowsocks.preference.OnPreferenceDataStoreChangeListener
 import com.github.shadowsocks.subscription.SubscriptionFragment
 import com.github.shadowsocks.utils.Key
 import com.github.shadowsocks.utils.SingleInstanceActivity
+import com.github.shadowsocks.utils.printLog
 import com.github.shadowsocks.widget.ListHolderListener
 import com.github.shadowsocks.widget.ServiceButton
 import com.github.shadowsocks.widget.StatsBar
@@ -124,14 +125,19 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         stateListener?.invoke(state)
     }
 
-    private fun toggle() = when {
-        state.canStop -> Core.stopService()
-        DataStore.serviceMode == Key.modeVpn -> {
-            val intent = VpnService.prepare(this)
-            if (intent != null) startActivityForResult(intent, REQUEST_CONNECT)
-            else onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null)
+    private fun toggle() = try {
+        when {
+            state.canStop -> Core.stopService()
+            DataStore.serviceMode == Key.modeVpn -> {
+                val intent = VpnService.prepare(this)
+                if (intent != null) startActivityForResult(intent, REQUEST_CONNECT)
+                else onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null)
+            }
+            else -> Core.startService()
         }
-        else -> Core.startService()
+    }
+    catch (t:Throwable){
+        printLog(t)
     }
 
     private val handler = Handler()

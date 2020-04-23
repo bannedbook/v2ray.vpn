@@ -645,17 +645,19 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 profilesAdapter.notifyDataSetChanged()
 
                 for (k in 0 until profilesAdapter.profiles.size) {
-                    Log.e("tcping","$k")
-                    GlobalScope.launch {
-                        profilesAdapter.profiles[k].elapsed = tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
-                        ProfileManager.updateProfile(profilesAdapter.profiles[k])
-                        Log.e("tcping","$k - "+profilesAdapter.profiles[k].elapsed)
-                        activity?.runOnUiThread() {
-                            Log.e("tcping","$k - update")
-                            profilesAdapter.refreshId(profilesAdapter.profiles[k].id)
+                    try {
+                        Log.e("tcping", "$k")
+                        GlobalScope.launch {
+                            profilesAdapter.profiles[k].elapsed = tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
+                            ProfileManager.updateProfile(profilesAdapter.profiles[k])
+                            Log.e("tcping", "$k - " + profilesAdapter.profiles[k].elapsed)
+                            activity?.runOnUiThread() {
+                                Log.e("tcping", "$k - update")
+                                profilesAdapter.refreshId(profilesAdapter.profiles[k].id)
+                            }
                         }
                     }
-
+                    catch(e:IndexOutOfBoundsException){}
                 }
                 true
             }
@@ -710,9 +712,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             Core.stopService()
             var isProxyStarted=false
             for (k in 0 until profilesAdapter.profiles.size) {
-                if(testInvalidOnly && profilesAdapter.profiles[k].elapsed>0)continue
-                Log.e("real_ping_all",k.toString())
                 try {
+                    if(testInvalidOnly && profilesAdapter.profiles[k].elapsed>0)continue
+                    Log.e("real_ping_all",k.toString())
                     profilesAdapter.profiles[k].elapsed=-2
                     val old = DataStore.profileId
                     Core.switchProfile(profilesAdapter.profiles[k].id)
@@ -766,7 +768,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 profilesAdapter.profiles.clear()
                 profilesAdapter.profiles.addAll(list)
                 profilesAdapter.notifyDataSetChanged()
-                Core.alertMessage(getString(R.string.toast_test_ended),activity)
+                try{Core.alertMessage(activity.getString(R.string.toast_test_ended),activity)}catch (t:Throwable){}
             }
         }
     }

@@ -113,7 +113,7 @@ object ProfileManager {
      * Note: It's caller's responsibility to update DirectBoot profile if necessary.
      */
     @Throws(SQLException::class)
-    fun updateProfile(profile: Profile) = check(PrivateDatabase.profileDao.update(profile) == 1)
+    fun updateProfile(profile: Profile) = try {check(PrivateDatabase.profileDao.update(profile) == 1)}catch (t:Throwable){printLog(t)}
 
     @Throws(IOException::class)
     fun getProfile(id: Long): Profile? = try {
