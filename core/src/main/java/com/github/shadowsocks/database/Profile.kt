@@ -153,7 +153,7 @@ data class Profile(
             }
         }.filterNotNull().toMutableSet()
 
-        private fun findAllSSUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data
+        fun findAllSSUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data
                 ?: "").map {
             val uri = it.value.toUri()
             try {
@@ -498,5 +498,8 @@ data class Profile(
     }
     fun isBuiltin(): Boolean {
         return VpnEncrypt.vpnGroupName == url_group
+    }
+    fun isBuiltin2(): Boolean {
+        return VpnEncrypt.freesubGroupName == url_group
     }
 }

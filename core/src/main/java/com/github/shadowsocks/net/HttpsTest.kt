@@ -22,14 +22,18 @@ package com.github.shadowsocks.net
 
 import android.os.Build
 import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.Core.app
 import com.github.shadowsocks.acl.Acl
 import com.github.shadowsocks.core.R
+import com.github.shadowsocks.database.Profile
+import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.utils.Key
+import com.github.shadowsocks.utils.printLog
 import com.github.shadowsocks.utils.useCancellable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -72,7 +76,7 @@ class HttpsTest : ViewModel() {
             class UnexpectedResponseCode(private val code: Int) : Error() {
                 override val error get() = app.getString(R.string.connection_test_error_status_code, code)
             }
-            class IOFailure(private val e: IOException) : Error() {
+            class IOFailure(private val e: Exception) : Error() {
                 override val error get() = app.getString(R.string.connection_test_error, e.message)
             }
         }
@@ -97,12 +101,23 @@ class HttpsTest : ViewModel() {
         running = GlobalScope.launch(Dispatchers.Main.immediate) {
             status.value = conn.useCancellable {
                 try {
+                    val activeProfile: Profile? = ProfileManager.getProfile(DataStore.profileId)
+                    if (activeProfile!!.plugin!=null && activeProfile.plugin!!.contains("v2ray", ignoreCase = true)){
+                        Thread.sleep(3_000)  //if v2ray plugin, delay 3s
+                    }
+                    //Log.e("plugin------",activeProfile.plugin.toString())
+                }
+                catch (t:Throwable){
+                    printLog(t)
+                }
+
+                try {
                     val start = SystemClock.elapsedRealtime()
                     val code = responseCode
                     val elapsed = SystemClock.elapsedRealtime() - start
                     if (code == 204 || code == 200 && responseLength == 0L) Status.Success(elapsed)
                     else Status.Error.UnexpectedResponseCode(code)
-                } catch (e: IOException) {
+                } catch (e: Exception) {
                     Status.Error.IOFailure(e)
                 } finally {
                     disconnect()

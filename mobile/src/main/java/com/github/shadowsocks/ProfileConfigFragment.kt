@@ -109,6 +109,10 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         findPreference<Preference>(Key.udpdns)!!.isEnabled = serviceMode != Key.modeProxy
         plugin = findPreference(Key.plugin)!!
         pluginConfigure = findPreference(Key.pluginConfigure)!!
+        if(thisprofile.isBuiltin()){
+            plugin.isVisible=false
+            pluginConfigure.isVisible=false
+        }
         pluginConfigure.setOnBindEditTextListener(EditTextPreferenceModifiers.Monospace)
         pluginConfigure.onPreferenceChangeListener = this
         pluginConfiguration = PluginConfiguration(DataStore.plugin)

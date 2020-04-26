@@ -130,7 +130,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     var viewHolder = profilesList.findViewHolderForAdapterPosition(i)
 					if(viewHolder==null)continue
 					viewHolder = viewHolder  as ProfileViewHolder
-                    if (true /*viewHolder.item.isBuiltin()*/) {
+                    if (viewHolder.item.isBuiltin() || viewHolder.item.isBuiltin2()) {
                         viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
                         // might be in the middle of a layout after scrolling, need to wait
                         withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
@@ -326,7 +326,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 if (item.url_group.isNotEmpty()) this += item.url_group	    
                 else if (!item.name.isNullOrEmpty()) this += item.formattedAddress
                 val id = PluginConfiguration(item.plugin ?: "").selected
-                if (id.isNotEmpty()) this += getString(R.string.profile_plugin, id)
+                if (id.isNotEmpty() && !item.isBuiltin()) this += getString(R.string.profile_plugin, id)
             }.joinToString("\n")
             val context = requireContext()
             traffic.text =ArrayList<String>().apply {

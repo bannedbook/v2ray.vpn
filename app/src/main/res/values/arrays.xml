@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="modes">
+        <item>websocket-http</item>
+        <item>websocket-tls</item>
+        <item>quic-tls</item>
+    </string-array>
+    <string-array name="loglevels">
+        <item>debug</item>
+        <item>info</item>
+        <item>warning</item>
+        <item>error</item>
+        <item>none</item>
+    </string-array>
+</resources>

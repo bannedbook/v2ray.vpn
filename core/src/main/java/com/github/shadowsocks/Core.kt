@@ -105,7 +105,7 @@ object Core {
         GlobalScope.launch {
             var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
             for (i in 0 until builtinSubUrls.size) {
-                var builtinSub=SSRSubManager.create(builtinSubUrls.get(i),"aes")
+                var builtinSub=SSRSubManager.createBuiltInSub(builtinSubUrls.get(i))
                 if (builtinSub != null) break
             }
         }

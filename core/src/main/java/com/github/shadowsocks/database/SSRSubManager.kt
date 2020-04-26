@@ -158,18 +158,21 @@ object SSRSubManager {
         if (url.isEmpty()) return null
         try {
             val response = getResponse(url,mode)
-            val profiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first).toList()
+            val ssrProfiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first)
+            val sspPofiles = Profile.findAllSSUrls(response, Core.currentProfile?.first)
+            ssrProfiles.addAll(sspPofiles)
+            val profiles=ssrProfiles.toList()
             if (profiles.isNullOrEmpty() || profiles[0].url_group.isEmpty()) return null
             val new = SSRSub(url = url, url_group = profiles[0].url_group)
             getAllSSRSub().forEach {
                 if (it.url_group == new.url_group) {
-                    update(it, response)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    update(it, profiles)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
                     Log.println(Log.ERROR,"------","ssrsub existed, update.")
                     return it
                 }
             }
             createSSRSub(new)
-            update(new, response)
+            update(new, profiles)
             Log.println(Log.ERROR,"------","success create ssrsub.")
             return new
         } catch (e: Exception) {
@@ -177,7 +180,45 @@ object SSRSubManager {
             return null
         }
     }
+    suspend fun createBuiltInSub(url: String): SSRSub? {
+        Log.println(Log.ERROR,"------","start createBuiltInSub...")
+        if (url.isEmpty()) return null
+        try {
+            val response = getResponse(url,"aes")
+            val ssrProfiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first)
+            val ssPofiles = Profile.findAllSSUrls(response, Core.currentProfile?.first)
+            var profiles:List<Profile>? = null
+            if(ssrProfiles!=null && ssPofiles!=null) {
+                ssrProfiles.addAll(ssPofiles)
+                profiles=ssrProfiles.toList()
+            }
+            else if(ssPofiles==null) {
+                profiles = ssrProfiles.toList()
+            }
+            else {
+                profiles = ssPofiles.toList()
+            }
 
+            if (profiles.isNullOrEmpty()) return null
+            val new = SSRSub(url = url, url_group = VpnEncrypt.vpnGroupName)
+            profiles.forEach { it.url_group = VpnEncrypt.vpnGroupName }
+            getAllSSRSub().forEach {
+                if (it.url_group == new.url_group) {
+                    update(it, profiles)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    Log.println(Log.ERROR,"------","ssrsub existed, update.")
+                    return it
+                }
+            }
+            createSSRSub(new)
+            update(new, profiles)
+            Log.println(Log.ERROR,"------","success create ssrsub.")
+            return new
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("------","failed create ssrsub",e)
+            return null
+        }
+    }
     suspend fun createSSSub(url: String): SSRSub? {
         if (url.isEmpty()) return null
         try {

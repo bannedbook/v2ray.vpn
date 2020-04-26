@@ -55,6 +55,7 @@ def roomVersion = '2.2.3'
 def workVersion = '2.3.1'
 dependencies {
     api project(':plugin')
+    implementation project(':app')
     api 'androidx.fragment:fragment-ktx:1.2.1'
     api "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
     api "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
