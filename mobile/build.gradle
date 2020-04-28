@@ -30,6 +30,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs rootProject.resConfigs
     }
+    signingConfigs {
+        release {
+            storeFile file("/root/java/andorid-key/ssr.key")
+            storePassword System.console().readLine("\nKeystore password: ")
+            keyAlias 'ssr'
+            keyPassword System.console().readLIne("\nKey password: ")
+        }
+    }
     buildTypes {
         debug {
             pseudoLocalesEnabled true
@@ -38,6 +46,7 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt')
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -58,6 +67,7 @@ android {
             universalApk true
         }
     }
+
     sourceSets.main.jniLibs.srcDirs +=
             new File(project(':core').buildDir, "intermediates/bundles/${getCurrentFlavor()}/jni")
 }

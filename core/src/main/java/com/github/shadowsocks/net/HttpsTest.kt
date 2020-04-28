@@ -92,6 +92,7 @@ class HttpsTest : ViewModel() {
             Acl.CHINALIST -> "www.qualcomm.cn"
             else -> "www.google.com"
         }, "/generate_204")
+
         val conn = (if (DataStore.serviceMode != Key.modeVpn) {
             url.openConnection(Proxy(Proxy.Type.SOCKS, DataStore.proxyAddress))
         } else url.openConnection()) as HttpURLConnection

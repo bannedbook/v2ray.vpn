@@ -123,6 +123,54 @@ object SSRSubManager {
         }
     }
 
+    fun updateBuiltinProfiles(ssrSub: SSRSub, profiles : List<Profile>,limit:Int) {
+        when {
+            profiles.isEmpty() -> {
+                deletProfiles(ssrSub)
+                ssrSub.status = SSRSub.EMPTY
+                updateSSRSub(ssrSub)
+                return
+            }
+            ssrSub.url_group != profiles[0].url_group -> {
+                ssrSub.status = SSRSub.NAME_CHANGED
+                updateSSRSub(ssrSub)
+                return
+            }
+            else -> {
+                ssrSub.status = SSRSub.NORMAL
+                updateSSRSub(ssrSub)
+            }
+        }
+
+        val count = profiles.count()
+        var limitProfiles:ArrayList<Profile> = arrayListOf()
+
+        if (limit != -1 && limit < count) {
+            try {
+                val uqid=VpnEncrypt.getUniqueID()
+                Log.e("uqid",uqid.toString())
+                val startPosition=uqid % count
+                for (k in 0 until limit) {
+                    var thePosition=startPosition+k
+                    if(thePosition>=count) thePosition -= count
+                    limitProfiles.add(profiles[thePosition])
+                }
+            }
+            catch (ex: Exception) {
+                limitProfiles.clear()
+                limitProfiles.addAll(profiles.shuffled().take(limit))
+            }
+            if (limitProfiles.isEmpty())limitProfiles.addAll(profiles.shuffled().take(limit))
+        }
+        else
+            limitProfiles.addAll(profiles)
+
+        if (limitProfiles.isNotEmpty()) {
+            deletProfiles(ssrSub)
+            ProfileManager.createProfilesFromSub(limitProfiles, ssrSub.url_group)
+        }
+    }
+
     fun update(ssrSub: SSRSub, profiles : List<Profile>) {
         when {
             profiles.isEmpty() -> {
@@ -185,6 +233,11 @@ object SSRSubManager {
         if (url.isEmpty()) return null
         try {
             val response = getResponse(url,"aes")
+            var limit = -1
+            if (response.indexOf("MAX=") == 0) {
+                limit = response.split("\n")[0].split("MAX=")[1]
+                        .replace("\\D+".toRegex(), "").toInt()
+            }
             val ssrProfiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first)
             val ssPofiles = Profile.findAllSSUrls(response, Core.currentProfile?.first)
             var profiles:List<Profile>? = null
@@ -204,13 +257,13 @@ object SSRSubManager {
             profiles.forEach { it.url_group = VpnEncrypt.vpnGroupName }
             getAllSSRSub().forEach {
                 if (it.url_group == new.url_group) {
-                    update(it, profiles)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    updateBuiltinProfiles(it, profiles,limit)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
                     Log.println(Log.ERROR,"------","ssrsub existed, update.")
                     return it
                 }
             }
             createSSRSub(new)
-            update(new, profiles)
+            updateBuiltinProfiles(new, profiles,limit)
             Log.println(Log.ERROR,"------","success create ssrsub.")
             return new
         } catch (e: Exception) {
