@@ -145,7 +145,7 @@ object PluginManager {
                         PackageManager.MATCH_DIRECT_BOOT_UNAWARE or PackageManager.MATCH_DIRECT_BOOT_AWARE
         )
         if (providers.isEmpty()) return null
-        val provider = providers.single().providerInfo
+        val provider = providers.first().providerInfo
         val options = configuration.getOptions { provider.loadString(PluginContract.METADATA_KEY_DEFAULT_CONFIG) }
         var failure: Throwable? = null
         try {

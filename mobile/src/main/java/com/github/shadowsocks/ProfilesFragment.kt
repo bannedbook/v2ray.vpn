@@ -720,7 +720,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     Core.switchProfile(profilesAdapter.profiles[k].id)
                     activity?.runOnUiThread() {
                         layoutManager.scrollToPositionWithOffset(k, 0)
-                        layoutManager.stackFromEnd = true
+                        //layoutManager.stackFromEnd = true
                         profilesAdapter.refreshId(old)
                         profilesAdapter.refreshId(profilesAdapter.profiles[k].id)
                     }

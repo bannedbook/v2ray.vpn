@@ -34,8 +34,13 @@ class PluginList : ArrayList<Plugin>() {
     val lookup = mutableMapOf<String, Plugin>().apply {
         for (plugin in this@PluginList) {
             fun check(old: Plugin?) = check(old == null || old === plugin)
+            remove(plugin.id)
             check(put(plugin.id, plugin))
-            for (alias in plugin.idAliases) check(put(alias, plugin))
+
+            for (alias in plugin.idAliases) {
+                remove(alias)
+                check(put(alias, plugin))
+            }
         }
     }
 }

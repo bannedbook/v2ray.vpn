@@ -1,1 +1,2 @@
-include ':mobile', ':core', ':plugin', ':v2ray-plugin'
+include ':ssvpn-v2ray'
+include ':mobile', ':core', ':plugin'
