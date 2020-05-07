@@ -202,7 +202,7 @@
     <string name="title_remove_invalid_servers">删除无效/按组排序</string>
     <string name="title_sort_servers_by_speed">按测速结果排序</string>
     <string name="toast_test_ended">啊!测试结束啦!</string>
-    <string name="toast_test_interrupted">"服务器：%s或前一个服务器导致测试中断，请检查之。并请确保安装了simple-obfs插件"</string>
+    <string name="toast_test_interrupted">"服务器：%s或前一个服务器导致测试中断，请检查/刪除之"</string>
     <string name="recommended_site_1">"<![CDATA[
 <html xmlns='http://www.w3.org/1999/xhtml' dir='ltr' lang='zh-CN'>
 <head profile='http://gmpg.org/xfn/11'>

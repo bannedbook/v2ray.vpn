@@ -34,10 +34,7 @@ import android.os.SystemClock
 import android.text.format.Formatter
 import android.util.Log
 import android.util.LongSparseArray
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.*
@@ -719,10 +716,12 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     val old = DataStore.profileId
                     Core.switchProfile(profilesAdapter.profiles[k].id)
                     activity?.runOnUiThread() {
+                        try {activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
                         layoutManager.scrollToPositionWithOffset(k, 0)
                         //layoutManager.stackFromEnd = true
                         profilesAdapter.refreshId(old)
                         profilesAdapter.refreshId(profilesAdapter.profiles[k].id)
+                        try {activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
                     }
 
                     var result = tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
@@ -770,6 +769,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 profilesAdapter.notifyDataSetChanged()
                 try{Core.alertMessage(activity.getString(R.string.toast_test_ended),activity)}catch (t:Throwable){}
             }
+            try {activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
         }
     }
 

@@ -208,7 +208,7 @@ object Core {
         val builder: AlertDialog.Builder? = activity.let {
             AlertDialog.Builder(activity)
         }
-        builder?.setMessage(msg)?.setTitle("SS VPN")?.setPositiveButton("ok", DialogInterface.OnClickListener {
+        builder?.setMessage(msg)?.setTitle("Alert")?.setPositiveButton("ok", DialogInterface.OnClickListener {
             _, _ ->
         })
         val dialog: AlertDialog? = builder?.create()

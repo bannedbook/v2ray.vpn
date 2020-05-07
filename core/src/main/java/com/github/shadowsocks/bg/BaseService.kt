@@ -193,6 +193,7 @@ object BaseService {
 
         fun stateChanged(s: State, msg: String?) {
             val profileName = profileName
+            //if(!msg.isNullOrEmpty() && msg.isNotBlank())Core.showMessage(msg)
             broadcast { it.stateChanged(s.ordinal, profileName, msg) }
         }
 

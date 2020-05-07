@@ -56,7 +56,7 @@ private object AES256{
         return encstr
     }
     fun decrypt(str:String, secretKey:String):String{
-        val byteStr : ByteArray;
+        val byteStr : ByteArray
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || isWindows())
             byteStr=java.util.Base64.getDecoder().decode(str.toByteArray(Charsets.UTF_8))
         else

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.takisoft.preferencex.SimpleMenuPreference
+        app:key="obfs"
+        app:persistent="false"
+        app:entries="@array/methods"
+        app:entryValues="@array/methods"
+        app:title="@string/simple_obfs_method"
+        app:summary="%s"
+        app:useSimpleSummaryProvider="true"/>
+
+    <EditTextPreference
+        app:key="obfs-host"
+        app:persistent="false"
+        app:title="@string/simple_obfs_hostname"
+        app:summary="%s"
+        app:useSimpleSummaryProvider="true"/>
+    <EditTextPreference
+        app:key="obfs-uri"
+        app:persistent="false"
+        app:title="@string/simple_obfs_uri"
+        app:summary="%s"
+        app:useSimpleSummaryProvider="true"/>
+</PreferenceScreen>

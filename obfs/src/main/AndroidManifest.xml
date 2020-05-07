@@ -1,0 +1,35 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.github.shadowsocks.plugin.obfs_local">
+    <uses-feature android:name="android.hardware.touchscreen"
+                  android:required="false"/>
+    <application android:icon="@mipmap/ic_launcher">
+        <provider android:name=".SSVpnBinaryProvider"
+                  android:exported="true"
+                  android:authorities="com.github.shadowsocks.plugin.obfs_local.SSVpnBinaryProvider">
+            <intent-filter>
+                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <data android:scheme="plugin"
+                      android:host="com.github.shadowsocks"
+                      android:pathPrefix="/obfs-local"/>
+            </intent-filter>
+            <meta-data android:name="com.github.shadowsocks.plugin.id"
+                       android:value="obfs-local"/>
+            <meta-data android:name="com.github.shadowsocks.plugin.default_config"
+                       android:value="obfs=http"/>
+            <meta-data android:name="com.github.shadowsocks.plugin.executable_path"
+                       android:value="libobfs-local.so"/>
+        </provider>
+        <activity android:name=".ConfigActivity">
+            <intent-filter>
+                <action android:name="com.github.shadowsocks.plugin.ACTION_CONFIGURE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="plugin"
+                      android:host="com.github.shadowsocks"
+                      android:path="/obfs-local"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
