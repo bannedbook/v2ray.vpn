@@ -21,6 +21,7 @@
 package com.github.shadowsocks.preference
 import SpeedUpVPN.VpnEncrypt
 import android.os.Binder
+import android.util.Log
 import androidx.preference.PreferenceDataStore
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
@@ -31,6 +32,7 @@ import com.github.shadowsocks.utils.DirectBoot
 import com.github.shadowsocks.utils.Key
 import com.github.shadowsocks.utils.parsePort
 import java.net.InetSocketAddress
+import java.util.*
 
 object DataStore : OnPreferenceDataStoreChangeListener {
     val publicStore = RoomPreferenceDataStore(PublicDatabase.kvPairDao)
@@ -66,7 +68,14 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     val directBootAware: Boolean get() = Core.directBootSupported && canToggleLocked
     val tcpFastOpen: Boolean get() = TcpFastOpen.sendEnabled && publicStore.getBoolean(Key.tfo, false)
     val isAutoUpdateServers: Boolean get() = publicStore.getBoolean(Key.isAutoUpdateServers, true)
-    val is_get_free_servers: Boolean get() = publicStore.getBoolean(Key.is_get_free_servers, false)
+    val is_get_free_servers: Boolean get() {
+        return try {
+            val userCountry=Locale.getDefault().country
+            publicStore.getBoolean(Key.is_get_free_servers, "CN" != userCountry)
+        }catch (t:Throwable){
+            publicStore.getBoolean(Key.is_get_free_servers, true)
+        }
+    }
     val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
     var portProxy: Int

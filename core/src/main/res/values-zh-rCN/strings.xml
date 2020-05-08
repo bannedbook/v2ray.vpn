@@ -195,7 +195,7 @@
     <string name="auto_update_servers">"自动更新服务器"</string>
     <string name="auto_update_servers_summary">"应用启动后自动更新VPN服务器"</string>
     <string name = "get_free_servers">启用第三方服务器</string>
-    <string name = "get_free_servers_summary">从网络抓取第三方免费服务器，安全性未知</string>
+    <string name = "get_free_servers_summary">抓取网络上的免费服务器，安全性未知</string>
     <string name="title_ping_all_server">测试全部配置Tcping</string>
     <string name="title_real_ping_all_server">测试全部配置真连接</string>
     <string name="title_retest_invalid_servers">再测无效服务器</string>

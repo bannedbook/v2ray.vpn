@@ -169,7 +169,7 @@
   <string name = "auto_update_servers">Automatic Update Servers</string>
   <string name = "auto_update_servers_summary">Automatically update VPN servers when App launch</string>
   <string name = "get_free_servers">Enable 3rd-party servers</string>
-  <string name = "get_free_servers_summary">Crawl 3rd-party free servers from internet, security unknown.</string>
+  <string name = "get_free_servers_summary">Crawl free servers from internet.</string>
   <string name="title_ping_all_server">Tcping all servers</string>
   <string name="title_real_ping_all_server">Real test all servers</string>
   <string name="title_retest_invalid_servers">Re-test invalid servers</string>

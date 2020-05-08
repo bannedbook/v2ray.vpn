@@ -62,6 +62,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
 
 class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPreferenceDataStoreChangeListener,
         NavigationView.OnNavigationItemSelectedListener {
@@ -203,7 +204,11 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         connection.connect(this, this)
         DataStore.publicStore.registerChangeListener(this)
         //updateBuiltinServers
-        if(DataStore.isAutoUpdateServers)Core.updateBuiltinServers()
+        if(DataStore.isAutoUpdateServers){
+            Core.updateBuiltinServers()
+            if (DataStore.is_get_free_servers)Core.importFreeSubs()
+        }
+        //Log.e("user-country", Locale.getDefault().country)
     }
 
     override fun onPreferenceDataStoreChanged(store: PreferenceDataStore, key: String) {
