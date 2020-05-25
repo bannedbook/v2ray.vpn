@@ -358,7 +358,11 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 Core.switchProfile(item.id)
                 profilesAdapter.refreshId(old)
                 itemView.isSelected = true
-                if (activity.state.canStop) Core.reloadService()
+                if (activity.state.canStop)
+                    Core.reloadService(old,activity.getShadowsocksConnection())
+                else if (ProfileManager.getProfile(old)?.profileType != ProfileManager.getProfile(item.id)?.profileType) {
+                    activity.getShadowsocksConnection().binderDied()
+                }
             }
         }
 
@@ -583,10 +587,12 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             R.id.action_import_clipboard -> {
                 try {
-                    val profiles = Profile.findAllUrls(
-                            clipboard.primaryClip!!.getItemAt(0).text,
-                            Core.currentProfile?.first
-                    ).toList()
+                    var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
+                    val ssPofiles = Profile.findAllSSUrls(clipboard.primaryClip!!.getItemAt(0).text, Core.currentProfile?.first)
+                    val v2Profiles= Profile.findAllVmessUrls(clipboard.primaryClip!!.getItemAt(0).text, Core.currentProfile?.first)
+                    profilesSet.addAll(ssPofiles)
+                    profilesSet.addAll(v2Profiles)
+                    var profiles:List<Profile> = profilesSet.toList()
                     if (profiles.isNotEmpty()) {
                         profiles.forEach { ProfileManager.createProfile(it) }
                         (activity as MainActivity).snackbar().setText(R.string.action_import_msg).show()
@@ -645,7 +651,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     try {
                         Log.e("tcping", "$k")
                         GlobalScope.launch {
-                            profilesAdapter.profiles[k].elapsed = tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
+                            profilesAdapter.profiles[k].elapsed = Core.tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
                             ProfileManager.updateProfile(profilesAdapter.profiles[k])
                             Log.e("tcping", "$k - " + profilesAdapter.profiles[k].elapsed)
                             activity?.runOnUiThread() {
@@ -724,13 +730,12 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                         try {activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
                     }
 
-                    var result = tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
+                    var result = Core.tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
                     if( result > 0) {
                         if(!isProxyStarted)Core.startServiceForTest()
-                        else Core.reloadService()
-
+                        else Core.reloadServiceForTest(old,activity.getShadowsocksConnection())
                         var ttt = 0
-                        while (tcping("127.0.0.1", DataStore.portProxy) < 0 || tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) < 0) {
+                        while (Core.tcping("127.0.0.1", DataStore.portProxy) < 0 || Core.tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) < 0) {
                             Log.e("starting", "$k try $ttt ...")
                             if (ttt == 5) {
                                 activity?.runOnUiThread() {Core.alertMessage(activity.getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
@@ -767,6 +772,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 profilesAdapter.profiles.clear()
                 profilesAdapter.profiles.addAll(list)
                 profilesAdapter.notifyDataSetChanged()
+                activity.getShadowsocksConnection().binderDied()
                 try{Core.alertMessage(activity.getString(R.string.toast_test_ended),activity)}catch (t:Throwable){}
             }
             try {activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
@@ -817,38 +823,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
     private val URLConnection.responseLength: Long
         get() = if (Build.VERSION.SDK_INT >= 24) contentLengthLong else contentLength.toLong()
 
-    /**
-     * tcping
-     */
-    private fun tcping(url: String, port: Int): Long {
-        var time = -1L
-        for (k in 0 until 2) {
-            val one = socketConnectTime(url, port)
-            if (one != -1L  )
-                if(time == -1L || one < time) {
-                    time = one
-                }
-        }
-        return time
-    }
-    private fun socketConnectTime(url: String, port: Int): Long {
-        try {
-            val start = System.currentTimeMillis()
-            val socket = Socket()
-            var socketAddress = InetSocketAddress(url, port)
-            socket.connect(socketAddress,5000)
-            val time = System.currentTimeMillis() - start
-            socket.close()
-            return time
-        } catch (e: UnknownHostException) {
-            Log.e("testConnection2",e.toString())
-        } catch (e: IOException) {
-            Log.e("testConnection2",e.toString())
-        } catch (e: Exception) {
-            Log.e("testConnection2",e.toString())
-        }
-        return -1
-    }
+
     private fun startFilesForResult(intent: Intent, requestCode: Int) {
         try {
             startActivityForResult(intent.addCategory(Intent.CATEGORY_OPENABLE), requestCode)

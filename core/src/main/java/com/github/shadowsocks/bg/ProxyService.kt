@@ -29,7 +29,7 @@ import java.io.*
 /**
  * Shadowsocks service at its minimum.
  */
-class ProxyService : Service(), BaseService.Interface {
+open class ProxyService : Service(), BaseService.Interface {
     override val data = BaseService.Data(this)
     override val tag: String get() = "ShadowsocksProxyService"
     override fun createNotification(profileName: String): ServiceNotification =
@@ -52,8 +52,8 @@ class ProxyService : Service(), BaseService.Interface {
         val rootDataDir = filesDir
         val toPath = rootDataDir.toString()
 
-        var confFilename = "config.conf"
-        if (DataStore.listenAddress=="0.0.0.0")confFilename = "configLanShare.conf"
+        var confFilename = "config-v2.conf"
+        if (DataStore.listenAddress=="0.0.0.0")confFilename = "configLanShare-v2.conf"
 
         var configFile = "$toPath/$confFilename"
         Log.e("configFile is: ", configFile)

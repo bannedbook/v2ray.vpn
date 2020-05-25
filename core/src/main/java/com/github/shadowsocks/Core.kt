@@ -42,13 +42,13 @@ import androidx.work.WorkManager
 import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.acl.Acl
 import com.github.shadowsocks.aidl.ShadowsocksConnection
+import com.github.shadowsocks.bg.*
 import com.github.shadowsocks.core.R
 import com.github.shadowsocks.database.Profile
 import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.database.SSRSubManager
 import com.github.shadowsocks.net.TcpFastOpen
 import com.github.shadowsocks.preference.DataStore
-import com.github.shadowsocks.work.SSRSubSyncer
 import com.github.shadowsocks.subscription.SubscriptionService
 import com.github.shadowsocks.utils.*
 import com.github.shadowsocks.work.UpdateCheck
@@ -62,12 +62,16 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import kotlin.reflect.KClass
-import com.github.shadowsocks.bg.ProxyService
+import me.dozen.dpreference.DPreference
+import java.net.InetSocketAddress
+import java.net.Socket
+import java.net.UnknownHostException
+
 object Core {
     const val TAG = "Core"
-
     lateinit var app: Application
         @VisibleForTesting set
+    val defaultDPreference by lazy { DPreference(app, app.packageName + "_preferences") }
     lateinit var configureIntent: (Context) -> PendingIntent
     val activity by lazy { app.getSystemService<ActivityManager>()!! }
     val connectivity by lazy { app.getSystemService<ConnectivityManager>()!! }
@@ -179,6 +183,9 @@ object Core {
                     NotificationChannel("service-vpn", app.getText(R.string.service_vpn),
                             if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
                             else NotificationManager.IMPORTANCE_LOW),   // #1355
+                    NotificationChannel("service-v2vpn", app.getText(R.string.service_vpn),
+                            if (Build.VERSION.SDK_INT >= 28) NotificationManager.IMPORTANCE_MIN
+                            else NotificationManager.IMPORTANCE_LOW),   // #1355
                     NotificationChannel("service-proxy", app.getText(R.string.service_proxy),
                             NotificationManager.IMPORTANCE_LOW),
                     NotificationChannel("service-transproxy", app.getText(R.string.service_transproxy),
@@ -193,9 +200,46 @@ object Core {
             else @Suppress("DEPRECATION") PackageManager.GET_SIGNATURES)!!
 
     fun startService() = ContextCompat.startForegroundService(app, Intent(app, ShadowsocksConnection.serviceClass))
-    fun reloadService() = app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
+    fun reloadService(oldProfileId:Long, connection : ShadowsocksConnection) {
+        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType )
+            app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
+        else{
+            stopService()
+            while (BaseService.State.values()[connection.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
+            connection.binderDied()
+            //while (connection.service==null)Thread.sleep(100)
+            startService()
+        }
+    }
+    fun reloadServiceForTest(oldProfileId:Long, connection : ShadowsocksConnection) {
+        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType ) {
+            Log.e("reloadServiceForTest","reload")
+            app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
+        }
+        else{
+            Log.e("reloadServiceForTest","restart")
+            Log.e("reloadServiceForTest","old:"+ProfileManager.getProfile(oldProfileId)?.formattedName+",type:"+ProfileManager.getProfile(oldProfileId)?.profileType)
+            Log.e("reloadServiceForTest","cur:"+ProfileManager.getProfile(DataStore.profileId)?.formattedName+",type:"+ProfileManager.getProfile(DataStore.profileId)?.profileType)
+            stopService()
+            //while (BaseService.State.values()[connection.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
+            while (tcping("127.0.0.1", DataStore.portProxy) > 0 || tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) > 0) Thread.sleep(100)
+            //connection.binderDied()
+            startServiceForTest()
+        }
+    }
     fun stopService() = app.sendBroadcast(Intent(Action.CLOSE).setPackage(app.packageName))
-    fun startServiceForTest() = app.startService(Intent(app, ProxyService::class.java).putExtra("test","go"))
+    fun startServiceForTest() {
+        val currprofileType=ProfileManager.getProfile(DataStore.profileId)?.profileType
+        Log.e("startServiceForTest",currprofileType)
+        if ("vmess"==currprofileType){
+            Log.e("startServiceForTest","start V2RayTestService")
+            app.startService(Intent(app, V2RayTestService::class.java))
+        }
+        else {
+            Log.e("startServiceForTest","start SSProxyService")
+            app.startService(Intent(app, ProxyTestService::class.java).putExtra("test", "go"))
+        }
+    }
     fun showMessage(msg: String) {
         var toast = Toast.makeText(app, msg, Toast.LENGTH_LONG)
         toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 150)
@@ -215,5 +259,38 @@ object Core {
         dialog?.show()
         }
         catch (t:Throwable){}
+    }
+
+    /**
+     * tcping
+     */
+    fun tcping(url: String, port: Int): Long {
+        var time = -1L
+        for (k in 0 until 2) {
+            val one = socketConnectTime(url, port)
+            if (one != -1L  )
+                if(time == -1L || one < time) {
+                    time = one
+                }
+        }
+        return time
+    }
+    private fun socketConnectTime(url: String, port: Int): Long {
+        try {
+            val start = System.currentTimeMillis()
+            val socket = Socket()
+            var socketAddress = InetSocketAddress(url, port)
+            socket.connect(socketAddress,5000)
+            val time = System.currentTimeMillis() - start
+            socket.close()
+            return time
+        } catch (e: UnknownHostException) {
+            Log.e("testConnection2",e.toString())
+        } catch (e: IOException) {
+            Log.e("testConnection2",e.toString())
+        } catch (e: Exception) {
+            Log.e("testConnection2",e.toString())
+        }
+        return -1
     }
 }

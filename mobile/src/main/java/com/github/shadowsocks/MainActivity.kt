@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
     private fun toggle() = try {
         when {
             state.canStop -> Core.stopService()
-            DataStore.serviceMode == Key.modeVpn -> {
+            (DataStore.serviceMode == Key.modeVpn || DataStore.serviceMode == Key.v2rayVpn) -> {
                 val intent = VpnService.prepare(this)
                 if (intent != null) startActivityForResult(intent, REQUEST_CONNECT)
                 else onActivityResult(REQUEST_CONNECT, Activity.RESULT_OK, null)
@@ -143,6 +143,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
 
     private val handler = Handler()
     private val connection = ShadowsocksConnection(handler, true)
+    fun getShadowsocksConnection():ShadowsocksConnection{return connection}
     override fun onServiceConnected(service: IShadowsocksService) = changeState(try {
         BaseService.State.values()[service.state]
     } catch (_: RemoteException) {

@@ -107,6 +107,8 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         val shareOverLan = findPreference<SwitchPreference>(Key.shareOverLan)!!
         val portProxy = findPreference<EditTextPreference>(Key.portProxy)!!
         portProxy.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
+        portProxy.isEnabled=false
+        portProxy.text=VpnEncrypt.SOCK_PROXY_PORT.toString()
         val portLocalDns = findPreference<EditTextPreference>(Key.portLocalDns)!!
         portLocalDns.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         val portTransproxy = findPreference<EditTextPreference>(Key.portTransproxy)!!
@@ -119,6 +121,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
                 Key.modeProxy -> Pair(false, false)
                 Key.modeVpn -> Pair(true, false)
                 Key.modeTransproxy -> Pair(true, true)
+                Key.v2rayVpn -> Pair(false, false)
                 else -> throw IllegalArgumentException("newValue: $newValue")
             }
             hosts.isEnabled = enabledLocalDns
@@ -131,7 +134,7 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             tfo.isEnabled = stopped
             serviceMode.isEnabled = stopped
             shareOverLan.isEnabled = stopped
-            portProxy.isEnabled = stopped
+            //portProxy.isEnabled = stopped
             if (stopped) onServiceModeChange.onPreferenceChange(null, DataStore.serviceMode) else {
                 hosts.isEnabled = false
                 portLocalDns.isEnabled = false

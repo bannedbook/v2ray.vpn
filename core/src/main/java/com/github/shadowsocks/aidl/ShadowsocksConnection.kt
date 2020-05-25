@@ -27,10 +27,8 @@ import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
 import android.os.RemoteException
-import com.github.shadowsocks.bg.BaseService
-import com.github.shadowsocks.bg.ProxyService
-import com.github.shadowsocks.bg.TransproxyService
-import com.github.shadowsocks.bg.VpnService
+import android.util.Log
+import com.github.shadowsocks.bg.*
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.utils.Action
 import com.github.shadowsocks.utils.Key
@@ -43,6 +41,7 @@ class ShadowsocksConnection(private val handler: Handler = Handler(),
         ServiceConnection, IBinder.DeathRecipient {
     companion object {
         val serviceClass get() = when (DataStore.serviceMode) {
+            Key.v2rayVpn -> V2RayVpnService::class
             Key.modeProxy -> ProxyService::class
             Key.modeVpn -> VpnService::class
             Key.modeTransproxy -> TransproxyService::class

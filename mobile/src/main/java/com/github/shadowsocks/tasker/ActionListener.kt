@@ -36,7 +36,7 @@ class ActionListener : BroadcastReceiver() {
         }
         if (settings.switchOn) {
             Core.startService()
-            if (changed) Core.reloadService()
+            //if (changed) Core.reloadService()
         } else Core.stopService()
     }
 }

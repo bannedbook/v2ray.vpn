@@ -26,6 +26,7 @@ import androidx.preference.PreferenceDataStore
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.database.PrivateDatabase
+import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.database.PublicDatabase
 import com.github.shadowsocks.net.TcpFastOpen
 import com.github.shadowsocks.utils.DirectBoot
@@ -76,11 +77,14 @@ object DataStore : OnPreferenceDataStoreChangeListener {
             publicStore.getBoolean(Key.is_get_free_servers, true)
         }
     }
-    val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
+    val serviceMode :String get() {
+        if (ProfileManager.getProfile(profileId)?.profileType=="vmess")return Key.v2rayVpn
+        return publicStore.getString(Key.serviceMode) ?: Key.modeVpn
+    }
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
-    var portProxy: Int
-        get() = getLocalPort(Key.portProxy, 1080)
-        set(value) = publicStore.putString(Key.portProxy, value.toString())
+    var portProxy: Int = VpnEncrypt.SOCK_PROXY_PORT
+        //get() = getLocalPort(Key.portProxy, VpnEncrypt.SOCK_PROXY_PORT)
+        //set(value) = publicStore.putString(Key.portProxy, value.toString())
     val proxyAddress get() = InetSocketAddress("127.0.0.1", portProxy)
     var portLocalDns: Int
         get() = getLocalPort(Key.portLocalDns, 5450)
@@ -100,7 +104,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         if (publicStore.getBoolean(Key.tfo) == null) publicStore.putBoolean(Key.tfo, tcpFastOpen)
         if (publicStore.getBoolean(Key.isAutoUpdateServers) == null) publicStore.putBoolean(Key.isAutoUpdateServers, isAutoUpdateServers)
         if (publicStore.getBoolean(Key.is_get_free_servers) == null) publicStore.putBoolean(Key.is_get_free_servers, is_get_free_servers)
-        if (publicStore.getString(Key.portProxy) == null) portProxy = portProxy
+        //if (publicStore.getString(Key.portProxy) == null) portProxy = portProxy
         if (publicStore.getString(Key.portLocalDns) == null) portLocalDns = portLocalDns
         if (publicStore.getString(Key.portTransproxy) == null) portTransproxy = portTransproxy
         if (publicStore.getString(Key.portHttpProxy) == null) portHttpProxy = portHttpProxy

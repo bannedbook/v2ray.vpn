@@ -1,3 +1,4 @@
-include ':ssvpn-v2ray'
+include ':libv2ray'
+//include ':ssvpn-v2ray'
 include ':obfs'
-include ':mobile', ':core', ':plugin'
+include ':mobile', ':core', ':plugin', ':dpreference'

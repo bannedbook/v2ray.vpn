@@ -35,7 +35,23 @@
                    android:value="true" />
         <meta-data android:name="com.google.android.backup.api_key"
                    android:value="AEdPqrEAAAAIENnFBzugt9171NjZ_etNgRcwZ93KmEl3HN8tXQ"/>
-
+        <service
+            android:name="com.github.shadowsocks.bg.V2RayVpnService"
+            android:process=":bg"
+            android:directBootAware="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.VpnService"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.github.shadowsocks.bg.V2RayTestService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":bg">
+        </service>
         <service
             android:name="com.github.shadowsocks.bg.VpnService"
             android:process=":bg"
@@ -61,7 +77,12 @@
             android:directBootAware="true"
             android:exported="false">
         </service>
-
+        <service
+            android:name="com.github.shadowsocks.bg.ProxyTestService"
+            android:process=":bg"
+            android:directBootAware="true"
+            android:exported="false">
+        </service>
         <service
             android:name="com.github.shadowsocks.subscription.SubscriptionService"
             android:exported="false">

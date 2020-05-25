@@ -12,9 +12,15 @@ import javax.crypto.spec.SecretKeySpec
 object VpnEncrypt{
     private const val theKey="your key"
     const val vpnGroupName="SpeedUp.VPN"
+    const val v2vpnRemark="v2ray.vpn"
     const val freesubGroupName="https://git.io/jmsfq"
     const val testing="test..."
+    const val SOCK_PROXY_PORT = 10808
     const val HTTP_PROXY_PORT = 58300
+    const val enableLocalDns =  false
+    const val enableSniffing = true
+    const val PREF_ROUTING_DOMAIN_STRATEGY = "IPIfNonMatch"
+    const val enableSpeed = false
     @JvmStatic fun aesEncrypt(v:String, secretKey:String=theKey) = AES256.encrypt(v, secretKey)
     @JvmStatic fun aesDecrypt(v:String, secretKey:String=theKey) = AES256.decrypt(v, secretKey)
     @JvmStatic fun readFileAsTextUsingInputStream(fileName: String)  = File(fileName).inputStream().readBytes().toString(Charsets.UTF_8)

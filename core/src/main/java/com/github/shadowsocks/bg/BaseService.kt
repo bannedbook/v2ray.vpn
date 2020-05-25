@@ -119,7 +119,8 @@ object BaseService {
                 repeat(count) {
                     try {
                         work(callbacks.getBroadcastItem(it))
-                    } catch (_: RemoteException) {
+                    } catch (e: RemoteException) {
+                        printLog(e)
                     } catch (e: Exception) {
                         printLog(e)
                     }

@@ -23,3 +23,4 @@ release/
 *.apk
 *.bak
 gitupdate.*
+gitupdate.bat

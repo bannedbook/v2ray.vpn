@@ -41,6 +41,7 @@ import com.github.shadowsocks.preference.*
 import com.github.shadowsocks.utils.*
 import com.github.shadowsocks.widget.ListListener
 import com.google.android.material.snackbar.Snackbar
+import com.takisoft.preferencex.SimpleMenuPreference
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -75,6 +76,7 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
     private lateinit var pluginConfiguration: PluginConfiguration
     private lateinit var receiver: BroadcastReceiver
     private lateinit var udpFallback: Preference
+    private lateinit var route: SimpleMenuPreference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = DataStore.privateStore
@@ -95,9 +97,9 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
 
         val serviceMode = DataStore.serviceMode
         findPreference<Preference>(Key.remoteDns)!!.isEnabled = serviceMode != Key.modeProxy
-        findPreference<Preference>(Key.ipv6)!!.isEnabled = serviceMode == Key.modeVpn
+        findPreference<Preference>(Key.ipv6)!!.isEnabled = (serviceMode == Key.modeVpn || serviceMode == Key.v2rayVpn)
         isProxyApps = findPreference(Key.proxyApps)!!
-        isProxyApps.isEnabled = serviceMode == Key.modeVpn
+        isProxyApps.isEnabled = (serviceMode == Key.modeVpn || serviceMode == Key.v2rayVpn)
         isProxyApps.setOnPreferenceChangeListener { _, newValue ->
             startActivity(Intent(activity, AppManager::class.java))
             if (newValue as Boolean) DataStore.dirty = true
@@ -121,6 +123,13 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         DataStore.privateStore.registerChangeListener(this)
 
         val profile = ProfileManager.getProfile(profileId) ?: Profile()
+        if (profile.profileType=="vmess"){
+            route=findPreference(Key.route)!!
+            route.setEntries(R.array.route_entry_v2ray)
+            plugin.isVisible=false
+            udpFallback.isVisible=false
+            udpFallback.isEnabled = false
+        }
         if (profile.subscription == Profile.SubscriptionStatus.Active) {
             findPreference<Preference>(Key.name)!!.isEnabled = false
             findPreference<Preference>(Key.host)!!.isEnabled = false
