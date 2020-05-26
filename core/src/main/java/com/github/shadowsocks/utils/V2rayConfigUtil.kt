@@ -78,7 +78,8 @@ object V2rayConfigUtil {
             }
 
             //转成Json
-            val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
+            val theInstance=V2rayConfig()
+            val v2rayConfig = Gson().fromJson(assets, theInstance::class.java) ?: return result
 //            if (v2rayConfig == null) {
 //                return result
 //            }

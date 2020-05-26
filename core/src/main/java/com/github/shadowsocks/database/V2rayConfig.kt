@@ -2,24 +2,24 @@ package com.github.shadowsocks.database
 
 data class V2rayConfig(
         val stats: Any?=null,
-        val log: LogBean,
-        val policy: PolicyBean,
-        val inbounds: ArrayList<InboundBean>,
-        var outbounds: ArrayList<OutboundBean>,
-        var dns: DnsBean,
-        val routing: RoutingBean) {
+        val log: LogBean = LogBean(),
+        val policy: PolicyBean = PolicyBean(),
+        val inbounds: ArrayList<InboundBean> = arrayListOf(InboundBean()),
+        var outbounds: ArrayList<OutboundBean> = arrayListOf(OutboundBean()),
+        var dns: DnsBean = DnsBean(),
+        val routing: RoutingBean = RoutingBean()) {
 
-    data class LogBean(val access: String,
-                       val error: String,
-                       val loglevel: String)
+    data class LogBean(val access: String="",
+                       val error: String="",
+                       val loglevel: String="")
 
     data class InboundBean(
-            var tag: String,
-            var port: Int,
-            var protocol: String,
+            var tag: String ="",
+            var port: Int?=null,
+            var protocol: String ="",
             var listen: String?=null,
-            val settings: InSettingsBean,
-            val sniffing: SniffingBean?) {
+            val settings: InSettingsBean?=InSettingsBean(),
+            val sniffing: SniffingBean?=SniffingBean()) {
 
         data class InSettingsBean(val auth: String? = null,
                                   val udp: Boolean? = null,
@@ -28,48 +28,48 @@ data class V2rayConfig(
                                   val port: Int? = null,
                                   val network: String? = null)
 
-        data class SniffingBean(var enabled: Boolean,
-                                val destOverride: List<String>)
+        data class SniffingBean(var enabled: Boolean?=null,
+                                val destOverride: List<String>?=null)
     }
 
-    data class OutboundBean(val tag: String,
-                            var protocol: String,
-                            var settings: OutSettingsBean?,
-                            var streamSettings: StreamSettingsBean?,
-                            var mux: MuxBean?) {
+    data class OutboundBean(val tag: String="",
+                            var protocol: String="",
+                            var settings: OutSettingsBean?=OutSettingsBean(),
+                            var streamSettings: StreamSettingsBean?=null,
+                            var mux: MuxBean?=MuxBean()) {
 
-        data class OutSettingsBean(var vnext: List<VnextBean>?,
-                                   var servers: List<ServersBean>?,
-                                   var response: Response) {
+        data class OutSettingsBean(var vnext: List<VnextBean>?= listOf(VnextBean()),
+                                   var servers: List<ServersBean>?=listOf(ServersBean()),
+                                   var response: Response=Response()) {
 
-            data class VnextBean(var address: String,
-                                 var port: Int,
-                                 var users: List<UsersBean>) {
+            data class VnextBean(var address: String ="",
+                                 var port: Int = 0,
+                                 var users: List<UsersBean> = listOf(UsersBean())) {
 
-                data class UsersBean(var id: String,
-                                     var alterId: Int,
-                                     var security: String,
-                                     var level: Int)
+                data class UsersBean(var id: String="",
+                                     var alterId: Int=2,
+                                     var security: String="",
+                                     var level: Int=2)
             }
 
-            data class ServersBean(var address: String,
-                                   var method: String,
-                                   var ota: Boolean,
-                                   var password: String,
-                                   var port: Int,
-                                   var level: Int)
+            data class ServersBean(var address: String="",
+                                   var method: String="",
+                                   var ota: Boolean=false,
+                                   var password: String="",
+                                   var port: Int=0,
+                                   var level: Int=0)
 
-            data class Response(var type: String)
+            data class Response(var type: String="")
         }
 
-        data class StreamSettingsBean(var network: String,
-                                      var security: String,
-                                      var tcpSettings: TcpsettingsBean?,
-                                      var kcpsettings: KcpsettingsBean?,
-                                      var wssettings: WssettingsBean?,
-                                      var httpsettings: HttpsettingsBean?,
-                                      var tlssettings: TlssettingsBean?,
-                                      var quicsettings: QuicsettingBean?
+        data class StreamSettingsBean(var network: String="",
+                                      var security: String="",
+                                      var tcpSettings: TcpsettingsBean?=TcpsettingsBean(),
+                                      var kcpsettings: KcpsettingsBean?=KcpsettingsBean(),
+                                      var wssettings: WssettingsBean?=WssettingsBean(),
+                                      var httpsettings: HttpsettingsBean?=HttpsettingsBean(),
+                                      var tlssettings: TlssettingsBean?=TlssettingsBean(),
+                                      var quicsettings: QuicsettingBean?=QuicsettingBean()
         ) {
 
             data class TcpsettingsBean(var connectionReuse: Boolean = true,
@@ -108,7 +108,7 @@ data class V2rayConfig(
             }
         }
 
-        data class MuxBean(var enabled: Boolean)
+        data class MuxBean(var enabled: Boolean = false)
     }
 
     //data class DnsBean(var servers: List<String>)
@@ -120,8 +120,8 @@ data class V2rayConfig(
                                var domains: List<String>?)
     }
 
-    data class RoutingBean(var domainStrategy: String,
-                           var rules: ArrayList<RulesBean>) {
+    data class RoutingBean(var domainStrategy: String="",
+                           var rules: ArrayList<RulesBean> =arrayListOf(RulesBean())) {
 
         data class RulesBean(var type: String = "",
                              var ip: ArrayList<String>? = null,
@@ -131,8 +131,8 @@ data class V2rayConfig(
                              var inboundTag: ArrayList<String>? = null)
     }
 
-    data class PolicyBean(var levels: Map<String, LevelBean>,
-                            var system: Any?=null) {
+    data class PolicyBean(var levels: Map<String, LevelBean>?= mapOf("" to LevelBean()),
+                          var system: Any?=null) {
         data class LevelBean(
                   var handshake: Int? = null,
                   var connIdle: Int? = null,

@@ -143,6 +143,7 @@ object SSRSubManager {
         }
 
         val count = profiles.count()
+
         var limitProfiles:ArrayList<Profile> = arrayListOf()
 
         if (limit != -1 && limit < count) {
