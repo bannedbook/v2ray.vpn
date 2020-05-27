@@ -144,7 +144,7 @@ class V2RayTestService : Service() , BaseService.Interface {
     private fun startV2ray() {
         if (!v2rayPoint.isRunning) {
             val broadname="$packageName.SERVICE"
-            Log.e("broadname",broadname)
+            //Log.e("broadname",broadname)
             if (!data.closeReceiverRegistered) {
                 registerReceiver(data.closeReceiver, IntentFilter().apply {
                     addAction(Action.RELOAD)
@@ -153,8 +153,9 @@ class V2RayTestService : Service() , BaseService.Interface {
                 }, broadname, null)
                 data.closeReceiverRegistered = true
             }
+            Log.e("data.notification","ssvpn-"+activeProfile.formattedName)
             //data.notification = createNotification(activeProfile.formattedName)
-            //data.changeState(BaseService.State.Connecting)
+            data.changeState(BaseService.State.Connecting)
 
 
             configContent = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
@@ -170,11 +171,14 @@ class V2RayTestService : Service() , BaseService.Interface {
             }
 
             if (v2rayPoint.isRunning) {
-                //data.changeState(BaseService.State.Connected)
+                data.changeState(BaseService.State.Connected)
             } else {
                 //MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, "")
                 //cancelNotification()
             }
+        }
+        else{
+            Log.e("startV2ray","v2rayPoint isRunning already.")
         }
     }
     override fun stopRunner(restart: Boolean , msg: String? ) {
