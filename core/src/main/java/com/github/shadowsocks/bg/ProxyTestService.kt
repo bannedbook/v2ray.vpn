@@ -72,7 +72,7 @@ class ProxyTestService : ProxyService(), Interface {
             }, "$packageName.SERVICE", null)
             data.closeReceiverRegistered = true
         }
-        //data.changeState(BaseService.State.Connecting)
+        data.changeState(BaseService.State.Connecting)
         data.connectingJob = GlobalScope.launch(Dispatchers.Main) {
             try {
                 Executable.killAll()    // clean up old processes
@@ -99,7 +99,7 @@ class ProxyTestService : ProxyService(), Interface {
                 proxy.scheduleUpdate()
                 data.udpFallback?.scheduleUpdate()
 
-                //data.changeState(BaseService.State.Connected)
+                data.changeState(BaseService.State.Connected)
             } catch (_: CancellationException) {
                 // if the job was cancelled, it is canceller's responsibility to call stopRunner
             } catch (_: UnknownHostException) {
