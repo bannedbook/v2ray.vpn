@@ -79,6 +79,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.*
 import java.nio.charset.StandardCharsets
@@ -587,15 +588,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             R.id.action_import_clipboard -> {
                 try {
-                    var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
-                    val ssPofiles = Profile.findAllSSUrls(clipboard.primaryClip!!.getItemAt(0).text, Core.currentProfile?.first)
-                    val v2Profiles= Profile.findAllVmessUrls(clipboard.primaryClip!!.getItemAt(0).text, Core.currentProfile?.first)
-                    profilesSet.addAll(ssPofiles)
-                    profilesSet.addAll(v2Profiles)
-                    var profiles:List<Profile> = profilesSet.toList()
-                    if (profiles.isNotEmpty()) {
-                        profiles.forEach { ProfileManager.createProfile(it) }
-                        (activity as MainActivity).snackbar().setText(R.string.action_import_msg).show()
+                    var i=ProfileManager.importProfiles(clipboard.primaryClip!!.getItemAt(0).text)
+                    if (i>0) {
+                        try {(activity as MainActivity).snackbar().setText(getString(com.github.shadowsocks.core.R.string.action_import_msg2, i)).show()}catch (t:Throwable){}
                         return true
                     }
                 } catch (exc: Exception) {
@@ -839,6 +834,19 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         else when (requestCode) {
             REQUEST_IMPORT_PROFILES -> {
                 val activity = activity as MainActivity
+
+                try {
+                    if(ProfileManager.importProfilesFromFileSequence(data!!.datas.asSequence().map {
+                        activity.contentResolver.openInputStream(it)
+                    }.filterNotNull())) return
+                }
+                catch (e: FileNotFoundException) {
+                    activity.snackbar(e.readableMessage).show()
+                }
+                catch (e: Exception) {
+                    printLog(e)
+                }
+
                 try {
                     ProfileManager.createProfilesFromJson(data!!.datas.asSequence().map {
                         activity.contentResolver.openInputStream(it)
@@ -849,6 +857,18 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             REQUEST_REPLACE_PROFILES -> {
                 val activity = activity as MainActivity
+                try {
+                    if(ProfileManager.importProfilesFromFileSequence(data!!.datas.asSequence().map {
+                        activity.contentResolver.openInputStream(it)
+                    }.filterNotNull(), true)) return
+                }
+                catch (e: FileNotFoundException) {
+                    activity.snackbar(e.readableMessage).show()
+                }
+                catch (e: Exception) {
+                    printLog(e)
+                }
+
                 try {
                     ProfileManager.createProfilesFromJson(data!!.datas.asSequence().map {
                         activity.contentResolver.openInputStream(it)

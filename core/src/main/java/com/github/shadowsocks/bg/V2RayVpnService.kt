@@ -132,6 +132,8 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
                 data.connectingJob = GlobalScope.launch(Dispatchers.Main) {
                     try {
                         activeProfile = ProfileManager.getProfile(DataStore.profileId)!!
+                        val proxy = V2ProxyInstance(v2rayPoint,activeProfile,activeProfile.route)
+                        data.proxy = proxy
                         genStoreV2rayConfig()
                         startV2ray()
                     } catch (_: CancellationException) {
@@ -324,12 +326,15 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
             try {
                 v2rayPoint.runLoop()
             } catch (e: Exception) {
-                Log.d(packageName, e.toString())
+                Log.e(packageName, e.toString())
+                e.printStackTrace()
             }
 
             if (v2rayPoint.isRunning) {
+                Log.e(packageName, "v2rayPoint isRunning")
                 data.changeState(BaseService.State.Connected)
             } else {
+                Log.e(packageName, "v2rayPoint is not Running")
                 //MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, "")
                 //cancelNotification()
             }
@@ -351,6 +356,13 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
             }
             data.notification?.destroy()
             data.notification = null
+            val ids = listOfNotNull(data.proxy, data.udpFallback).map {
+                it.shutdown(this)
+                it.profile.id
+            }
+            data.binder.trafficPersisted(ids)
+            data.proxy = null
+            data.udpFallback = null
             // change the state
             data.changeState(BaseService.State.Stopped, msg)
 

@@ -22,6 +22,7 @@ package com.github.shadowsocks.database
 
 import SpeedUpVPN.VpnEncrypt
 import android.database.sqlite.SQLiteCantOpenDatabaseException
+import android.util.Base64
 import android.util.Log
 import android.util.LongSparseArray
 import com.github.shadowsocks.Core
@@ -31,6 +32,7 @@ import com.github.shadowsocks.utils.forEachTry
 import com.github.shadowsocks.utils.printLog
 import com.google.gson.JsonStreamParser
 import org.json.JSONArray
+import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.sql.SQLException
@@ -50,10 +52,20 @@ object ProfileManager {
 
     @Throws(SQLException::class)
     fun createProfile(profile: Profile = Profile()): Profile {
-        profile.id = 0
-        profile.userOrder = PrivateDatabase.profileDao.nextOrder() ?: 0
-        profile.id = PrivateDatabase.profileDao.create(profile)
-        listener?.onAdd(profile)
+        var existOne=PrivateDatabase.profileDao.getByHost(profile.host)
+        if (existOne==null) {
+            profile.id = 0
+            profile.userOrder = PrivateDatabase.profileDao.nextOrder() ?: 0
+            profile.id = PrivateDatabase.profileDao.create(profile)
+            listener?.onAdd(profile)
+        }
+        else {
+            existOne.copyFeatureSettingsTo(profile)
+            profile.id=existOne.id
+            profile.tx=existOne.tx
+            profile.rx=existOne.rx
+            updateProfile(profile)
+        }
         return profile
     }
 
@@ -75,6 +87,82 @@ object ProfileManager {
             return@filter true
         }.forEach { createProfile(it) }
         deletProfiles(old)
+    }
+
+    fun importProfiles(text: CharSequence, replace: Boolean = false):Int {
+        val profiles = if (replace) getAllProfiles()?.associateBy { it.formattedAddress } else null
+        val feature = if (replace) {
+            profiles?.values?.singleOrNull { it.id == DataStore.profileId }
+        } else Core.currentProfile?.first
+
+        val lazyClear = lazy { clear() }
+
+        var profilesSet:MutableSet<Profile> = LinkedHashSet()
+        val ssPofiles = Profile.findAllSSUrls(text, feature)
+        val v2Profiles= Profile.findAllVmessUrls(text, feature)
+        profilesSet.addAll(ssPofiles)
+        profilesSet.addAll(v2Profiles)
+        var newProfiles:List<Profile> = profilesSet.toList()
+        if (newProfiles.isNotEmpty()){
+            newProfiles.asIterable().forEachTry {
+                if (replace) {
+                    lazyClear.value
+                    // if two profiles has the same address, treat them as the same profile and copy stats over
+                    profiles?.get(it.formattedAddress)?.apply {
+                        it.tx = tx
+                        it.rx = rx
+                    }
+                }
+                createProfile(it)
+            }
+
+            return newProfiles.size
+        }
+        else return 0
+    }
+
+    fun importProfilesFromBase64FileSequence(files: Sequence<InputStream>, replace: Boolean = false):Boolean {
+        var i=0
+        files.asIterable().forEachTry {
+            if(importProfilesFromBase64File(it,replace))i++
+        }
+        return (i>0)
+    }
+
+    fun importProfilesFromBase64File(file: InputStream, replace: Boolean = false):Boolean {
+        var content: String=""
+        var reader:BufferedReader?=null
+        try {
+            reader = BufferedReader(file.reader())
+            content = reader.readText()
+            content=String(Base64.decode(content, Base64.DEFAULT))
+        }
+        catch (e:Exception){
+            printLog(e)
+        }
+        finally {
+            reader?.close()
+        }
+        return importProfiles(content,replace) > 0
+    }
+
+    fun importProfilesFromFile(file: InputStream, replace: Boolean = false):Boolean {
+        val reader = BufferedReader(file.reader())
+        var content: String
+        try {
+            content = reader.readText()
+        } finally {
+            reader.close()
+        }
+        return importProfiles(content,replace) >0
+    }
+
+    fun importProfilesFromFileSequence(files: Sequence<InputStream>, replace: Boolean = false):Boolean {
+        var i=0
+        files.asIterable().forEachTry {
+            if(importProfilesFromFile(it,replace))i++
+        }
+        return (i>0)
     }
 
     fun createProfilesFromJson(jsons: Sequence<InputStream>, replace: Boolean = false) {

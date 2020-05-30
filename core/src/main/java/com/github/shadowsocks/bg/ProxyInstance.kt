@@ -21,8 +21,7 @@
 package com.github.shadowsocks.bg
 
 import android.content.Context
-import android.util.Base64
-import com.github.shadowsocks.Core
+import android.util.Log
 import com.github.shadowsocks.acl.Acl
 import com.github.shadowsocks.acl.AclSyncer
 import com.github.shadowsocks.database.Profile
@@ -31,26 +30,23 @@ import com.github.shadowsocks.plugin.PluginConfiguration
 import com.github.shadowsocks.plugin.PluginManager
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.utils.parseNumericAddress
-import com.github.shadowsocks.utils.signaturesCompat
-import com.github.shadowsocks.utils.useCancellable
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
-import java.net.*
-import java.security.MessageDigest
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.UnknownHostException
 
 /**
  * This class sets up environment for ss-local.
  */
-class ProxyInstance(val profile: Profile, private val route: String = profile.route) {
+open class ProxyInstance(open val profile: Profile, private val route: String = profile.route) {
     private var configFile: File? = null
     var trafficMonitor: TrafficMonitor? = null
     val plugin by lazy { PluginManager.init(PluginConfiguration(profile.plugin ?: "")) }
     private var scheduleConfigUpdate = false
 
-    suspend fun init(service: BaseService.Interface, hosts: HostsFile) {
+    open suspend fun init(service: BaseService.Interface, hosts: HostsFile) {
 
         // it's hard to resolve DNS on a specific interface so we'll do it here
         if (profile.host.parseNumericAddress() == null) {
@@ -79,7 +75,7 @@ class ProxyInstance(val profile: Profile, private val route: String = profile.ro
      * Sensitive shadowsocks configuration file requires extra protection. It may be stored in encrypted storage or
      * device storage, depending on which is currently available.
      */
-    fun start(service: BaseService.Interface, stat: File, configFile: File, extraFlag: String? = null) {
+    open fun start(service: BaseService.Interface, stat: File, configFile: File, extraFlag: String? = null) {
         trafficMonitor = TrafficMonitor(stat)
 
         this.configFile = configFile
@@ -109,12 +105,12 @@ class ProxyInstance(val profile: Profile, private val route: String = profile.ro
         service.data.processes!!.start(cmd)
     }
 
-    fun scheduleUpdate() {
+    open fun scheduleUpdate() {
         if (route !in arrayOf(Acl.ALL, Acl.CUSTOM_RULES)) AclSyncer.schedule(route)
         if (scheduleConfigUpdate) RemoteConfig.fetchAsync()
     }
 
-    fun shutdown(scope: CoroutineScope) {
+    open fun shutdown(scope: CoroutineScope) {
         trafficMonitor?.apply {
             thread.shutdown(scope)
             persistStats(profile.id)    // Make sure update total traffic when stopping the runner

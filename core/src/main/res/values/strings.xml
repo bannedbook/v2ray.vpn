@@ -109,6 +109,7 @@
   <string name="action_export_msg">Successfully export!</string>
   <string name="action_export_err">Failed to export.</string>
   <string name="action_import_msg">Successfully import!</string>
+  <string name="action_import_msg2">Successfully import %d profiles.</string>
   <string name="action_import_err">Failed to import.</string>
 
   <!-- profile -->

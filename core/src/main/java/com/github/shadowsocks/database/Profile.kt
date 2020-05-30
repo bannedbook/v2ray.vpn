@@ -128,10 +128,80 @@ data class Profile(
         private val decodedPattern_ssr_protocolparam = "(?i)(.*)[?&]protoparam=([A-Za-z0-9_=-]*)(.*)".toRegex()
         private val decodedPattern_ssr_groupparam = "(?i)(.*)[?&]group=([A-Za-z0-9_=-]*)(.*)".toRegex()
 
-        private val pattern_vmess = "(?i)vmess://([A-Za-z0-9_=-]+)".toRegex()
+        private val pattern_vmess = "(?i)vmess://(.*)".toRegex()
 
         private fun base64Decode(data: String) = String(Base64.decode(data.replace("=", ""), Base64.URL_SAFE), Charsets.UTF_8)
+        /**
+         * base64 decode
+         */
+        fun decodeForVmess(text: String): String {
+            try {
+                return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return ""
+            }
+        }
 
+        fun profileFromVmessBean(vmess: VmessBean, profile:Profile): Profile {
+            profile.profileType = "vmess"
+            //profile.id=vmess.guid.toLong()
+            profile.remoteDns=vmess.remoteDns
+            profile.host=vmess.address
+            profile.alterId=vmess.alterId
+            profile.headerType=vmess.headerType
+            profile.password=vmess.id
+            profile.network=vmess.network
+            profile.path=vmess.path
+            profile.remotePort=vmess.port
+            profile.name=vmess.remarks
+            profile.requestHost=vmess.requestHost
+            profile.method=vmess.security
+            profile.streamSecurity=vmess.streamSecurity
+            profile.url_group=vmess.subid
+
+            if(vmess.route=="0")profile.route="all"
+            else if(vmess.route=="1")profile.route="bypass-lan"
+            else if(vmess.route=="2")profile.route="bypass-china"
+            else if(vmess.route=="3")profile.route="bypass-lan-china"
+            else profile.route="all"
+
+            return profile
+        }
+
+
+        private fun ResolveVmess4Kitsunebi(server: String): VmessBean {
+            val vmess = VmessBean()
+            var result = server.replace(VMESS_PROTOCOL, "")
+            val indexSplit = result.indexOf("?")
+            if (indexSplit > 0) {
+                result = result.substring(0, indexSplit)
+            }
+            result = decodeForVmess(result)
+
+            val arr1 = result.split('@')
+            if (arr1.count() != 2) {
+                return vmess
+            }
+            val arr21 = arr1[0].split(':')
+            val arr22 = arr1[1].split(':')
+            if (arr21.count() != 2 || arr21.count() != 2) {
+                return vmess
+            }
+
+            vmess.address = arr22[0]
+            vmess.port = parseInt(arr22[1])
+            vmess.security = arr21[0]
+            vmess.id = arr21[1]
+
+            vmess.security = "chacha20-poly1305"
+            vmess.network = "tcp"
+            vmess.headerType = "none"
+            vmess.remarks = "Alien"
+            vmess.alterId = 0
+
+            return vmess
+        }
         fun findAllVmessUrls(data: CharSequence?, feature: Profile? = null) = pattern_vmess.findAll(data
                 ?: "").map {
             val server = it.groupValues[1]
@@ -140,11 +210,10 @@ data class Profile(
             try {
                 val indexSplit = server.indexOf("?")
                 if (indexSplit > 0) {
-                    null
-                    //profile = ResolveVmess4Kitsunebi(server,subid)
+                    profileFromVmessBean(ResolveVmess4Kitsunebi(server),profile)
                 } else {
                     var result = server.replace(VMESS_PROTOCOL, "")
-                    result = base64Decode(result)
+                    result = decodeForVmess(result)
                     if (TextUtils.isEmpty(result)) {
                         null
                     }
@@ -176,8 +245,9 @@ data class Profile(
                     profile.streamSecurity = vmessQRCode.tls
                     profile
                 }
-            } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "Invalid SSR URI: ${it.value}")
+            } catch (e: Exception) {
+                printLog(e)
+                Log.e(TAG, "Invalid Vmess URI: ${it.value}")
                 null
             }
         }.filterNotNull().toMutableSet()
@@ -232,7 +302,7 @@ data class Profile(
                         profile.name = uri.fragment
                         profile
                     } else {
-                        Log.e(TAG, "Unrecognized URI: ${it.value}")
+                        Log.e(TAG, "Unrecognized URI")
                         null
                     }
                 } else {
@@ -363,6 +433,9 @@ data class Profile(
         @Query("SELECT * FROM `Profile` WHERE `id` = :id")
         operator fun get(id: Long): Profile?
 
+        @Query("SELECT * FROM `Profile` WHERE `host` = :host LIMIT 1")
+        fun getByHost(host: String): Profile?
+
         @Query("SELECT * FROM `Profile` WHERE `Subscription` != 2 ORDER BY `userOrder`")
         fun listActive(): List<Profile>
 
@@ -425,8 +498,7 @@ data class Profile(
         return builder.build()
     }
 
-    fun isSameAs(other: Profile): Boolean = other.host == host && other.remotePort == remotePort &&
-            other.password == password && other.method == method
+    fun isSameAs(other: Profile): Boolean = other.host == host
 
     override fun toString() = toUri().toString()
 

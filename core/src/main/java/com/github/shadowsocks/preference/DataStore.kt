@@ -78,7 +78,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         }
     }
     val serviceMode :String get() {
-        if (ProfileManager.getProfile(profileId)?.profileType=="vmess")return Key.v2rayVpn
+        val activeProfile=ProfileManager.getProfile(profileId)
+        if (activeProfile==null || activeProfile.profileType=="vmess")return Key.v2rayVpn
         return publicStore.getString(Key.serviceMode) ?: Key.modeVpn
     }
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
