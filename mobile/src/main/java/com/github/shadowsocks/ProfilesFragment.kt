@@ -321,7 +321,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             text1.text = item.formattedName
             text2.text = ArrayList<String>().apply {
-                if (item.url_group.isNotEmpty()) this += item.url_group	    
+                if (item.isBuiltin())this += "SSVPN Builtin"
+                else if (item.isBuiltin2()) this += "3rd-party free server"
+                else if (item.url_group.isNotEmpty()) this += item.url_group
                 else if (!item.name.isNullOrEmpty()) this += item.formattedAddress
                 val id = PluginConfiguration(item.plugin ?: "").selected
                 if (id.isNotEmpty() && !item.isBuiltin()) this += getString(R.string.profile_plugin, id)
@@ -356,14 +358,14 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             if (isEnabled) {
                 val activity = activity as MainActivity
                 val old = DataStore.profileId
-                Core.switchProfile(item.id)
+                if (item.id!=old)Core.switchProfile(item.id,activity.state.canStop)
                 profilesAdapter.refreshId(old)
                 itemView.isSelected = true
-                if (activity.state.canStop)
-                    Core.reloadService(old,activity.getShadowsocksConnection())
-                else if (ProfileManager.getProfile(old)?.profileType != ProfileManager.getProfile(item.id)?.profileType) {
-                    activity.getShadowsocksConnection().binderDied()
-                }
+//                if (activity.state.canStop)
+//                    Core.reloadService(old,activity.getShadowsocksConnection())
+//                else if (ProfileManager.getProfile(old)?.profileType != ProfileManager.getProfile(item.id)?.profileType) {
+//                    activity.getShadowsocksConnection().binderDied()
+//                }
             }
         }
 
@@ -715,7 +717,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     Log.e("real_ping_all",k.toString())
                     profilesAdapter.profiles[k].elapsed=-2
                     val old = DataStore.profileId
-                    Core.switchProfile(profilesAdapter.profiles[k].id)
+                    Core.switchProfile(profilesAdapter.profiles[k].id,false)
                     activity?.runOnUiThread() {
                         try {activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)}catch (e:Exception){}
                         layoutManager.scrollToPositionWithOffset(k, 0)

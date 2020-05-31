@@ -31,7 +31,7 @@ class ActionListener : BroadcastReceiver() {
         val settings = Settings.fromIntent(intent)
         var changed = false
         if (ProfileManager.getProfile(settings.profileId) != null) {
-            Core.switchProfile(settings.profileId)
+            Core.switchProfile(settings.profileId,false)
             changed = true
         }
         if (settings.switchOn) {

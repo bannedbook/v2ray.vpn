@@ -203,11 +203,11 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
 
         changeState(BaseService.State.Idle) // reset everything to init state
         connection.connect(this, this)
+        DataStore.connection=connection
         DataStore.publicStore.registerChangeListener(this)
         //updateBuiltinServers
         if(DataStore.isAutoUpdateServers){
             Core.updateBuiltinServers()
-            if (DataStore.is_get_free_servers)Core.importFreeSubs()
         }
         //Log.e("user-country", Locale.getDefault().country)
     }

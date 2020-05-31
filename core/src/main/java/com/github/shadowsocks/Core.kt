@@ -97,9 +97,28 @@ object Core {
         return ProfileManager.expand(theOne ?: return null)
     }
 
-    fun switchProfile(id: Long): Profile {
+    fun switchProfile(id: Long, canStop:Boolean): Profile {
+        val oldProfileId=DataStore.profileId
+        Log.e("oldProfileId",oldProfileId.toString())
         val result = ProfileManager.getProfile(id) ?: ProfileManager.createProfile()
-        DataStore.profileId = result.id
+        if (id==oldProfileId)return result
+
+        val profileTypeChanged = result.profileType != ProfileManager.getProfile(oldProfileId)?.profileType
+
+        if(!canStop)
+            DataStore.profileId = result.id
+        else if(canStop && profileTypeChanged)  {
+            stopService()
+            while (BaseService.State.values()[DataStore.connection!!.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
+            DataStore.profileId = result.id
+            startService()
+        }
+        else if (canStop && !profileTypeChanged){
+            DataStore.profileId = result.id
+            app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
+        }
+
+        Log.e("profileId",DataStore.profileId.toString())
         return result
     }
     
@@ -112,6 +131,7 @@ object Core {
                 var builtinSub=SSRSubManager.createBuiltInSub(builtinSubUrls.get(i))
                 if (builtinSub != null) break
             }
+            if (DataStore.is_get_free_servers)importFreeSubs()
         }
     }
     /**

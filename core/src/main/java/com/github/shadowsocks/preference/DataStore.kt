@@ -25,6 +25,7 @@ import android.util.Log
 import androidx.preference.PreferenceDataStore
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
+import com.github.shadowsocks.aidl.ShadowsocksConnection
 import com.github.shadowsocks.database.PrivateDatabase
 import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.database.PublicDatabase
@@ -59,10 +60,18 @@ object DataStore : OnPreferenceDataStoreChangeListener {
             value
         } else parsePort(publicStore.getString(key), default + userIndex)
     }
-
+    var connection: ShadowsocksConnection? =null
+    var oldProfileId: Long
+        get() = publicStore.getLong(Key.oldId) ?: 0
+        set(value) = publicStore.putLong(Key.oldId, value)
     var profileId: Long
         get() = publicStore.getLong(Key.id) ?: 0
-        set(value) = publicStore.putLong(Key.id, value)
+        set(value) {
+            oldProfileId=profileId
+            publicStore.putLong(Key.id, value)
+            if (oldProfileId==0L || ProfileManager.getProfile(profileId)?.profileType  != ProfileManager.getProfile(oldProfileId)?.profileType)
+                connection?.binderDied()
+        }
     val persistAcrossReboot get() = publicStore.getBoolean(Key.persistAcrossReboot)
             ?: BootReceiver.enabled.also { publicStore.putBoolean(Key.persistAcrossReboot, it) }
     val canToggleLocked: Boolean get() = publicStore.getBoolean(Key.directBootAware) == true
