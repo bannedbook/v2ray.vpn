@@ -7,15 +7,15 @@ buildscript {
         javaVersion = JavaVersion.VERSION_1_8
         kotlinVersion = '1.3.61'
         minSdkVersion = 21
-        sdkVersion = 29
+        sdkVersion = 28
         compileSdkVersion = 29
         lifecycleVersion = '2.2.0'
         desugarLibsVersion = '1.0.4'
         junitVersion = '4.13'
         androidTestVersion = '1.2.0'
         androidEspressoVersion = '3.2.0'
-        versionCode = 5000818
-        versionName = '5.1.5-nightly'
+        versionCode = 5000828
+        versionName = '5.1.6-nightly'
         resConfigs = ['ar', 'es', 'fa', 'fr', 'ja', 'ko', 'ru', 'tr', 'zh-rCN', 'zh-rTW']
     }
 
