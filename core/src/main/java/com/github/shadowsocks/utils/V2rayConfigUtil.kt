@@ -372,7 +372,8 @@ object V2rayConfigUtil {
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""), AppConfig.TAG_BLOCKED, v2rayConfig)
 
             v2rayConfig.routing.domainStrategy = VpnEncrypt.PREF_ROUTING_DOMAIN_STRATEGY
-            val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
+            //val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
+            val routingMode = vmess.route
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(
