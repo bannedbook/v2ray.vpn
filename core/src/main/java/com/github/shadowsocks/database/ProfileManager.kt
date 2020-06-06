@@ -26,8 +26,10 @@ import android.util.Base64
 import android.util.Log
 import android.util.LongSparseArray
 import com.github.shadowsocks.Core
+import com.github.shadowsocks.Core.defaultDPreference
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.utils.DirectBoot
+import com.github.shadowsocks.utils.V2rayConfigUtil
 import com.github.shadowsocks.utils.forEachTry
 import com.github.shadowsocks.utils.printLog
 import com.google.gson.JsonStreamParser
@@ -312,6 +314,52 @@ object ProfileManager {
         } catch (ex: Exception) {
             Log.e("speedup.vpn",this.javaClass.name+":"+ex.javaClass.name)
             return null
+        }
+    }
+
+    fun profileToVmessBean(profile: Profile): VmessBean {
+        var vmess = VmessBean()
+        vmess.guid=profile.id.toString()
+        vmess.remoteDns=profile.remoteDns
+        vmess.address=profile.host
+        vmess.alterId=profile.alterId
+        vmess.headerType=profile.headerType
+        vmess.id=profile.password
+        vmess.network=profile.network
+        vmess.path=profile.path
+        vmess.port=profile.remotePort
+        vmess.remarks= profile.name.toString()
+        vmess.requestHost=profile.requestHost
+        vmess.security=profile.method
+        vmess.streamSecurity=profile.streamSecurity
+        vmess.subid=profile.url_group
+        vmess.testResult=profile.elapsed.toString()
+
+        if(profile.route=="all")vmess.route="0"
+        else if(profile.route=="bypass-lan")vmess.route="1"
+        else if(profile.route=="bypass-china")vmess.route="2"
+        else if(profile.route=="bypass-lan-china")vmess.route="3"
+        else vmess.route="0"
+
+        return vmess
+    }
+    /**
+     * gen and store v2ray config file
+     */
+    fun genStoreV2rayConfig(activeProfile:Profile,isTest:Boolean=false): Boolean {
+        try {
+            val result = V2rayConfigUtil.getV2rayConfig(Core.app, profileToVmessBean(activeProfile),isTest)
+            if (result.status) {
+                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG, result.content)
+                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_GUID, activeProfile.id.toString())
+                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_NAME, activeProfile.name)
+                return true
+            } else {
+                return false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 }

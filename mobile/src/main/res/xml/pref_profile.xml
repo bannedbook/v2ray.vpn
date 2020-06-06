@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <!--
     <EditTextPreference
         android:icon="@drawable/ic_baseline_group_work"
         app:key="groupName"
         app:title="@string/group_name"
         app:useSimpleSummaryProvider="true" />
-
+    -->
     <EditTextPreference
             app:key="profileName"
             app:icon="@drawable/ic_social_emoji_symbols"
             app:title="@string/profile_name"
             app:useSimpleSummaryProvider="true"/>
 
-    <PreferenceCategory
+    <PreferenceCategory  android:key="proxyCategory"
             app:title="@string/proxy_cat">
-
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="profileType"
+            app:title="Profile Type"
+            app:entries="@array/profile_type"
+            app:entryValues="@array/profile_type"
+            app:useSimpleSummaryProvider="true" />
         <EditTextPreference
                 app:key="proxy"
                 app:icon="@drawable/ic_hardware_router"
@@ -39,7 +44,40 @@
                 app:entryValues="@array/enc_method_value"
                 app:title="@string/enc_method"
                 app:useSimpleSummaryProvider="true"/>
-
+    </PreferenceCategory>
+    <PreferenceCategory  android:key="v2ray_more_cat"
+        app:title="more function">
+        <EditTextPreference
+            app:key="alterId"
+            app:title="alterId"
+            android:defaultValue="64"
+            app:useSimpleSummaryProvider="true"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="network"
+            app:entries="@array/networks"
+            app:entryValues="@array/networks"
+            app:title="network"
+            app:useSimpleSummaryProvider="true"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="headerType"
+            app:entries="@array/headertypes"
+            app:entryValues="@array/headertypes"
+            app:title="head type"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            app:key="requestHost"
+            app:title="request host(host/ws host/h2 host)/QUIC security"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            app:key="path"
+            app:title="path(ws path/h2 path)/QUIC key"
+            app:useSimpleSummaryProvider="true"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="streamSecurity"
+            app:entries="@array/streamsecuritys"
+            app:entryValues="@array/streamsecuritys"
+            app:title="tls"
+            app:useSimpleSummaryProvider="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -80,7 +118,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
+    <PreferenceCategory android:key="pluginCategory"
             app:title="@string/plugin">
 
         <com.github.shadowsocks.preference.PluginPreference
@@ -99,7 +137,7 @@
                 app:icon="@drawable/ic_maps_360"
                 app:title="@string/udp_fallback"
                 app:summary="@string/plugin_disabled">
-            <intent android:targetPackage="com.github.shadowsocks"
+            <intent android:targetPackage="free.shadowsocks.proxy.VPN"
                     android:targetClass="com.github.shadowsocks.UdpFallbackProfileActivity"/>
         </Preference>
 

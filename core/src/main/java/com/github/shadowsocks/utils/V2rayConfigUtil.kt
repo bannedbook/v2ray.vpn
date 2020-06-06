@@ -31,7 +31,7 @@ object V2rayConfigUtil {
     /**
      * 生成v2ray的客户端配置文件
      */
-    fun getV2rayConfig(app: Application, vmess: VmessBean): Result {
+    fun getV2rayConfig(app: Application, vmess: VmessBean,isTest:Boolean=false): Result {
         var result = Result(false, "")
         try {
             //检查设置
@@ -43,7 +43,7 @@ object V2rayConfigUtil {
 //            }
 
             if (vmess.configType == AppConfig.EConfigType.Vmess) {
-                result = getV2rayConfigType1(app, vmess)
+                result = getV2rayConfigType1(app, vmess,isTest)
             } else if (vmess.configType == AppConfig.EConfigType.Custom) {
                 result = getV2rayConfigType2(app, vmess)
             } else if (vmess.configType == AppConfig.EConfigType.Shadowsocks) {
@@ -68,7 +68,7 @@ object V2rayConfigUtil {
     /**
      * 生成v2ray的客户端配置文件
      */
-    private fun getV2rayConfigType1(app: Application, vmess: VmessBean): Result {
+    private fun getV2rayConfigType1(app: Application, vmess: VmessBean,isTest:Boolean=false): Result {
         val result = Result(false, "")
         try {
             //取得默认配置
@@ -88,7 +88,7 @@ object V2rayConfigUtil {
 
             outbounds(vmess, v2rayConfig, app)
 
-            routing(vmess, v2rayConfig, app)
+            routing(vmess, v2rayConfig, app,isTest)
 
             //if (VpnEncrypt.enableLocalDns) {customLocalDns(vmess, v2rayConfig, app) } else {
                 customRemoteDns(vmess, v2rayConfig, app)
@@ -365,7 +365,7 @@ object V2rayConfigUtil {
     /**
      * routing
      */
-    private fun routing(vmess: VmessBean, v2rayConfig: V2rayConfig, app: Application): Boolean {
+    private fun routing(vmess: VmessBean, v2rayConfig: V2rayConfig, app: Application,isTest:Boolean=false): Boolean {
         try {
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""), AppConfig.TAG_AGENT, v2rayConfig)
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""), AppConfig.TAG_DIRECT, v2rayConfig)
@@ -373,7 +373,8 @@ object V2rayConfigUtil {
 
             v2rayConfig.routing.domainStrategy = VpnEncrypt.PREF_ROUTING_DOMAIN_STRATEGY
             //val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
-            val routingMode = vmess.route
+            var routingMode = "0"   // vmess.route  //强制全局模式，"3"时启动很慢
+            if (isTest)routingMode="0" //测试时强制全局模式，"3"时启动很慢
 
             // Hardcode googleapis.cn
             val googleapisRoute = V2rayConfig.RoutingBean.RulesBean(

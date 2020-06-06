@@ -28,6 +28,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -77,7 +78,42 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
     private lateinit var receiver: BroadcastReceiver
     private lateinit var udpFallback: Preference
     private lateinit var route: SimpleMenuPreference
+    private lateinit var profileType: SimpleMenuPreference
+    private lateinit var pluginCategory: PreferenceCategory
+    private lateinit var encMethod: SimpleMenuPreference
+    private lateinit var v2rayMoreCat: PreferenceCategory
+    private lateinit var sitekey: EditTextPreference
+    private lateinit var sitekeyTitle: CharSequence
 
+    private fun switchVmessSS(profileTypeValue:String){
+        Log.e("switchVmessSS",profileTypeValue)
+        if (profileTypeValue=="vmess"){
+            route.setEntries(R.array.route_entry_v2ray)
+            route.setEntryValues(R.array.route_value_v2ray)
+            route.value="all"
+            route.isEnabled=false
+            encMethod.setEntries(R.array.vmess_enc_method)
+            encMethod.setEntryValues(R.array.vmess_enc_method)
+            var  encMethodList  = resources.getStringArray(R.array.vmess_enc_method)
+            if(!encMethodList.contains(encMethod.value))encMethod.value=encMethodList[2] //auto
+            pluginCategory.isVisible=false
+            v2rayMoreCat.isVisible=true
+            sitekey.title="id"
+
+        }
+        else{
+            route.setEntries(R.array.route_entry)
+            route.setEntryValues(R.array.route_value)
+            route.isEnabled=true
+            encMethod.setEntries(R.array.enc_method_entry)
+            encMethod.setEntryValues(R.array.enc_method_value)
+            var  encMethodList  = resources.getStringArray(R.array.enc_method_value)
+            if(!encMethodList.contains(encMethod.value))encMethod.value=encMethodList[16] //aes-256-gcm
+            pluginCategory.isVisible=true
+            v2rayMoreCat.isVisible=false
+            sitekey.title=sitekeyTitle
+        }
+    }
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         preferenceManager.preferenceDataStore = DataStore.privateStore
         val activity = requireActivity()
@@ -86,15 +122,35 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
             activity.finish()
             return
         }
-        var thisprofile: Profile = ProfileManager.getProfile(profileId) ?: return
-        if(thisprofile.isBuiltin())
-            addPreferencesFromResource(R.xml.pref_profile_vpn)
+        var profile: Profile = ProfileManager.getProfile(profileId) ?: return
+        addPreferencesFromResource(R.xml.pref_profile)
+        //val profile = ProfileManager.getProfile(profileId) ?: Profile()
+        route=findPreference(Key.route)!!
+        profileType=findPreference(Key.profileType)!!
+        encMethod=findPreference(Key.method)!!
+        sitekey=findPreference(Key.password)!!
+        sitekeyTitle=sitekey.title
+        pluginCategory = findPreference("pluginCategory")!!
+        v2rayMoreCat = findPreference("v2ray_more_cat")!!
+
+        if (profile.profileType=="vmess")profile.route="all"  //暂且强制v2ray全局路由模式
+
+        switchVmessSS(profile.profileType)
+        profileType.setOnPreferenceChangeListener { _, newValue ->
+            //profile.profileType=newValue.toString()
+            switchVmessSS(newValue.toString())
+            true
+        }
+        if(profile.isBuiltin()){
+            val proxyCategory:PreferenceCategory = findPreference("proxyCategory")!!
+            proxyCategory.isVisible=false
+            v2rayMoreCat.isVisible=false
+            pluginCategory.isVisible=false
+        }
         else {
-            addPreferencesFromResource(R.xml.pref_profile)
             findPreference<EditTextPreference>(Key.remotePort)!!.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
             findPreference<EditTextPreference>(Key.password)!!.summaryProvider = PasswordSummaryProvider
         }
-
         val serviceMode = DataStore.serviceMode
         findPreference<Preference>(Key.remoteDns)!!.isEnabled = serviceMode != Key.modeProxy
         findPreference<Preference>(Key.ipv6)!!.isEnabled = (serviceMode == Key.modeVpn || serviceMode == Key.v2rayVpn)
@@ -111,30 +167,17 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         findPreference<Preference>(Key.udpdns)!!.isEnabled = serviceMode != Key.modeProxy
         plugin = findPreference(Key.plugin)!!
         pluginConfigure = findPreference(Key.pluginConfigure)!!
-        if(thisprofile.isBuiltin()){
-            plugin.isVisible=false
-            pluginConfigure.isVisible=false
-        }
         pluginConfigure.setOnBindEditTextListener(EditTextPreferenceModifiers.Monospace)
         pluginConfigure.onPreferenceChangeListener = this
         pluginConfiguration = PluginConfiguration(DataStore.plugin)
         initPlugins()
         udpFallback = findPreference(Key.udpFallback)!!
         DataStore.privateStore.registerChangeListener(this)
-
-        val profile = ProfileManager.getProfile(profileId) ?: Profile()
-        if (profile.profileType=="vmess"){
-            route=findPreference(Key.route)!!
-            route.setEntries(R.array.route_entry_v2ray)
-            plugin.isVisible=false
-            udpFallback.isVisible=false
-            udpFallback.isEnabled = false
-        }
         if (profile.subscription == Profile.SubscriptionStatus.Active) {
             findPreference<Preference>(Key.name)!!.isEnabled = false
             findPreference<Preference>(Key.host)!!.isEnabled = false
             findPreference<Preference>(Key.password)!!.isEnabled = false
-            findPreference<Preference>(Key.method)!!.isEnabled = false
+            encMethod!!.isEnabled = false
             findPreference<Preference>(Key.remotePort)!!.isEnabled = false
             plugin.isEnabled = false
             pluginConfigure.isEnabled = false

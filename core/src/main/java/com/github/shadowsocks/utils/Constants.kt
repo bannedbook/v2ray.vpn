@@ -28,6 +28,15 @@ object Key {
     const val DB_PUBLIC = "config.db"
     const val DB_PROFILE = "profile.db"
 
+    const val profileType = "profileType"
+    const val v2rayVpn = "v2rayVpn"
+    const val alterId = "alterId"
+    const val network = "network"
+    const val headerType = "headerType"
+    const val requestHost = "requestHost"
+    const val path = "path"
+    const val streamSecurity = "streamSecurity"
+
     const val id = "profileId"
     const val oldId = "oldProfileId"
     const val name = "profileName"
@@ -38,7 +47,7 @@ object Key {
     const val serviceMode = "serviceMode"
     const val modeProxy = "proxy"
     const val modeVpn = "vpn"
-    const val v2rayVpn = "v2rayVpn"
+
     const val modeTransproxy = "transproxy"
     const val shareOverLan = "shareOverLan"
     const val portProxy = "portProxy"

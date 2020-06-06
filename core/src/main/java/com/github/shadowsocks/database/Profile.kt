@@ -57,10 +57,10 @@ data class Profile(
 
         var host: String = sponsored,
         var remotePort: Int = 8388,
-        var password: String = "u1rRWTssNv0p",
+        var password: String = "",
         var method: String = "aes-256-cfb",
 
-        var route: String = "bypass-lan-china",
+        var route: String = "all",   //""bypass-lan-china"
         var remoteDns: String = "1.1.1.1",
         var proxyApps: Boolean = false,
         var bypass: Boolean = false,
@@ -483,7 +483,7 @@ data class Profile(
         profile.udpdns = udpdns
     }
 
-    fun toUri(): Uri {
+    fun toSsUri(): Uri {
         val auth = Base64.encodeToString("$method:$password".toByteArray(),
                 Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE)
         val wrappedHost = if (host.contains(':')) "[$host]" else host
@@ -497,12 +497,41 @@ data class Profile(
         if (!name.isNullOrEmpty()) builder.fragment(name)
         return builder.build()
     }
-
+    fun toVmessUri(): String {
+        if (isBuiltin()) return ""
+        try {
+            val vmess = ProfileManager.profileToVmessBean(this)
+                val vmessQRCode = VmessQRCode()
+                vmessQRCode.v = vmess.configVersion.toString()
+                vmessQRCode.ps = vmess.remarks
+                vmessQRCode.add = vmess.address
+                vmessQRCode.port = vmess.port.toString()
+                vmessQRCode.id = vmess.id
+                vmessQRCode.aid = vmess.alterId.toString()
+                vmessQRCode.net = vmess.network
+                vmessQRCode.type = vmess.headerType
+                vmessQRCode.host = vmess.requestHost
+                vmessQRCode.path = vmess.path
+                vmessQRCode.tls = vmess.streamSecurity
+                val json = Gson().toJson(vmessQRCode)
+                val conf = VMESS_PROTOCOL + encodeForVmess(json)
+                return conf
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
+    }
     fun isSameAs(other: Profile): Boolean = other.host == host
 
-    override fun toString() = toUri().toString()
+    override fun toString() : String {
+        if (profileType=="ss")
+           return toSsUri().toString()
+        else
+            return toVmessUri()
+    }
 
     fun toJson(profiles: LongSparseArray<Profile>? = null): JSONObject = JSONObject().apply {
+        if (profileType=="vmess")return@apply
         put("server", host)
         put("server_port", remotePort)
         put("password", password)
@@ -553,6 +582,15 @@ data class Profile(
         DataStore.plugin = plugin ?: ""
         DataStore.udpFallback = udpFallback
         DataStore.privateStore.remove(Key.dirty)
+        //add for vmess begin
+        DataStore.privateStore.putString(Key.profileType,profileType)
+        DataStore.privateStore.putString(Key.alterId,alterId.toString())
+        DataStore.privateStore.putString(Key.network,network)
+        DataStore.privateStore.putString(Key.headerType,headerType)
+        DataStore.privateStore.putString(Key.requestHost,requestHost)
+        DataStore.privateStore.putString(Key.path,path)
+        DataStore.privateStore.putString(Key.streamSecurity,streamSecurity)
+        //add for vmess end
     }
 
     fun deserialize() {
@@ -576,6 +614,15 @@ data class Profile(
         individual = DataStore.individual
         plugin = DataStore.plugin
         udpFallback = DataStore.udpFallback
+        //add for vmess begin
+        profileType=DataStore.privateStore.getString(Key.profileType) ?: "ss"
+        alterId=(DataStore.privateStore.getString(Key.alterId)?: "64").toInt()
+        network=DataStore.privateStore.getString(Key.network) ?: "tcp"
+        headerType=DataStore.privateStore.getString(Key.headerType) ?: ""
+        requestHost=DataStore.privateStore.getString(Key.requestHost) ?: ""
+        path=DataStore.privateStore.getString(Key.path) ?: ""
+        streamSecurity=DataStore.privateStore.getString(Key.streamSecurity) ?: ""
+        //add for vmess end
     }
     fun isBuiltin(): Boolean {
         return VpnEncrypt.vpnGroupName == url_group

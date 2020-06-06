@@ -62,7 +62,7 @@ class V2RayTestService : Service() , BaseService.Interface {
                 data.connectingJob = GlobalScope.launch(Dispatchers.Main) {
                     try {
                         activeProfile = ProfileManager.getProfile(DataStore.profileId)!!
-                        genStoreV2rayConfig()
+                        ProfileManager.genStoreV2rayConfig(activeProfile,true)
                         startV2ray()
                     } catch (_: CancellationException) {
                         // if the job was cancelled, it is canceller's responsibility to call stopRunner
@@ -80,51 +80,8 @@ class V2RayTestService : Service() , BaseService.Interface {
         stopRunner()
         return Service.START_NOT_STICKY
     }
-    fun profileToVmessBean(profile: Profile): VmessBean {
-        var vmess = VmessBean()
-        vmess.guid=profile.id.toString()
-        vmess.remoteDns=profile.remoteDns
-        vmess.address=profile.host
-        vmess.alterId=profile.alterId
-        vmess.headerType=profile.headerType
-        vmess.id=profile.password
-        vmess.network=profile.network
-        vmess.path=profile.path
-        vmess.port=profile.remotePort
-        vmess.remarks= profile.name.toString()
-        vmess.requestHost=profile.requestHost
-        vmess.security=profile.method
-        vmess.streamSecurity=profile.streamSecurity
-        vmess.subid=profile.url_group
-        vmess.testResult=profile.elapsed.toString()
 
-        if(profile.route=="all")vmess.route="0"
-        else if(profile.route=="bypass-lan")vmess.route="1"
-        else if(profile.route=="bypass-china")vmess.route="2"
-        else if(profile.route=="bypass-lan-china")vmess.route="3"
-        else vmess.route="0"
 
-        return vmess
-    }
-    /**
-     * gen and store v2ray config file
-     */
-    fun genStoreV2rayConfig(): Boolean {
-        try {
-            val result = V2rayConfigUtil.getV2rayConfig(Core.app, profileToVmessBean(activeProfile))
-            if (result.status) {
-                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG, result.content)
-                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_GUID, activeProfile.id.toString())
-                defaultDPreference.setPrefString(AppConfig.PREF_CURR_CONFIG_NAME, activeProfile.name)
-                return true
-            } else {
-                return false
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-    }
 
     override fun onLowMemory() {
         stopV2Ray()

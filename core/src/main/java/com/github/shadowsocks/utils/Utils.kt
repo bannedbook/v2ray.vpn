@@ -32,6 +32,7 @@ import android.os.Build
 import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
+import android.util.Base64
 import android.util.Log
 import android.util.TypedValue
 import androidx.annotation.AttrRes
@@ -275,4 +276,16 @@ private fun Float.toShortString(): String {
     if (s.length <= 4)
         return s
     return s.substring(0, 4).removeSuffix(".")
+}
+
+/**
+ * base64 encode
+ */
+fun encodeForVmess(text: String): String {
+    try {
+        return Base64.encodeToString(text.toByteArray(charset("UTF-8")), Base64.NO_WRAP)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return ""
+    }
 }

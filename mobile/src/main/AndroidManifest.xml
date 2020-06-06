@@ -33,6 +33,7 @@
         </activity>
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".ProfileConfigActivity"
             android:theme="@style/Theme.Shadowsocks.Immersive"
             android:excludeFromRecents="true"
