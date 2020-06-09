@@ -30,6 +30,7 @@ import android.util.Log
 import android.util.LongSparseArray
 import androidx.core.net.toUri
 import androidx.room.*
+import com.github.shadowsocks.Core
 import com.github.shadowsocks.plugin.PluginConfiguration
 import com.github.shadowsocks.plugin.PluginOptions
 import com.github.shadowsocks.preference.DataStore
@@ -250,7 +251,7 @@ data class Profile(
                 Log.e(TAG, "Invalid Vmess URI: ${it.value}")
                 null
             }
-        }.filterNotNull().toMutableSet()
+        }.filterNotNull()
 
         fun findAllSSRUrls(data: CharSequence?, feature: Profile? = null) = pattern_ssr.findAll(data
                 ?: "").map {
@@ -283,10 +284,19 @@ data class Profile(
                 Log.e(TAG, "Invalid SSR URI: ${it.value}")
                 null
             }
-        }.filterNotNull().toMutableSet()
+        }.filterNotNull()
 
-        fun findAllSSUrls(data: CharSequence?, feature: Profile? = null) = findAllUrls(data,feature).toMutableSet()
-        fun findAllUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data ?: "").map {
+        fun findAllUrls(response: CharSequence?, feature: Profile? = null):MutableSet<Profile> {
+            var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
+            val ssrProfiles = findAllSSRUrls(response, Core.currentProfile?.first)
+            val ssPofiles = findAllSSUrls(response, Core.currentProfile?.first)
+            val v2Profiles= findAllVmessUrls(response, Core.currentProfile?.first)
+            profilesSet.addAll(ssPofiles)
+            profilesSet.addAll(ssrProfiles)
+            profilesSet.addAll(v2Profiles)
+            return profilesSet
+        }
+        fun findAllSSUrls(data: CharSequence?, feature: Profile? = null) = pattern.findAll(data ?: "").map {
             val uri = it.value.toUri()
             try {
                 if (uri.userInfo == null) {

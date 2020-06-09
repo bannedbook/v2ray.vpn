@@ -99,7 +99,7 @@ object SSRSubManager {
 
         if (limit != -1 && limit < count) {
             try {
-                val uqid=VpnEncrypt.getUniqueID()
+                val uqid=VpnEncrypt.getUniqueID(Core.appName)
                 Log.e("uqid",uqid.toString())
                 val startPosition=uqid % count
                 for (k in 0 until limit) {
@@ -123,7 +123,7 @@ object SSRSubManager {
         }
     }
 
-    fun updateBuiltinProfiles(ssrSub: SSRSub, profiles : List<Profile>,limit:Int) {
+    fun update(ssrSub: SSRSub, profiles : List<Profile>,limit:Int=-1) {
         when {
             profiles.isEmpty() -> {
                 deletProfiles(ssrSub)
@@ -148,7 +148,7 @@ object SSRSubManager {
 
         if (limit != -1 && limit < count) {
             try {
-                val uqid=VpnEncrypt.getUniqueID()
+                val uqid=VpnEncrypt.getUniqueID(Core.appName)
                 Log.e("uqid",uqid.toString())
                 val startPosition=uqid % count
                 for (k in 0 until limit) {
@@ -167,26 +167,9 @@ object SSRSubManager {
             limitProfiles.addAll(profiles)
 
         if (limitProfiles.isNotEmpty()) {
-            deletProfiles(ssrSub)
+            //deletProfiles(ssrSub)
             ProfileManager.createProfilesFromSub(limitProfiles, ssrSub.url_group)
         }
-    }
-
-    fun update(ssrSub: SSRSub, profiles : List<Profile>) {
-        when {
-            profiles.isEmpty() -> {
-                deletProfiles(ssrSub)
-                ssrSub.status = SSRSub.EMPTY
-                updateSSRSub(ssrSub)
-                return
-            }
-            else -> {
-                ssrSub.status = SSRSub.NORMAL
-                updateSSRSub(ssrSub)
-            }
-        }
-
-        ProfileManager.createProfilesFromSub(profiles, ssrSub.url_group)
     }
 
     suspend fun updateAll() {
@@ -207,10 +190,7 @@ object SSRSubManager {
         if (url.isEmpty()) return null
         try {
             val response = getResponse(url,mode)
-            val ssrProfiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first)
-            val sspPofiles = Profile.findAllSSUrls(response, Core.currentProfile?.first)
-            ssrProfiles.addAll(sspPofiles)
-            val profiles=ssrProfiles.toList()
+            val profiles=Profile.findAllUrls(response, Core.currentProfile?.first).toList()
             if (profiles.isNullOrEmpty() || profiles[0].url_group.isEmpty()) return null
             val new = SSRSub(url = url, url_group = profiles[0].url_group)
             getAllSSRSub().forEach {
@@ -229,69 +209,37 @@ object SSRSubManager {
             return null
         }
     }
-    suspend fun createBuiltInSub(url: String): SSRSub? {
-        Log.println(Log.ERROR,"------","start createBuiltInSub...")
+    suspend fun createSSSub(url: String, group: String?=null): SSRSub? {
         if (url.isEmpty()) return null
         try {
-            val response = getResponse(url,"aes")
+            val response = if (VpnEncrypt.vpnGroupName==group)
+                getResponse(url,"aes")
+            else
+                getResponse(url)
+
             var limit = -1
             if (response.indexOf("MAX=") == 0) {
                 limit = response.split("\n")[0].split("MAX=")[1]
                         .replace("\\D+".toRegex(), "").toInt()
             }
-
-            var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
-            val ssrProfiles = Profile.findAllSSRUrls(response, Core.currentProfile?.first)
-            val ssPofiles = Profile.findAllSSUrls(response, Core.currentProfile?.first)
-            val v2Profiles= Profile.findAllVmessUrls(response, Core.currentProfile?.first)
-            profilesSet.addAll(ssPofiles)
-            profilesSet.addAll(ssrProfiles)
-            profilesSet.addAll(v2Profiles)
-            var profiles:List<Profile>? = profilesSet.toList()
+            val profiles = Profile.findAllUrls(response, Core.currentProfile?.first).toList()
             if (profiles.isNullOrEmpty()) return null
-            val new = SSRSub(url = url, url_group = VpnEncrypt.vpnGroupName)
-            profiles.forEach { it.url_group = VpnEncrypt.vpnGroupName }
+            val subGroup = group ?: profiles[0].url_group
+            val new = SSRSub(url = url, url_group = subGroup)
+            profiles.forEach { it.url_group = subGroup }
             getAllSSRSub().forEach {
                 if (it.url_group == new.url_group) {
-                    updateBuiltinProfiles(it, profiles,limit)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    update(it, profiles,limit)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
                     Log.println(Log.ERROR,"------","ssrsub existed, update.")
                     return it
                 }
             }
             createSSRSub(new)
-            updateBuiltinProfiles(new, profiles,limit)
+            update(new, profiles,limit)
             Log.println(Log.ERROR,"------","success create ssrsub.")
             return new
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("------","failed create ssrsub",e)
-            return null
-        }
-    }
-    suspend fun createSSSub(url: String): SSRSub? {
-        if (url.isEmpty()) return null
-        try {
-            val response = getResponse(url)
-            val profiles = Profile.findAllUrls(response, Core.currentProfile?.first).toList()
-            if (profiles.isNullOrEmpty()) return null
-            var theGroupName = profiles[0].url_group
-            if (theGroupName.isNullOrEmpty() || theGroupName=="" || theGroupName != VpnEncrypt.vpnGroupName){
-                theGroupName=VpnEncrypt.freesubGroupName
-                profiles.forEach { it.url_group = VpnEncrypt.freesubGroupName }
-            }
-            val new = SSRSub(url = url, url_group = theGroupName)
-            getAllSSRSub().forEach {
-                if (it.url_group == new.url_group) {
-                    update(it, profiles)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
-                    Log.println(Log.ERROR,"------","ssrsub existed, update.")
-                    return it
-                }
-            }
-            createSSRSub(new)
-            update(new, profiles)
-            Log.println(Log.ERROR,"------","success create ssrsub.")
-            return new
-        } catch (e: Exception) {
             Log.e("------","failed create ssrsub",e)
             return null
         }

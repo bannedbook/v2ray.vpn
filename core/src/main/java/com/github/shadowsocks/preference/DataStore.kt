@@ -80,8 +80,9 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     val isAutoUpdateServers: Boolean get() = publicStore.getBoolean(Key.isAutoUpdateServers, true)
     val is_get_free_servers: Boolean get() {
         return try {
-            val userCountry=Locale.getDefault().country
-            publicStore.getBoolean(Key.is_get_free_servers, "CN" != userCountry)
+            //val userCountry=Locale.getDefault().country
+            //publicStore.getBoolean(Key.is_get_free_servers, "CN" != userCountry)
+            publicStore.getBoolean(Key.is_get_free_servers, true)
         }catch (t:Throwable){
             publicStore.getBoolean(Key.is_get_free_servers, true)
         }

@@ -31,6 +31,6 @@ class ProfileTest {
                 .toList()
         Assert.assertEquals(1, results.size)
         Assert.assertEquals("ss://YmYtY2ZiOnRlc3Q@192.168.100.1:8888#example-server".toUri(),
-                results.single().toUri())
+                results.single())
     }
 }

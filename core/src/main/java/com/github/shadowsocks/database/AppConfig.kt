@@ -5,7 +5,6 @@ package com.github.shadowsocks.database
  * App Config Const
  */
 object AppConfig {
-    const val ANG_PACKAGE = "free.v2ray.proxy.VPN"
     const val ANG_CONFIG = "ang_config"
     const val PREF_CURR_CONFIG = "pref_v2ray_config"
     const val PREF_CURR_CONFIG_GUID = "pref_v2ray_config_guid"

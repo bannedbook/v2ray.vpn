@@ -1,4 +1,4 @@
-package com.github.shadowsocks.plugin.obfs_local
+package free.shadowsocks.proxy.VPN
 
 import android.net.Uri
 import android.os.ParcelFileDescriptor
@@ -7,7 +7,7 @@ import com.github.shadowsocks.plugin.PathProvider
 import java.io.File
 import java.io.FileNotFoundException
 
-class SSVpnBinaryProvider : NativePluginProvider() {
+class ObfsBinaryProvider : NativePluginProvider() {
     override fun populateFiles(provider: PathProvider) {
         provider.addPath("obfs-local", 755)
     }

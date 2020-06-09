@@ -22,7 +22,6 @@
 -->
 
 <resources>
-    <string name="app_name">"شدوساکس VPN"</string>
     <string name="remote_dns">"دی‌ان‌اس سرور"</string>
     <string name="connection_test_testing">"در حال آزمایش…"</string>
     <string name="connection_test_fail">"ارتباط با اینترنت فراهم نیست"</string>

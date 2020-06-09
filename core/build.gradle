@@ -26,7 +26,29 @@ android {
                 "room.schemaLocation": "$projectDir/schemas".toString(),
         ]
     }
-
+    flavorDimensions "encryption"
+    productFlavors {
+        ssvpn {
+            dimension "encryption"
+            resValue 'string', 'app_name', "SS VPN"
+            resValue 'string', 'about_title', "SS VPN %s"
+            resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~5832794268"
+            resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/4292721507"
+            resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/8267385919"
+        }
+        v2free {
+            dimension "encryption"
+            resValue 'string', 'app_name', "V2free"
+            resValue 'string', 'about_title', "V2free %s"
+            resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~8520668797"
+            resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/7710984154"
+            resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/5507178325"
+        }
+    }
+    sourceSets {
+        ssvpn.setRoot('src/ssvpn')
+        v2free.setRoot('src/v2free')
+    }
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility javaVersion
@@ -55,7 +77,7 @@ def roomVersion = '2.2.3'
 def workVersion = '2.3.1'
 dependencies {
     api project(':plugin')
-    implementation project(':dpreference')
+    //implementation project(':dpreference')
     implementation project(':libv2ray')
     //implementation project(':ssvpn-v2ray')
     implementation project(':obfs')

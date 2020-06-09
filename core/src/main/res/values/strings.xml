@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-  <string name="app_name">SS VPN</string>
   <string name="quick_toggle">Toggle</string>
   <string name="send_email">Send email</string>
 
@@ -94,7 +92,6 @@
   <string name="faq">FAQ</string>
   <string name="faq_url">https://github.com/bannedbook/ssvpn/blob/master/.github/faq.md</string>
   <string name="about">About</string>
-  <string name="about_title">SS VPN %s</string>
   <string name="edit">Edit</string>
   <string name="share">Share</string>
   <string name="add_profile">Add Profile</string>

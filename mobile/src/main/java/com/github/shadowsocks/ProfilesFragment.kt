@@ -275,7 +275,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             if (adHost != null /*|| !item.isBuiltin()*/) return
             if (nativeAdView == null) {
                 nativeAdView = layoutInflater.inflate(R.layout.ad_unified, adContainer, false) as UnifiedNativeAdView
-                AdLoader.Builder(context, "ca-app-pub-2194043486084479/8267385919").apply {
+                AdLoader.Builder(context, getString(R.string.native_adUnitId)).apply {
                     forUnifiedNativeAd { unifiedNativeAd ->
                         // You must call destroy on old ads when you are done with them,
                         // otherwise you will have a memory leak.
@@ -321,7 +321,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
             text1.text = item.formattedName
             text2.text = ArrayList<String>().apply {
-                if (item.isBuiltin())this += "SSVPN Builtin"
+                if (item.isBuiltin())this += "Builtin VPN Server"
                 else if (item.isBuiltin2()) this += "3rd-party free server"
                 else if (item.url_group.isNotEmpty()) this += item.url_group
                 else if (!item.name.isNullOrEmpty()) this += item.formattedAddress
@@ -581,7 +581,6 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         return when (item.itemId) {
             R.id.update_servers -> {
                 Core.updateBuiltinServers()
-                if(DataStore.is_get_free_servers)Core.importFreeSubs()
                 true
             }
             R.id.action_scan_qr_code -> {

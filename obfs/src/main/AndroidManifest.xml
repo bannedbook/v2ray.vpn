@@ -3,9 +3,9 @@
     <uses-feature android:name="android.hardware.touchscreen"
                   android:required="false"/>
     <application android:icon="@mipmap/ic_launcher">
-        <provider android:name=".SSVpnBinaryProvider"
+        <provider android:name="${applicationId}.ObfsBinaryProvider"
                   android:exported="true"
-                  android:authorities="com.github.shadowsocks.plugin.obfs_local.SSVpnBinaryProvider">
+                  android:authorities="${applicationId}.ObfsBinaryProvider">
             <intent-filter>
                 <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
             </intent-filter>

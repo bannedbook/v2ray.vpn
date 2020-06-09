@@ -86,7 +86,6 @@
     <string name="settings">"設定"</string>
     <string name="faq">"常見問題"</string>
     <string name="about">"關於"</string>
-    <string name="about_title">"Shadowsocks %s"</string>
     <string name="edit">"編輯"</string>
     <string name="share">"分享"</string>
     <string name="add_profile">"新增設定檔"</string>

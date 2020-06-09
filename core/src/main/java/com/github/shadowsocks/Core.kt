@@ -42,7 +42,10 @@ import androidx.work.WorkManager
 import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.acl.Acl
 import com.github.shadowsocks.aidl.ShadowsocksConnection
-import com.github.shadowsocks.bg.*
+import com.github.shadowsocks.bg.BaseService
+import com.github.shadowsocks.bg.ProxyTestService
+import com.github.shadowsocks.bg.V2RayTestService
+import com.github.shadowsocks.core.BuildConfig
 import com.github.shadowsocks.core.R
 import com.github.shadowsocks.database.Profile
 import com.github.shadowsocks.database.ProfileManager
@@ -59,13 +62,13 @@ import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import me.dozen.dpreference.DPreference
 import java.io.File
 import java.io.IOException
-import kotlin.reflect.KClass
-import me.dozen.dpreference.DPreference
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.UnknownHostException
+import kotlin.reflect.KClass
 
 object Core {
     const val TAG = "Core"
@@ -83,6 +86,9 @@ object Core {
         Build.VERSION.SDK_INT >= 24 && app.getSystemService<DevicePolicyManager>()?.storageEncryptionStatus ==
                 DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER
     }
+
+    const val appName = BuildConfig.FLAVOR
+    val applicationId = if (appName === "v2free") "free.v2ray.proxy.VPN" else "free.shadowsocks.proxy.VPN"
 
     val activeProfileIds get() = ProfileManager.getProfile(DataStore.profileId).let {
         if (it == null) emptyList() else listOfNotNull(it.id, it.udpFallback)
@@ -128,7 +134,7 @@ object Core {
         GlobalScope.launch {
             var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
             for (i in 0 until builtinSubUrls.size) {
-                var builtinSub=SSRSubManager.createBuiltInSub(builtinSubUrls.get(i))
+                var builtinSub=SSRSubManager.createSSSub(builtinSubUrls.get(i),VpnEncrypt.vpnGroupName)
                 if (builtinSub != null) break
             }
             if (DataStore.is_get_free_servers)importFreeSubs()
@@ -142,7 +148,7 @@ object Core {
             GlobalScope.launch {
                 var  freesuburl  = app.resources.getStringArray(R.array.freesuburl)
                 for (i in freesuburl.indices) {
-                    var freeSub=SSRSubManager.createSSSub(freesuburl[i])
+                    var freeSub=SSRSubManager.createSSSub(freesuburl[i],VpnEncrypt.freesubGroupName)
                     if (freeSub != null) break
                 }
             }

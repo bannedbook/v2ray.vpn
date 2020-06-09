@@ -7,16 +7,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+<!--    <RelativeLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" >-->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_above="@id/adDividerLine"
         android:id="@+id/snackbar"
         android:clipChildren="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
+<!--        android:layout_above="@id/adDividerLine"-->
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/fragment_holder"
@@ -128,22 +128,22 @@
         </com.github.shadowsocks.widget.StatsBar>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-	<View android:id="@+id/adDividerLine"
-	    android:layout_above="@id/adView"
-	    android:layout_width="match_parent"
-	    android:layout_height="5dp"
-	    android:background="@color/material_green_800"/>
-	<com.google.android.gms.ads.AdView
-	    android:id="@+id/adView"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"
-	    android:layout_centerHorizontal="true"
-	    android:layout_gravity="bottom"
-	    android:background="@android:color/transparent"
-	    app:adSize="SMART_BANNER"
-	    app:adUnitId="ca-app-pub-2194043486084479/4292721507" />
-    </RelativeLayout>
+<!--	<View android:id="@+id/adDividerLine"-->
+<!--	    android:layout_above="@id/adView"-->
+<!--	    android:layout_width="match_parent"-->
+<!--	    android:layout_height="5dp"-->
+<!--	    android:background="@color/material_green_800"/>-->
+<!--	<com.google.android.gms.ads.AdView-->
+<!--	    android:id="@+id/adView"-->
+<!--	    android:layout_width="match_parent"-->
+<!--	    android:layout_height="wrap_content"-->
+<!--	    android:layout_alignParentBottom="true"-->
+<!--	    android:layout_centerHorizontal="true"-->
+<!--	    android:layout_gravity="bottom"-->
+<!--	    android:background="@android:color/transparent"-->
+<!--	    app:adSize="SMART_BANNER"-->
+<!--	    app:adUnitId="@string/banner_adUnitId" />-->
+<!--    </RelativeLayout>-->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"

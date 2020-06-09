@@ -178,5 +178,10 @@
                  android:directBootAware="true"
                  tools:ignore="Instantiatable"
                  tools:replace="android:directBootAware"/>
+        <provider
+            android:name="me.dozen.dpreference.PreferenceProvider"
+            android:enabled="true"
+            android:authorities="${applicationId}.dpreference"
+            android:exported="false" />
     </application>
 </manifest>

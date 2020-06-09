@@ -1,4 +1,4 @@
-import com.android.build.OutputFile
+//import com.android.build.OutputFile
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -22,7 +22,6 @@ android {
     compileSdkVersion rootProject.compileSdkVersion
     archivesBaseName = "ssvpn"
     defaultConfig {
-        applicationId "free.shadowsocks.proxy.VPN"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.sdkVersion
         versionCode rootProject.versionCode
@@ -30,6 +29,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs rootProject.resConfigs
     }
+    flavorDimensions "encryption"
+    productFlavors {
+        ssvpn {
+            dimension "encryption"
+            applicationId "free.shadowsocks.proxy.VPN"
+            resValue 'string', 'applicationId', applicationId
+        }
+        v2free {
+            dimension "encryption"
+            applicationId "free.v2ray.proxy.VPN"
+            resValue 'string', 'applicationId', applicationId
+        }
+    }
+    sourceSets {
+        ssvpn.setRoot('src/ssvpn')
+        v2free.setRoot('src/v2free')
+    }
+
     buildTypes {
         debug {
             pseudoLocalesEnabled true

@@ -97,9 +97,8 @@
                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING"/>
             </intent-filter>
         </receiver>
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2194043486084479~5832794268"/>
+            android:value="@string/admob_appid"/>
     </application>
 </manifest>
