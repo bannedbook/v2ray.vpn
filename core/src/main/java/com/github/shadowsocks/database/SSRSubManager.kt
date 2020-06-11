@@ -12,6 +12,8 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.sql.SQLException
+import java.util.*
+import kotlin.collections.ArrayList
 
 object SSRSubManager {
 
@@ -222,20 +224,30 @@ object SSRSubManager {
                 limit = response.split("\n")[0].split("MAX=")[1]
                         .replace("\\D+".toRegex(), "").toInt()
             }
-            val profiles = Profile.findAllUrls(response, Core.currentProfile?.first).toList()
+            var profiles = Profile.findAllUrls(response, Core.currentProfile?.first)
             if (profiles.isNullOrEmpty()) return null
-            val subGroup = group ?: profiles[0].url_group
+
+            val userCountry= Locale.getDefault().country
+            Log.e("userCountry",userCountry)
+            if (("TM" == userCountry || "UZ" == userCountry || "RU" == userCountry) && VpnEncrypt.vpnGroupName==group){ //builtin server for Russia and Turkmenistan,Uzbekistan
+                val iterator = profiles.iterator()
+                for (it in iterator){
+                    if ( it.name!=null && ( it.name!!.endsWith("r")  || it.name!!.endsWith("rc") ) )
+                        iterator.remove()
+                }
+            }
+            val subGroup = group ?: profiles.first().url_group
             val new = SSRSub(url = url, url_group = subGroup)
             profiles.forEach { it.url_group = subGroup }
             getAllSSRSub().forEach {
                 if (it.url_group == new.url_group) {
-                    update(it, profiles,limit)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+                    update(it, profiles.toList(),limit)//android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
                     Log.println(Log.ERROR,"------","ssrsub existed, update.")
                     return it
                 }
             }
             createSSRSub(new)
-            update(new, profiles,limit)
+            update(new, profiles.toList(),limit)
             Log.println(Log.ERROR,"------","success create ssrsub.")
             return new
         } catch (e: Exception) {

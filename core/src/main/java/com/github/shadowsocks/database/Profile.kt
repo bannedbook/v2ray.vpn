@@ -312,7 +312,7 @@ data class Profile(
                         profile.name = uri.fragment
                         profile
                     } else {
-                        Log.e(TAG, "Unrecognized URI")
+                        Log.w(TAG, "Unrecognized URI")
                         null
                     }
                 } else {
