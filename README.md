@@ -1,6 +1,6 @@
-## V2free for android, a V2ray and  Shadowsocks client with many builtin free servers.
+## V2free for android
 
-Compatible with Shadowsocks, based on shadowsocks-android, added some free built-in shadowsocks servers. If you are not satisfied with our built-in Shadowsocks vpn servers, you can add or import your own Shadowsocks server to use.
+V2free for android, a V2ray and  Shadowsocks client with many builtin free servers.
 
 SS VPN 功能和使用简介
 https://www.youtube.com/watch?v=JE8xRj7_eBQ
