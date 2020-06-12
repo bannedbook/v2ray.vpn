@@ -31,6 +31,7 @@ You can check whether the latest commit builds under UNIX environment by checkin
  	<li>Shadowsocks-android: <a href="https://github.com/shadowsocks/shadowsocks-android/blob/master/LICENSE">GPLv3</a></li>
  	<li>ShadowsocksRb: <a href="https://github.com/shadowsocksRb/shadowsocksRb-android/blob/master/LICENSE">GPLv3</a></li>
  	<li>Polipo: <a href="https://github.com/jech/polipo/blob/master/COPYING">MIT</a></li>
+  <li>V2rayNG: <a href="https://github.com/2dust/v2rayNG/blob/master/LICENSE">GPLv3</a></li>
 </ul>
 
 ### LICENSE
