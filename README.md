@@ -1,4 +1,4 @@
-## SS VPN, A Android VPN base on Shadowsocks.
+## V2free for android, a V2ray and  Shadowsocks client with many builtin free servers.
 
 Compatible with Shadowsocks, based on shadowsocks-android, added some free built-in shadowsocks servers. If you are not satisfied with our built-in Shadowsocks vpn servers, you can add or import your own Shadowsocks server to use.
 
