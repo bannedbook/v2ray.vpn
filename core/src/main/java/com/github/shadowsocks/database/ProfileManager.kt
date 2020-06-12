@@ -84,7 +84,7 @@ object ProfileManager {
         profiles.filter {
             for (i: Profile in old) if (it.isSameAs(i)) {
                 old.remove(i)
-                return@filter false
+                return@filter true  //change to true, because old one also need update
             }
             return@filter true
         }.forEach { createProfile(it) }

@@ -20,7 +20,7 @@ def getCurrentFlavor() {
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    archivesBaseName = "ssvpn"
+    archivesBaseName = "android"
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.sdkVersion

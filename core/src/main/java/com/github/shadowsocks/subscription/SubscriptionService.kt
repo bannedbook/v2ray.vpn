@@ -33,6 +33,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import com.github.shadowsocks.database.SSRSubManager
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.Core.app
 import com.github.shadowsocks.core.R
@@ -128,6 +129,9 @@ class SubscriptionService : Service(), CoroutineScope {
     }
 
     private suspend fun fetchJson(url: URL, max: Int, notification: NotificationCompat.Builder): File? {
+        val sUrl=url.toString()
+        if (SSRSubManager.createSSSub(sUrl,sUrl)!=null)return null
+        
         val tempFile = File.createTempFile("subscription-", ".json", cacheDir)
         try {
             (url.openConnection() as HttpURLConnection).useCancellable {
@@ -171,8 +175,8 @@ class SubscriptionService : Service(), CoroutineScope {
         }
 
         for (json in jsons.asIterable()) try {
-            if (ProfileManager.importProfilesFromBase64File(json))
-            else
+            //if (ProfileManager.importProfilesFromBase64File(json))
+            //else
             Profile.parseJson(JsonStreamParser(json.bufferedReader()).asSequence().single(), feature) {
                 subscriptions.compute(it.name to it.formattedAddress) { _, oldProfile ->
                     when (oldProfile?.subscription) {

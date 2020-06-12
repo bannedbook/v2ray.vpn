@@ -41,6 +41,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.shadowsocks.MainActivity
 import com.github.shadowsocks.R
 import com.github.shadowsocks.ToolbarFragment
+import com.github.shadowsocks.database.PrivateDatabase
+import com.github.shadowsocks.database.SSRSub
+import com.github.shadowsocks.database.SSRSubManager
 import com.github.shadowsocks.plugin.AlertDialogFragment
 import com.github.shadowsocks.utils.readableMessage
 import com.github.shadowsocks.widget.ListHolderListener
@@ -49,6 +52,7 @@ import com.github.shadowsocks.widget.UndoSnackbarManager
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.parcel.Parcelize
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import java.lang.Exception
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -180,6 +184,13 @@ class SubscriptionFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener 
         }
 
         fun remove(i: Int) {
+            try {
+                val ssrsub = PrivateDatabase.ssrSubDao.getByGroup(subscription.urls[i].toString())
+                if (ssrsub!=null){
+                    SSRSubManager.deletProfiles(ssrsub)
+                    SSRSubManager.delSSRSub(ssrsub.id)
+                }
+            }catch (e:Exception){}
             undoManager.remove(Pair(i, subscription.urls[i]))
             subscription.urls.removeItemAt(i)
             notifyItemRemoved(i)

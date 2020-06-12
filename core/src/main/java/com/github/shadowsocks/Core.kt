@@ -138,6 +138,7 @@ object Core {
                 if (builtinSub != null) break
             }
             if (DataStore.is_get_free_servers)importFreeSubs()
+            app.startService(Intent(app, SubscriptionService::class.java))
         }
     }
     /**
