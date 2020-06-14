@@ -128,7 +128,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     var viewHolder = profilesList.findViewHolderForAdapterPosition(i)
 					if(viewHolder==null)continue
 					viewHolder = viewHolder  as ProfileViewHolder
-                    if (viewHolder.item.isBuiltin() || viewHolder.item.isBuiltin2()) {
+                    if ( (viewHolder.item.isBuiltin() || viewHolder.item.isBuiltin2()) && viewHolder.item.id<3) {
                         viewHolder.populateUnifiedNativeAdView(nativeAd!!, nativeAdView!!)
                         // might be in the middle of a layout after scrolling, need to wait
                         withContext(Dispatchers.Main) { profilesAdapter.notifyItemChanged(i) }
@@ -272,7 +272,8 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         fun attach() {
-            if (adHost != null /*|| !item.isBuiltin()*/) return
+            if (adHost != null) return
+            if (!item.isBuiltin() && !item.isBuiltin2()) return
             if (nativeAdView == null) {
                 nativeAdView = layoutInflater.inflate(R.layout.ad_unified, adContainer, false) as UnifiedNativeAdView
                 AdLoader.Builder(context, getString(R.string.native_adUnitId)).apply {
@@ -642,11 +643,9 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                     element.elapsed = 0
                 }
                 profilesAdapter.notifyDataSetChanged()
-
                 for (k in 0 until profilesAdapter.profiles.size) {
-                    try {
-                        Log.e("tcping", "$k")
-                        GlobalScope.launch {
+                    GlobalScope.launch {
+                        try {
                             profilesAdapter.profiles[k].elapsed = Core.tcping(profilesAdapter.profiles[k].host, profilesAdapter.profiles[k].remotePort)
                             ProfileManager.updateProfile(profilesAdapter.profiles[k])
                             Log.e("tcping", "$k - " + profilesAdapter.profiles[k].elapsed)
@@ -655,8 +654,8 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                                 profilesAdapter.refreshId(profilesAdapter.profiles[k].id)
                             }
                         }
+                        catch(e:IndexOutOfBoundsException){}
                     }
-                    catch(e:IndexOutOfBoundsException){}
                 }
                 true
             }
@@ -734,7 +733,11 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                         while (Core.tcping("127.0.0.1", DataStore.portProxy) < 0 || Core.tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) < 0) {
                             Log.e("starting", "$k try $ttt ...")
                             if (ttt == 5) {
-                                activity?.runOnUiThread() {Core.alertMessage(activity.getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
+                                try {
+                                    activity?.runOnUiThread{Core.alertMessage(activity.getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
+                                }catch (e:Exception){
+                                    activity?.runOnUiThread{Core.alertMessage("Server:"+profilesAdapter.profiles[k].name+" or previous one caused the test to be interrupted, please check/remove them.",activity)}
+                                }
                                 Log.e("realTestProfiles","Server: "+profilesAdapter.profiles[k].name+" or the one before it caused the test to be interrupted.")
                                 Core.stopService()
                                 return@launch

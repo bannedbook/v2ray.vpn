@@ -24,11 +24,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
-import androidx.core.os.bundleOf
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.acl.Acl
+import com.github.shadowsocks.bg.BaseService.Interface
 import com.github.shadowsocks.core.R
 import com.github.shadowsocks.net.HostsFile
 import com.github.shadowsocks.preference.DataStore
@@ -36,11 +35,8 @@ import com.github.shadowsocks.utils.Action
 import com.github.shadowsocks.utils.Key
 import com.github.shadowsocks.utils.printLog
 import com.github.shadowsocks.utils.readableMessage
-import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.*
-import org.bannedbook.app.service.NativeCall
-import com.github.shadowsocks.bg.BaseService.Interface
-import java.io.*
+import java.io.IOException
 import java.net.UnknownHostException
 
 /**
@@ -113,5 +109,8 @@ class ProxyTestService : ProxyService(), Interface {
         }
         return Service.START_NOT_STICKY
     }
-
+    override fun startRunner() {
+        this as Context
+        startService(Intent(this, javaClass))
+    }
 }

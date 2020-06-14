@@ -66,6 +66,7 @@ object ProfileManager {
             profile.id=existOne.id
             profile.tx=existOne.tx
             profile.rx=existOne.rx
+            profile.elapsed=existOne.elapsed
             updateProfile(profile)
         }
         return profile
@@ -208,9 +209,11 @@ object ProfileManager {
     @Throws(IOException::class)
     fun getProfile(id: Long): Profile? = try {
         PrivateDatabase.profileDao[id]
-    } catch (ex: SQLiteCantOpenDatabaseException) {
-        throw IOException(ex)
-    } catch (ex: SQLException) {
+    }
+//    catch (ex: SQLiteCantOpenDatabaseException) {
+//        throw IOException(ex)
+//    }
+    catch (ex: SQLException) {
         printLog(ex)
         null
     }
