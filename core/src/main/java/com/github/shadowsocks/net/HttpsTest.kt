@@ -90,7 +90,7 @@ class HttpsTest : ViewModel() {
             else -> "www.google.com"
         }, "/generate_204")
 
-        val conn = (if (DataStore.serviceMode != Key.modeVpn && DataStore.serviceMode != Key.v2rayVpn) {
+        val conn = (if (DataStore.serviceMode != Key.modeVpn) {
             url.openConnection(Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1",  DataStore.portHttpProxy)))
         } else url.openConnection()) as HttpURLConnection
         conn.setRequestProperty("Connection", "close")

@@ -153,9 +153,9 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         }
         val serviceMode = DataStore.serviceMode
         findPreference<Preference>(Key.remoteDns)!!.isEnabled = serviceMode != Key.modeProxy
-        findPreference<Preference>(Key.ipv6)!!.isEnabled = (serviceMode == Key.modeVpn || serviceMode == Key.v2rayVpn)
+        findPreference<Preference>(Key.ipv6)!!.isEnabled = (serviceMode == Key.modeVpn)
         isProxyApps = findPreference(Key.proxyApps)!!
-        isProxyApps.isEnabled = (serviceMode == Key.modeVpn || serviceMode == Key.v2rayVpn)
+        isProxyApps.isEnabled = (serviceMode == Key.modeVpn)
         isProxyApps.setOnPreferenceChangeListener { _, newValue ->
             startActivity(Intent(activity, AppManager::class.java))
             if (newValue as Boolean) DataStore.dirty = true

@@ -87,11 +87,11 @@ object DataStore : OnPreferenceDataStoreChangeListener {
             publicStore.getBoolean(Key.is_get_free_servers, true)
         }
     }
-    val serviceMode :String get() {
-        val activeProfile=ProfileManager.getProfile(profileId)
-        if (activeProfile==null || activeProfile.profileType=="vmess")return Key.v2rayVpn
-        return publicStore.getString(Key.serviceMode) ?: Key.modeVpn
+    val serviceVmess :Boolean get() {
+        val activeProfile= ProfileManager.getProfile(profileId) ?: return true
+        return activeProfile.profileType=="vmess"
     }
+    val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
     var portProxy: Int = VpnEncrypt.SOCK_PROXY_PORT
         //get() = getLocalPort(Key.portProxy, VpnEncrypt.SOCK_PROXY_PORT)

@@ -41,10 +41,9 @@ class ShadowsocksConnection(private val handler: Handler = Handler(),
         ServiceConnection, IBinder.DeathRecipient {
     companion object {
         val serviceClass get() = when (DataStore.serviceMode) {
-            Key.v2rayVpn -> V2RayVpnService::class
-            Key.modeProxy -> ProxyService::class
-            Key.modeVpn -> VpnService::class
-            Key.modeTransproxy -> TransproxyService::class
+            Key.modeProxy -> if (DataStore.serviceVmess) V2RayProxyService::class  else ProxyService::class
+            Key.modeVpn -> if (DataStore.serviceVmess) V2RayVpnService::class  else VpnService::class
+            Key.modeTransproxy -> if (DataStore.serviceVmess) V2RayVpnService::class  else TransproxyService::class
             else -> throw UnknownError()
         }.java
     }

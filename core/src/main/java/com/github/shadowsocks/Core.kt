@@ -215,6 +215,8 @@ object Core {
                             else NotificationManager.IMPORTANCE_LOW),   // #1355
                     NotificationChannel("service-proxy", app.getText(R.string.service_proxy),
                             NotificationManager.IMPORTANCE_LOW),
+                    NotificationChannel("service-v2proxy", app.getText(R.string.service_proxy),
+                            NotificationManager.IMPORTANCE_LOW),
                     NotificationChannel("service-transproxy", app.getText(R.string.service_transproxy),
                             NotificationManager.IMPORTANCE_LOW),
                     SubscriptionService.notificationChannel))

@@ -30,6 +30,9 @@ import java.io.*
  * Shadowsocks service at its minimum.
  */
 open class ProxyService : Service(), BaseService.Interface {
+    companion object {
+        var polipoThread : Thread? = null
+    }
     override val data = BaseService.Data(this)
     override val tag: String get() = "ShadowsocksProxyService"
     override fun createNotification(profileName: String): ServiceNotification =
@@ -60,8 +63,10 @@ open class ProxyService : Service(), BaseService.Interface {
 
         val file = File(configFile)
         if (!file.exists()) copyAssets(confFilename, toPath)
-
-        Thread(Runnable { NativeCall.execPolipo(configFile) }).start()
+        if (polipoThread==null) {
+            polipoThread = Thread(Runnable { NativeCall.execPolipo(configFile) })
+            polipoThread?.start()
+        }
     }
 
     private fun copyAssets(configFile: String, toPath: String) {

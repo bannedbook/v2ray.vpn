@@ -29,7 +29,6 @@ object Key {
     const val DB_PROFILE = "profile.db"
 
     const val profileType = "profileType"
-    const val v2rayVpn = "v2rayVpn"
     const val alterId = "alterId"
     const val network = "network"
     const val headerType = "headerType"

@@ -732,7 +732,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                         var ttt = 0
                         while (Core.tcping("127.0.0.1", DataStore.portProxy) < 0 || Core.tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) < 0) {
                             Log.e("starting", "$k try $ttt ...")
-                            if (ttt == 5) {
+                            if (ttt >= 5) {
                                 try {
                                     activity?.runOnUiThread{Core.alertMessage(activity.getString(R.string.toast_test_interrupted,profilesAdapter.profiles[k].name),activity)}
                                 }catch (e:Exception){

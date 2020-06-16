@@ -124,7 +124,6 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (DataStore.serviceMode == Key.v2rayVpn) {
             if (prepare(this) != null) {
                 Log.e("prepare","prepare != null")
                 startActivity(Intent(this, VpnRequestActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -149,9 +148,7 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
                 }
                 return START_NOT_STICKY
             }
-        }
         stopRunner()
-        //stopRunner(false,null)
         return Service.START_NOT_STICKY
     }
 
@@ -262,7 +259,6 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     private fun startV2ray() {
         if (!v2rayPoint.isRunning) {
             val broadname="$packageName.SERVICE"
-            Log.e("broadname",broadname)
             if (!data.closeReceiverRegistered) {
                 registerReceiver(data.closeReceiver, IntentFilter().apply {
                     addAction(Action.RELOAD)
@@ -289,10 +285,8 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
             }
 
             if (v2rayPoint.isRunning) {
-                Log.e(packageName, "v2rayPoint isRunning")
                 data.changeState(BaseService.State.Connected)
             } else {
-                Log.e(packageName, "v2rayPoint is not Running")
                 //MessageUtil.sendMsg2UI(this, AppConfig.MSG_STATE_START_FAILURE, "")
                 //cancelNotification()
             }
@@ -381,7 +375,6 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
         override fun protect(l: Long) = (if (this@V2RayVpnService.protect(l.toInt())) 0 else 1).toLong()
 
         override fun onEmitStatus(l: Long, s: String?): Long {
-            //Logger.d(s)
             return 0
         }
 

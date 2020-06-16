@@ -46,7 +46,7 @@ class VpnRequestActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (DataStore.serviceMode != Key.modeVpn && DataStore.serviceMode != Key.v2rayVpn) {
+        if (DataStore.serviceMode != Key.modeVpn) {
             finish()
             return
         }

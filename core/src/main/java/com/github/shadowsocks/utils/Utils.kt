@@ -144,7 +144,7 @@ fun Resources.Theme.resolveResourceId(@AttrRes resId: Int): Int {
 val Intent.datas get() = listOfNotNull(data) + (clipData?.asIterable()?.mapNotNull { it.uri } ?: emptyList())
 
 fun printLog(t: Throwable) {
-    Crashlytics.logException(t)
+    //Crashlytics.logException(t)
     Log.e("Utils","printLog",t)
     t.printStackTrace()
 }

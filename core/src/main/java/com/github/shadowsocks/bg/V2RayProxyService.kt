@@ -24,16 +24,13 @@ import libv2ray.Libv2ray
 import libv2ray.V2RayVPNServiceSupportsSet
 import java.net.UnknownHostException
 
-class V2RayTestService : Service() , BaseService.Interface {
+class V2RayProxyService : Service() , BaseService.Interface {
     //for BaseService.Interface start
     override val data = BaseService.Data(this)
     override val tag: String get() = "SSV2Service"
     override fun createNotification(profileName: String): ServiceNotification =
             ServiceNotification(this, profileName, "service-v2proxy", true)
     override fun onBind(intent: Intent) = super.onBind(intent)
-    override fun startRunner() {
-        startService(Intent(this, javaClass))
-    }
     //for BaseService.Interface stop
 
     private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())
@@ -53,7 +50,9 @@ class V2RayTestService : Service() , BaseService.Interface {
                 data.connectingJob = GlobalScope.launch(Dispatchers.Main) {
                     try {
                         activeProfile = ProfileManager.getProfile(DataStore.profileId)!!
-                        ProfileManager.genStoreV2rayConfig(activeProfile,true)
+                        val proxy = V2ProxyInstance(v2rayPoint,activeProfile,activeProfile.route)
+                        data.proxy = proxy
+                        ProfileManager.genStoreV2rayConfig(activeProfile)
                         startV2ray()
                     } catch (_: CancellationException) {
                         // if the job was cancelled, it is canceller's responsibility to call stopRunner
@@ -97,7 +96,7 @@ class V2RayTestService : Service() , BaseService.Interface {
                 }, broadname, null)
                 data.closeReceiverRegistered = true
             }
-            //data.notification = createNotification(activeProfile.formattedName)
+            data.notification = createNotification(activeProfile.formattedName)
             data.changeState(BaseService.State.Connecting)
 
             configContent = defaultDPreference.getPrefString(AppConfig.PREF_CURR_CONFIG, "")
@@ -139,6 +138,13 @@ class V2RayTestService : Service() , BaseService.Interface {
             data.notification?.destroy()
             data.notification = null
             stopV2Ray()
+            val ids = listOfNotNull(data.proxy, data.udpFallback).map {
+                it.shutdown(this)
+                it.profile.id
+            }
+            data.binder.trafficPersisted(ids)
+            data.proxy = null
+            data.udpFallback = null
             // change the state
             data.changeState(BaseService.State.Stopped, msg)
 
@@ -178,7 +184,7 @@ class V2RayTestService : Service() , BaseService.Interface {
             // called by go
             // shutdown the whole vpn service
             try {
-                this@V2RayTestService.shutdown()
+                this@V2RayProxyService.shutdown()
                 return 0
             } catch (e: Exception) {
                 Log.d(packageName, e.toString())

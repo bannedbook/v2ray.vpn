@@ -78,6 +78,12 @@
             android:exported="false">
         </service>
         <service
+            android:name="com.github.shadowsocks.bg.V2RayProxyService"
+            android:process=":bg"
+            android:directBootAware="true"
+            android:exported="false">
+        </service>
+        <service
             android:name="com.github.shadowsocks.bg.ProxyTestService"
             android:process=":bg"
             android:directBootAware="true"

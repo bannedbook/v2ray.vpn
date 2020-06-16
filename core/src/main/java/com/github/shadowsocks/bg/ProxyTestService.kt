@@ -21,13 +21,10 @@
 package com.github.shadowsocks.bg
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
-import com.github.shadowsocks.acl.Acl
-import com.github.shadowsocks.bg.BaseService.Interface
 import com.github.shadowsocks.core.R
 import com.github.shadowsocks.net.HostsFile
 import com.github.shadowsocks.preference.DataStore
@@ -35,19 +32,20 @@ import com.github.shadowsocks.utils.Action
 import com.github.shadowsocks.utils.Key
 import com.github.shadowsocks.utils.printLog
 import com.github.shadowsocks.utils.readableMessage
-import kotlinx.coroutines.*
-import java.io.IOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 
 /**
  * Shadowsocks service at its minimum.
  */
-class ProxyTestService : ProxyService(), Interface {
+class ProxyTestService : ProxyService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int{
         val data = data
         if (data.state != BaseService.State.Stopped) return Service.START_NOT_STICKY
         val profilePair = Core.currentProfile
-        this as Context
         if (profilePair == null) {
             // gracefully shutdown: https://stackoverflow.com/q/47337857/2245107
             stopRunner(false, getString(R.string.profile_empty))
@@ -57,7 +55,7 @@ class ProxyTestService : ProxyService(), Interface {
         profile.name = profile.formattedName    // save name for later queries
         val proxy = ProxyInstance(profile)
         data.proxy = proxy
-        data.udpFallback = if (fallback == null) null else ProxyInstance(fallback, profile.route)
+        data.udpFallback = null
 
         BootReceiver.enabled = DataStore.persistAcrossReboot
         if (!data.closeReceiverRegistered) {
@@ -75,25 +73,14 @@ class ProxyTestService : ProxyService(), Interface {
                 preInit()
                 val hosts = HostsFile(DataStore.publicStore.getString(Key.hosts) ?: "")
                 proxy.init(this@ProxyTestService, hosts)
-                data.udpFallback?.init(this@ProxyTestService, hosts)
-                if (profile.route == Acl.CUSTOM_RULES) try {
-                    withContext(Dispatchers.IO) {
-                        Acl.customRules.flatten(10, this@ProxyTestService::openConnection).also {
-                            Acl.save(Acl.CUSTOM_RULES, it)
-                        }
-                    }
-                } catch (e: IOException) {
-                    throw BaseService.ExpectedExceptionWrapper(e)
-                }
-
                 data.processes = GuardedProcessPool {
                     printLog(it)
                     stopRunner(false, it.readableMessage)
                 }
                 startProcesses(hosts)
 
-                proxy.scheduleUpdate()
-                data.udpFallback?.scheduleUpdate()
+                //proxy.scheduleUpdate()
+                //data.udpFallback?.scheduleUpdate()
 
                 data.changeState(BaseService.State.Connected)
             } catch (_: CancellationException) {
@@ -110,7 +97,9 @@ class ProxyTestService : ProxyService(), Interface {
         return Service.START_NOT_STICKY
     }
     override fun startRunner() {
-        this as Context
         startService(Intent(this, javaClass))
+    }
+    override fun onCreate() {
+        if (polipoThread==null)super.onCreate()
     }
 }

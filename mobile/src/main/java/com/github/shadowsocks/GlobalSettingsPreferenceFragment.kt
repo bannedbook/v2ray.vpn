@@ -121,7 +121,6 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
                 Key.modeProxy -> Pair(false, false)
                 Key.modeVpn -> Pair(true, false)
                 Key.modeTransproxy -> Pair(true, true)
-                Key.v2rayVpn -> Pair(false, false)
                 else -> throw IllegalArgumentException("newValue: $newValue")
             }
             hosts.isEnabled = enabledLocalDns
