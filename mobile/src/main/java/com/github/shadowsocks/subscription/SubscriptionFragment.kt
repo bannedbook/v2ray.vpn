@@ -106,7 +106,7 @@ class SubscriptionFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener 
             var message = ""
             positive.isEnabled = try {
                 val url = URL(value.toString())
-                if ("http".equals(url.protocol, true)) message = getString(R.string.cleartext_http_warning)
+                //if ("http".equals(url.protocol, true)) message = getString(R.string.cleartext_http_warning)
                 true
             } catch (e: MalformedURLException) {
                 message = e.readableMessage

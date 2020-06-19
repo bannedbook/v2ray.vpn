@@ -52,19 +52,6 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
         SERVICE_INTERFACE -> super<VpnService>.onBind(intent)
         else -> super<BaseService.Interface>.onBind(intent)
     }
-    /*
-    private var active = false
-    private var metered = false
-    private var underlyingNetwork: Network? = null
-        set(value) {
-            field = value
-            if (active && Build.VERSION.SDK_INT >= 22) setUnderlyingNetworks(underlyingNetworks)
-        }
-    private val underlyingNetworks get() =
-            // clearing underlyingNetworks makes Android 9 consider the network to be metered
-        if (Build.VERSION.SDK_INT == 28 && metered) null else underlyingNetwork?.let { arrayOf(it) }
-    override suspend fun preInit() = DefaultNetworkListener.start(this) { underlyingNetwork = it }
-    */
     //for BaseService.Interface stop
 
     private val v2rayPoint = Libv2ray.newV2RayPoint(V2RayCallback())

@@ -4,7 +4,7 @@
                   android:required="false"/>
     <application android:icon="@mipmap/ic_launcher">
         <provider android:name="${applicationId}.ObfsBinaryProvider"
-                  android:exported="true"
+                  android:exported="false"
                   android:authorities="${applicationId}.ObfsBinaryProvider">
             <intent-filter>
                 <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
