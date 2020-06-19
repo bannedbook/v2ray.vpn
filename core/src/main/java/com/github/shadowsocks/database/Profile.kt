@@ -218,7 +218,6 @@ data class Profile(
                     if (TextUtils.isEmpty(result)) {
                         null
                     }
-                    //Log.e("VmessQRCode::class.java",VmessQRCode::class.java.toString())
                     var vmessQRCode = VmessQRCode()
                     vmessQRCode = Gson().fromJson(result, vmessQRCode::class.java)
                     if (TextUtils.isEmpty(vmessQRCode.add)
@@ -288,9 +287,9 @@ data class Profile(
 
         fun findAllUrls(response: CharSequence?, feature: Profile? = null):MutableSet<Profile> {
             var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
-            val ssrProfiles = findAllSSRUrls(response, Core.currentProfile?.first)
-            val ssPofiles = findAllSSUrls(response, Core.currentProfile?.first)
-            val v2Profiles= findAllVmessUrls(response, Core.currentProfile?.first)
+            val ssrProfiles = findAllSSRUrls(response, feature)
+            val ssPofiles = findAllSSUrls(response, feature)
+            val v2Profiles= findAllVmessUrls(response, feature)
             profilesSet.addAll(ssPofiles)
             profilesSet.addAll(ssrProfiles)
             profilesSet.addAll(v2Profiles)
@@ -446,6 +445,9 @@ data class Profile(
         @Query("SELECT * FROM `Profile` WHERE `host` = :host LIMIT 1")
         fun getByHost(host: String): Profile?
 
+        @Query("SELECT * FROM `Profile` WHERE `host` = :host and `remotePort` = :port LIMIT 1")
+        fun getByHostAndPort(host: String,port:Int): Profile?
+
         @Query("SELECT * FROM `Profile` WHERE `Subscription` != 2 ORDER BY `userOrder`")
         fun listActive(): List<Profile>
 
@@ -531,7 +533,7 @@ data class Profile(
             return ""
         }
     }
-    fun isSameAs(other: Profile): Boolean = other.host == host
+    fun isSameAs(other: Profile): Boolean = other.host == host && other.remotePort == remotePort
 
     override fun toString() : String {
         if (profileType=="ss")

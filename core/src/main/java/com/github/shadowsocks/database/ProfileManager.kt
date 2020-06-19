@@ -54,7 +54,7 @@ object ProfileManager {
 
     @Throws(SQLException::class)
     fun createProfile(profile: Profile = Profile()): Profile {
-        var existOne=PrivateDatabase.profileDao.getByHost(profile.host)
+        var existOne=PrivateDatabase.profileDao.getByHostAndPort(profile.host,profile.remotePort)
         if (existOne==null) {
             profile.id = 0
             profile.userOrder = PrivateDatabase.profileDao.nextOrder() ?: 0
@@ -89,7 +89,7 @@ object ProfileManager {
             }
             return@filter true
         }.forEach { createProfile(it) }
-        deletProfiles(old)
+        if (old.isNotEmpty())deletProfiles(old)
     }
 
     fun importProfiles(text: CharSequence, replace: Boolean = false):Int {
@@ -313,9 +313,13 @@ object ProfileManager {
 
     fun getRandomVPNServer(): Profile? {
         try {
-            return getAllProfilesByGroup(VpnEncrypt.vpnGroupName)?.random()
+            val profiles=getAllProfilesByGroup(VpnEncrypt.vpnGroupName)
+            return if (profiles.isNotEmpty())
+                profiles.random()
+            else
+                getAllProfiles()?.random()
         } catch (ex: Exception) {
-            Log.e("speedup.vpn",this.javaClass.name+":"+ex.javaClass.name)
+            Log.e("getRandomVPNServer",this.javaClass.name+":"+ex.javaClass.name)
             return null
         }
     }
