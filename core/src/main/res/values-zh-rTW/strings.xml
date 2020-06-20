@@ -179,7 +179,7 @@
     <string name="night_mode_off">"關閉"</string>
     <string name="send_email">"發送電子郵件"</string>
     <string name="action_export_more">"導出…"</string>
-    <string name="action_export_file">"導出至文件…"</string>
+    <string name="action_export_file">"SS導出至文件…"</string>
     <string name="cleartext_http_warning">"HTTP 明文流量不安全"</string>
     <string name="share_over_lan">"通過局域網分享"</string>
     <string name="connection_test_pending">"檢查連接"</string>

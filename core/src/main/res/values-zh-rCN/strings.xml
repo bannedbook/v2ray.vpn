@@ -167,7 +167,7 @@
     <string name="night_mode_off">"关闭"</string>
     <string name="send_email">"发送电子邮件"</string>
     <string name="action_export_more">"导出…"</string>
-    <string name="action_export_file">"导出至文件…"</string>
+    <string name="action_export_file">"SS导出至文件…"</string>
     <string name="cleartext_http_warning">"HTTP 明文流量不安全"</string>
     <string name="share_over_lan">"通过局域网分享"</string>
     <string name="connection_test_pending">"检查连接"</string>

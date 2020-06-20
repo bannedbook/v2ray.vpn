@@ -197,7 +197,7 @@ object ProfileManager {
     fun serializeToJsonIgnoreVPN(profiles: List<Profile>? = getAllProfilesIgnoreGroup(VpnEncrypt.vpnGroupName)): JSONArray? {
         if (profiles == null) return null
         val lookup = LongSparseArray<Profile>(profiles.size).apply { profiles.forEach { put(it.id, it) } }
-        return JSONArray(profiles.map { it.toJson(lookup) }.toTypedArray())
+        return JSONArray(profiles.filter{it.profileType=="ss"}.map { it.toJson(lookup) }.toTypedArray())
     }
 
     /**

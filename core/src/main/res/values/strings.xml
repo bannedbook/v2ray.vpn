@@ -98,7 +98,7 @@
   <string name="save_log">Save Log</string>
   <string name="action_apply_all">Apply Settings to All Profiles</string>
   <string name="action_export_more">Export…</string>
-  <string name="action_export_file">Export to file…</string>
+  <string name="action_export_file">SS Export to file…</string>
   <string name="action_export">Export to Clipboard</string>
   <string name="action_import">Import from Clipboard</string>
   <string name="action_import_file">Import from file…</string>

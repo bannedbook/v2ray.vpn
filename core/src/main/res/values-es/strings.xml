@@ -158,7 +158,7 @@ Recibido: \t%4$s\t↓\t%2$s"</string>
     <string name="night_mode_off">"Apagado"</string>
     <string name="send_email">"Enviar email"</string>
     <string name="action_export_more">"Exportar…"</string>
-    <string name="action_export_file">"Exportar a archivo…"</string>
+    <string name="action_export_file">"SS Exportar a archivo…"</string>
     <string name="share_over_lan">"Compartir por LAN"</string>
     <string name="connection_test_pending">"Verificar conectividad"</string>
     <string name="file_manager_missing">"Por favor, instala un explorador de archivos como MiXplorer"</string>
