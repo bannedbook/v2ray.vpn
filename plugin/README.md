@@ -87,10 +87,10 @@ Then add it to your manifest:
                   android:directBootAware="true"
                   android:authorities="$FULLY_QUALIFIED_NAME_OF_YOUR_CONTENTPROVIDER">
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
                 <data android:scheme="plugin"
                       android:host="com.github.shadowsocks"
                       android:path="/$PLUGIN_ID"/>

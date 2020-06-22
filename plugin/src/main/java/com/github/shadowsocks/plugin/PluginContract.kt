@@ -28,10 +28,8 @@ package com.github.shadowsocks.plugin
 object PluginContract {
     /**
      * ContentProvider Action: Used for NativePluginProvider.
-     *
-     * Constant Value: "com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"
      */
-    const val ACTION_NATIVE_PLUGIN = "com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"
+    const val ACTION_NATIVE_PLUGIN = "free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"
 
     /**
      * Activity Action: Used for ConfigurationActivity.

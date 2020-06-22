@@ -41,7 +41,6 @@ import androidx.core.os.bundleOf
  *        &lt;provider android:name="com.github.shadowsocks.$PLUGIN_ID.BinaryProvider"
  *                     android:authorities="com.github.shadowsocks.plugin.$PLUGIN_ID.BinaryProvider"&gt;
  *            &lt;intent-filter&gt;
- *                &lt;category android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN" /&gt;
  *            &lt;/intent-filter&gt;
  *        &lt;/provider&gt;
  *        ...

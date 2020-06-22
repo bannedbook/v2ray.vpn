@@ -127,10 +127,10 @@ Every native mode plugin MUST have a content provider to provide the native exec
 
 * MUST have `android:label` and `android:icon`; (may be inherited from parent `application`)
 * SHOULD have `android:directBootAware="true"` with proper support if possible;
-* MUST have an intent filter with action `com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN`;
+* MUST have an intent filter with action `free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN`;
   (used for discovering plugins)
 * MUST have meta-data `com.github.shadowsocks.plugin.id` with string value `$PLUGIN_ID` or a string resource;
-* MUST have an intent filter with action `com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN` and
+* MUST have an intent filter with action `free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN` and
   data `plugin://com.github.shadowsocks/$PLUGIN_ID`; (used for configuring plugin)
 * CAN have meta-data `com.github.shadowsocks.plugin.default_config` with string value or a string resource, default is empty;
 * MUST implement `query` that returns the file list which MUST include `$PLUGIN_ID` when having
@@ -159,10 +159,10 @@ This corresponds to `com.github.shadowsocks.plugin.NativePluginProvider` in the 
                   android:authorities="$FULLY_QUALIFIED_NAME_OF_YOUR_CONTENTPROVIDER"
                   tools:ignore="ExportedContentProvider">
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
                 <data android:scheme="plugin"
                       android:host="com.github.shadowsocks"
                       android:path="/$PLUGIN_ID"/>
@@ -249,7 +249,7 @@ To implement plugin ID aliasing, you:
 
 * MUST define meta-data `com.github.shadowsocks.plugin.id.aliases` in your plugin content provider with `android:value="alias"`,
   or use `android:resources` to specify a string resource or string array resource for multiple aliases.
-* MUST be able to be matched by `com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN` when invoked on alias.
+* MUST be able to be matched by `free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN` when invoked on alias.
   To do this, you SHOULD use multiple `intent-filter` and use a different `android:path` for each alias.
   Alternatively, you MAY also use a single `intent-filter` and use `android:pathPattern` to match all your aliases at once.
   You MUST NOT use `android:pathPrefix` or allow `android:pathPattern` to match undeclared plugin ID/alias as it might create a conflict with other plugins.
@@ -264,13 +264,13 @@ For example:
         <provider>
             ...
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
                 <data android:scheme="plugin"
                       android:host="com.github.shadowsocks"
                       android:path="/$PLUGIN_ID"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.github.shadowsocks.plugin.ACTION_NATIVE_PLUGIN"/>
+                <action android:name="free.v2ray.proxy.VPN.ACTION_NATIVE_PLUGIN"/>
                 <data android:scheme="plugin"
                       android:host="com.github.shadowsocks"
                       android:path="/$PLUGIN_ALIAS"/>
