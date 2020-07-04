@@ -263,6 +263,8 @@ object ProfileManager {
         null
     }
 
+    fun getActiveSSProfiles(): List<Profile>? = getAllProfiles()?.filter { it.profileType=="ss" }
+
     @Throws(IOException::class)
     fun getProfilesOrderlySpeed(): List<Profile>? = try {
         PrivateDatabase.profileDao.listAllbySpeed()
