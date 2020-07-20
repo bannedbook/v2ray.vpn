@@ -61,7 +61,7 @@ data class Profile(
         var password: String = "",
         var method: String = "aes-256-cfb",
 
-        var route: String = "all",   //""bypass-lan-china"
+        var route: String = "bypass-lan-china", // "all"
         var remoteDns: String = "1.1.1.1",
         var proxyApps: Boolean = false,
         var bypass: Boolean = false,

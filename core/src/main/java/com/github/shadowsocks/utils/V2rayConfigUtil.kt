@@ -373,7 +373,7 @@ object V2rayConfigUtil {
 
             v2rayConfig.routing.domainStrategy = VpnEncrypt.PREF_ROUTING_DOMAIN_STRATEGY
             //val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
-            var routingMode = "0"   // vmess.route  //强制全局模式，"3"时启动很慢
+            var routingMode = vmess.route  //强制全局模式，"3"时启动很慢
             if (isTest)routingMode="0" //测试时强制全局模式，"3"时启动很慢
 
             // Hardcode googleapis.cn

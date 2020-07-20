@@ -90,8 +90,8 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         if (profileTypeValue=="vmess"){
             route.setEntries(R.array.route_entry_v2ray)
             route.setEntryValues(R.array.route_value_v2ray)
-            route.value="all"
-            route.isEnabled=false
+            //route.value="all"
+            route.isEnabled=true
             encMethod.setEntries(R.array.vmess_enc_method)
             encMethod.setEntryValues(R.array.vmess_enc_method)
             var  encMethodList  = resources.getStringArray(R.array.vmess_enc_method)
@@ -133,7 +133,7 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         pluginCategory = findPreference("pluginCategory")!!
         v2rayMoreCat = findPreference("v2ray_more_cat")!!
 
-        if (profile.profileType=="vmess")profile.route="all"  //暂且强制v2ray全局路由模式
+        //if (profile.profileType=="vmess")profile.route="all"  //暂且强制v2ray全局路由模式
 
         switchVmessSS(profile.profileType)
         profileType.setOnPreferenceChangeListener { _, newValue ->
