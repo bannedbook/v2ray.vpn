@@ -3,6 +3,6 @@ git pull origin master
 git add -A
 git commit -m "update"
 git push origin master
-git tag -a v5.1.22 -m "release v5.1.22"
+git tag -a v5.1.24 -m "release v5.1.24"
 git push origin --tags
 pause
