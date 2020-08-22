@@ -193,10 +193,12 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
         init {
             edit.setOnClickListener {
+                (activity as MainActivity).userActionAds()
                 item = ProfileManager.getProfile(item.id)!!
                 startConfig(item)
             }
             subscription.setOnClickListener {
+                (activity as MainActivity).userActionAds()
                 item = ProfileManager.getProfile(item.id)!!
                 startConfig(item)
             }
@@ -204,6 +206,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             TooltipCompat.setTooltipText(subscription, subscription.contentDescription)
             itemView.setOnClickListener(this)
             share.setOnClickListener {
+                (activity as MainActivity).userActionAds()
                 val popup = PopupMenu(requireContext(), share)
                 popup.menuInflater.inflate(R.menu.profile_share_popup, popup.menu)
                 popup.setOnMenuItemClickListener(this)
@@ -372,10 +375,12 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
         override fun onMenuItemClick(item: MenuItem): Boolean = when (item.itemId) {
             R.id.action_qr_code -> {
+                (activity as MainActivity).userActionAds()
                 QRCodeDialog(this.item.toString()).showAllowingStateLoss(parentFragmentManager)
                 true
             }
             R.id.action_export_clipboard -> {
+                (activity as MainActivity).userActionAds()
                 clipboard.setPrimaryClip(ClipData.newPlainText(null, this.item.toString()))
                 true
             }
@@ -581,14 +586,17 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.update_servers -> {
+                (activity as MainActivity).userActionAds()
                 Core.updateBuiltinServers()
                 true
             }
             R.id.action_scan_qr_code -> {
+                (activity as MainActivity).userActionAds()
                 startActivity(Intent(context, ScannerActivity::class.java))
                 true
             }
             R.id.action_import_clipboard -> {
+                (activity as MainActivity).userActionAds()
                 try {
                     var i=ProfileManager.importProfiles(clipboard.primaryClip!!.getItemAt(0).text)
                     if (i>0) {
@@ -602,6 +610,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
             R.id.action_import_file -> {
+                (activity as MainActivity).userActionAds()
                 startFilesForResult(Intent(Intent.ACTION_GET_CONTENT).apply {
                     type = "application/*"
                     putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -610,6 +619,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
             R.id.action_replace_file -> {
+                (activity as MainActivity).userActionAds()
                 startFilesForResult(Intent(Intent.ACTION_GET_CONTENT).apply {
                     type = "application/*"
                     putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -618,11 +628,13 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
             R.id.action_manual_settings -> {
+                (activity as MainActivity).userActionAds()
                 startConfig(ProfileManager.createProfile(
                         Profile().also { Core.currentProfile?.first?.copyFeatureSettingsTo(it) }))
                 true
             }
             R.id.action_export_clipboard -> {
+                (activity as MainActivity).userActionAds()
                 val profiles = ProfileManager.getAllProfilesIgnoreGroup(VpnEncrypt.vpnGroupName)
                 (activity as MainActivity).snackbar().setText(if (profiles != null) {
                     clipboard.setPrimaryClip(ClipData.newPlainText(null, profiles.joinToString("\n")))
@@ -631,6 +643,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 true
             }
             R.id.action_export_file -> {
+                (activity as MainActivity).userActionAds()
                 startFilesForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     type = "application/json"
                     putExtra(Intent.EXTRA_TITLE, "profiles.json")   // optional title that can be edited
@@ -639,6 +652,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             R.id.ping_all -> {
+                (activity as MainActivity).userActionAds()
                 for (element in profilesAdapter.profiles) {
                     element.elapsed = 0
                 }
@@ -661,16 +675,19 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             R.id.real_ping_all -> {
+                (activity as MainActivity).userActionAds()
                 realTestProfiles(false)
                 true
             }
 
             R.id.retest_invalid_servers -> {
+                (activity as MainActivity).userActionAds()
                 realTestProfiles(true)
                 true
             }
 
             R.id.remove_invalid_servers -> {
+                (activity as MainActivity).userActionAds()
                 try {
                     for (k in profilesAdapter.profiles.size-1 downTo  0 ) {
                         if (profilesAdapter.profiles[k].elapsed == -1L){
@@ -690,6 +707,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             }
 
             R.id.sort_servers_by_speed -> {
+                (activity as MainActivity).userActionAds()
                 try {
                     profilesAdapter.profiles.sortBy {it.elapsed }
                     //configs.vmess.reverse()

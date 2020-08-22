@@ -35,6 +35,7 @@ android {
             resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~5832794268"
             resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/4292721507"
             resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/8267385919"
+            resValue 'string', 'chaye_adUnitId', "ca-app-pub-2194043486084479/4460118091"
         }
         v2free {
             dimension "encryption"
@@ -43,6 +44,7 @@ android {
             resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~8520668797"
             resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/7710984154"
             resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/5507178325"
+            resValue 'string', 'chaye_adUnitId', "ca-app-pub-2194043486084479/6292074516"
         }
     }
     sourceSets {

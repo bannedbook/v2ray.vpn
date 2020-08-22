@@ -59,6 +59,7 @@ import com.github.shadowsocks.widget.ServiceButton
 import com.github.shadowsocks.widget.StatsBar
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         private const val REQUEST_CONNECT = 1
 
         var stateListener: ((BaseService.State) -> Unit)? = null
+        @JvmStatic var newsClickCount = 1L
     }
 
     // UI
@@ -166,6 +168,19 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         }
     }
     lateinit var mAdView : AdView
+    lateinit var mInterstitialAd: InterstitialAd
+
+    fun userActionAds(){
+        if (newsClickCount%3==2L)mInterstitialAd.loadAd(AdRequest.Builder().build())
+        if (newsClickCount%3==1L && mInterstitialAd.isLoaded) {
+            Log.e("ads", "click count is $newsClickCount ,show ad.")
+            mInterstitialAd.show()
+        } else {
+            Log.e("ads", "click count is $newsClickCount ,The interstitial wasn't loaded yet.")
+        }
+        newsClickCount++
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;//会导致statusbar有时不能自动缩回，改为在AndroidMainfest.xml设置
@@ -178,10 +193,17 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
 //        val adRequest = AdRequest.Builder().build()
 //        mAdView.loadAd(adRequest)
 
+        mInterstitialAd = InterstitialAd(this)
+        mInterstitialAd.adUnitId = getString(R.string.chaye_adUnitId)
+        mInterstitialAd.loadAd(AdRequest.Builder().build())
+
         snackbar = findViewById(R.id.snackbar)
         snackbar.setOnApplyWindowInsetsListener(ListHolderListener)
         stats = findViewById(R.id.stats)
-        stats.setOnClickListener { if (state == BaseService.State.Connected) stats.testConnection() }
+        stats.setOnClickListener {
+            userActionAds()
+            if (state == BaseService.State.Connected) stats.testConnection()
+        }
         drawer = findViewById(R.id.drawer)
         drawer.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         navigation = findViewById(R.id.navigation)
@@ -192,7 +214,10 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         }
 
         fab = findViewById(R.id.fab)
-        fab.setOnClickListener { toggle() }
+        fab.setOnClickListener {
+            if(state.canStop)userActionAds()
+            toggle()
+        }
         fab.setOnApplyWindowInsetsListener { view, insets ->
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 bottomMargin = insets.systemWindowInsetBottom +
@@ -230,11 +255,16 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         if (item.isChecked) drawer.closeDrawers() else {
             when (item.itemId) {
                 R.id.profiles -> {
+                    //userActionAds()
                     displayFragment(ProfilesFragment())
                     connection.bandwidthTimeout = connection.bandwidthTimeout   // request stats update
                 }
-                R.id.globalSettings -> displayFragment(GlobalSettingsFragment())
+                R.id.globalSettings -> {
+                    userActionAds()
+                    displayFragment(GlobalSettingsFragment())
+                }
                 R.id.about -> {
+                    userActionAds()
                     Core.analytics.logEvent("about", Bundle())
                     displayFragment(AboutFragment())
                 }
@@ -242,8 +272,14 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
                     launchUrl(getString(R.string.faq_url))
                     return true
                 }
-                R.id.customRules -> displayFragment(CustomRulesFragment())
-                R.id.subscriptions -> displayFragment(SubscriptionFragment())
+                R.id.customRules -> {
+                    userActionAds()
+                    displayFragment(CustomRulesFragment())
+                }
+                R.id.subscriptions -> {
+                    userActionAds()
+                    displayFragment(SubscriptionFragment())
+                }
                 else -> return false
             }
             item.isChecked = true

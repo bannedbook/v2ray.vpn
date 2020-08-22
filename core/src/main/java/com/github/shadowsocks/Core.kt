@@ -19,6 +19,7 @@
  *******************************************************************************/
 
 package com.github.shadowsocks
+
 import SpeedUpVPN.VpnEncrypt
 import android.app.*
 import android.app.admin.DevicePolicyManager
@@ -93,74 +94,73 @@ object Core {
     const val appName = BuildConfig.FLAVOR
     val applicationId = if (appName === "v2free") "free.v2ray.proxy.VPN" else "free.shadowsocks.proxy.VPN"
 
-    val activeProfileIds get() = ProfileManager.getProfile(DataStore.profileId).let {
-        if (it == null) emptyList() else listOfNotNull(it.id, it.udpFallback)
-    }
-    val currentProfile: Pair<Profile, Profile?>? get() {
-        if (DataStore.directBootAware) DirectBoot.getDeviceProfile()?.apply { return this }
-        var theOne=ProfileManager.getProfile(DataStore.profileId)
-        if (theOne==null){
-            theOne=ProfileManager.getRandomVPNServer()
-            if (theOne!=null)DataStore.profileId=theOne.id
+    val activeProfileIds
+        get() = ProfileManager.getProfile(DataStore.profileId).let {
+            if (it == null) emptyList() else listOfNotNull(it.id, it.udpFallback)
         }
-        return ProfileManager.expand(theOne ?: return null)
-    }
+    val currentProfile: Pair<Profile, Profile?>?
+        get() {
+            if (DataStore.directBootAware) DirectBoot.getDeviceProfile()?.apply { return this }
+            var theOne = ProfileManager.getProfile(DataStore.profileId)
+            if (theOne == null) {
+                theOne = ProfileManager.getRandomVPNServer()
+                if (theOne != null) DataStore.profileId = theOne.id
+            }
+            return ProfileManager.expand(theOne ?: return null)
+        }
 
-    fun switchProfile(id: Long, canStop:Boolean): Profile {
-        val oldProfileId=DataStore.profileId
-        Log.e("oldProfileId",oldProfileId.toString())
+    fun switchProfile(id: Long, canStop: Boolean): Profile {
+        val oldProfileId = DataStore.profileId
+        Log.e("oldProfileId", oldProfileId.toString())
         val result = ProfileManager.getProfile(id) ?: ProfileManager.createProfile()
-        if (id==oldProfileId)return result
+        if (id == oldProfileId) return result
 
         val profileTypeChanged = result.profileType != ProfileManager.getProfile(oldProfileId)?.profileType
 
-        if(!canStop)
+        if (!canStop)
             DataStore.profileId = result.id
-        else if(canStop && profileTypeChanged)  {
+        else if (canStop && profileTypeChanged) {
             stopService()
-            while (BaseService.State.values()[DataStore.connection!!.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
+            while (BaseService.State.values()[DataStore.connection!!.service!!.state] != BaseService.State.Stopped) Thread.sleep(100)
             DataStore.profileId = result.id
             startService()
-        }
-        else if (canStop && !profileTypeChanged){
+        } else if (canStop && !profileTypeChanged) {
             DataStore.profileId = result.id
             app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
         }
 
-        Log.e("profileId",DataStore.profileId.toString())
+        Log.e("profileId", DataStore.profileId.toString())
         return result
     }
-    
+
     //Import built-in subscription
-    fun updateBuiltinServers(){
-        Log.e("updateBuiltinServers ","...")
+    fun updateBuiltinServers() {
         GlobalScope.launch {
-            var  builtinSubUrls  = app.resources.getStringArray(R.array.builtinSubUrls)
+            var builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
             for (i in 0 until builtinSubUrls.size) {
-                var builtinSub=SSRSubManager.createSSSub(builtinSubUrls.get(i),VpnEncrypt.vpnGroupName)
+                var builtinSub = SSRSubManager.createSSSub(builtinSubUrls.get(i), VpnEncrypt.vpnGroupName)
                 if (builtinSub != null) break
             }
-            if (DataStore.is_get_free_servers)importFreeSubs()
+            if (DataStore.is_get_free_servers) importFreeSubs()
             app.startService(Intent(app, SubscriptionService::class.java))
         }
     }
+
     /**
      * import free sub
      */
-    fun importFreeSubs(): Boolean {
-        try {
-            GlobalScope.launch {
-                var  freesuburl  = app.resources.getStringArray(R.array.freesuburl)
+    fun importFreeSubs() {
+        GlobalScope.launch {
+            try {
+                var freesuburl = app.resources.getStringArray(R.array.freesuburl)
                 for (i in freesuburl.indices) {
-                    var freeSub=SSRSubManager.createSSSub(freesuburl[i],VpnEncrypt.freesubGroupName)
+                    var freeSub = SSRSubManager.createSSSub(freesuburl[i], VpnEncrypt.freesubGroupName)
                     if (freeSub != null) break
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
         }
-        return true
     }
 
     fun init(app: Application, configureClass: KClass<out Any>) {
@@ -240,26 +240,26 @@ object Core {
     }
 
     fun startService() = ContextCompat.startForegroundService(app, Intent(app, ShadowsocksConnection.serviceClass))
-    fun reloadService(oldProfileId:Long, connection : ShadowsocksConnection) {
-        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType )
+    fun reloadService(oldProfileId: Long, connection: ShadowsocksConnection) {
+        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType)
             app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
-        else{
+        else {
             stopService()
-            while (BaseService.State.values()[connection.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
+            while (BaseService.State.values()[connection.service!!.state] != BaseService.State.Stopped) Thread.sleep(100)
             connection.binderDied()
             //while (connection.service==null)Thread.sleep(100)
             startService()
         }
     }
-    fun reloadServiceForTest(oldProfileId:Long, connection : ShadowsocksConnection) {
-        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType ) {
-            Log.e("reloadServiceForTest","reload")
+
+    fun reloadServiceForTest(oldProfileId: Long, connection: ShadowsocksConnection) {
+        if (ProfileManager.getProfile(oldProfileId)?.profileType == ProfileManager.getProfile(DataStore.profileId)?.profileType) {
+            Log.e("reloadServiceForTest", "reload")
             app.sendBroadcast(Intent(Action.RELOAD).setPackage(app.packageName))
-        }
-        else{
-            Log.e("reloadServiceForTest","restart")
-            Log.e("reloadServiceForTest","old:"+ProfileManager.getProfile(oldProfileId)?.formattedName+",type:"+ProfileManager.getProfile(oldProfileId)?.profileType)
-            Log.e("reloadServiceForTest","cur:"+ProfileManager.getProfile(DataStore.profileId)?.formattedName+",type:"+ProfileManager.getProfile(DataStore.profileId)?.profileType)
+        } else {
+            Log.e("reloadServiceForTest", "restart")
+            Log.e("reloadServiceForTest", "old:" + ProfileManager.getProfile(oldProfileId)?.formattedName + ",type:" + ProfileManager.getProfile(oldProfileId)?.profileType)
+            Log.e("reloadServiceForTest", "cur:" + ProfileManager.getProfile(DataStore.profileId)?.formattedName + ",type:" + ProfileManager.getProfile(DataStore.profileId)?.profileType)
             stopService()
             //while (BaseService.State.values()[connection.service!!.state]!=BaseService.State.Stopped)Thread.sleep(100)
             while (tcping("127.0.0.1", DataStore.portProxy) > 0 || tcping("127.0.0.1", VpnEncrypt.HTTP_PROXY_PORT) > 0) Thread.sleep(100)
@@ -267,38 +267,38 @@ object Core {
             startServiceForTest()
         }
     }
+
     fun stopService() = app.sendBroadcast(Intent(Action.CLOSE).setPackage(app.packageName))
     fun startServiceForTest() {
-        val currprofileType=ProfileManager.getProfile(DataStore.profileId)?.profileType
-        Log.e("startServiceForTest",currprofileType)
-        if ("vmess"==currprofileType){
-            Log.e("startServiceForTest","start V2RayTestService")
+        val currprofileType = ProfileManager.getProfile(DataStore.profileId)?.profileType
+        Log.e("startServiceForTest", currprofileType)
+        if ("vmess" == currprofileType) {
+            Log.e("startServiceForTest", "start V2RayTestService")
             app.startService(Intent(app, V2RayTestService::class.java))
-        }
-        else {
-            Log.e("startServiceForTest","start SSProxyService")
+        } else {
+            Log.e("startServiceForTest", "start SSProxyService")
             app.startService(Intent(app, ProxyTestService::class.java).putExtra("test", "go"))
         }
     }
+
     fun showMessage(msg: String) {
         var toast = Toast.makeText(app, msg, Toast.LENGTH_LONG)
         toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 150)
         toast.show()
     }
 
-    fun alertMessage(msg: String,activity:Context) {
+    fun alertMessage(msg: String, activity: Context) {
         try {
-            if(activity==null || (activity as Activity).isFinishing)return
-        val builder: AlertDialog.Builder? = activity.let {
-            AlertDialog.Builder(activity)
+            if (activity == null || (activity as Activity).isFinishing) return
+            val builder: AlertDialog.Builder? = activity.let {
+                AlertDialog.Builder(activity)
+            }
+            builder?.setMessage(msg)?.setTitle("Alert")?.setPositiveButton("ok", DialogInterface.OnClickListener { _, _ ->
+            })
+            val dialog: AlertDialog? = builder?.create()
+            dialog?.show()
+        } catch (t: Throwable) {
         }
-        builder?.setMessage(msg)?.setTitle("Alert")?.setPositiveButton("ok", DialogInterface.OnClickListener {
-            _, _ ->
-        })
-        val dialog: AlertDialog? = builder?.create()
-        dialog?.show()
-        }
-        catch (t:Throwable){}
     }
 
     /**
@@ -308,28 +308,29 @@ object Core {
         var time = -1L
         for (k in 0 until 2) {
             val one = socketConnectTime(url, port)
-            if (one != -1L  )
-                if(time == -1L || one < time) {
+            if (one != -1L)
+                if (time == -1L || one < time) {
                     time = one
                 }
         }
         return time
     }
+
     private fun socketConnectTime(url: String, port: Int): Long {
         try {
             val start = System.currentTimeMillis()
             val socket = Socket()
             var socketAddress = InetSocketAddress(url, port)
-            socket.connect(socketAddress,5000)
+            socket.connect(socketAddress, 5000)
             val time = System.currentTimeMillis() - start
             socket.close()
             return time
         } catch (e: UnknownHostException) {
-            Log.e("testConnection2",e.toString())
+            Log.e("testConnection2", e.toString())
         } catch (e: IOException) {
-            Log.e("testConnection2",e.toString())
+            Log.e("testConnection2", e.toString())
         } catch (e: Exception) {
-            Log.e("testConnection2",e.toString())
+            Log.e("testConnection2", e.toString())
         }
         return -1
     }
