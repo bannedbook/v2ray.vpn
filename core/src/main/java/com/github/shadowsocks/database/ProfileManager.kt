@@ -304,15 +304,6 @@ object ProfileManager {
         emptyList()
     }
 
-    fun getFirstVPNServer(): Profile? {
-        try {
-            return getAllProfilesByGroup(VpnEncrypt.vpnGroupName)?.first()
-        } catch (ex: Exception) {
-            Log.e("speedup.vpn",this.javaClass.name+":"+ex.javaClass.name)
-            return null
-        }
-    }
-
     fun getRandomVPNServer(): Profile? {
         try {
             val profiles=getAllProfilesByGroup(VpnEncrypt.vpnGroupName)

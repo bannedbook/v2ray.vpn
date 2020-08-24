@@ -136,9 +136,9 @@ object Core {
     //Import built-in subscription
     fun updateBuiltinServers() {
         GlobalScope.launch {
-            var builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
+            val builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
             for (i in 0 until builtinSubUrls.size) {
-                var builtinSub = SSRSubManager.createSSSub(builtinSubUrls.get(i), VpnEncrypt.vpnGroupName)
+                val builtinSub = SSRSubManager.createSSSub(builtinSubUrls[i], VpnEncrypt.vpnGroupName)
                 if (builtinSub != null) break
             }
             if (DataStore.is_get_free_servers) importFreeSubs()

@@ -256,4 +256,28 @@ object SSRSubManager {
             return null
         }
     }
+
+    suspend fun addProfiles(url: String, group: String): Boolean {
+        if (url.isEmpty() || group.isEmpty()) return false
+        try {
+            val response = if (VpnEncrypt.vpnGroupName==group)
+                getResponse(url,"aes")
+            else
+                getResponse(url)
+
+            val profiles = Profile.findAllUrls(response, Core.currentProfile?.first)
+            if (profiles.isNullOrEmpty()) return false
+
+            profiles.forEach {
+                it.url_group = group
+                ProfileManager.createProfile(it)
+            }
+            Log.println(Log.ERROR,"------","add profiles to sub successful.")
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("------","failed add profiles",e)
+            return false
+        }
+    }
 }

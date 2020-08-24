@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec
 object VpnEncrypt{
     private const val theKey="your key"
     const val vpnGroupName="SpeedUp.VPN"
-    const val v2vpnRemark="v2ray.vpn"
+    //const val v2vpnRemark="v2ray.vpn"
     const val freesubGroupName="https://git.io/jmsfq"
     const val testing="test..."
     const val SOCK_PROXY_PORT = 10808

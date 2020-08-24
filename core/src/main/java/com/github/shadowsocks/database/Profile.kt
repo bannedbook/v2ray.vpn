@@ -234,7 +234,7 @@ data class Profile(
                     profile.headerType = "none"
                     profile.host = vmessQRCode.add
                     profile.name = vmessQRCode.ps
-                    if (profile.name==VpnEncrypt.v2vpnRemark)profile.name = profile.host.substring(0,5)+"..."
+                    //if (profile.name==VpnEncrypt.v2vpnRemark)profile.name = profile.host.substring(0,5)+"..."
                     profile.remotePort = parseInt(vmessQRCode.port)
                     profile.password = vmessQRCode.id
                     profile.alterId = parseInt(vmessQRCode.aid)
