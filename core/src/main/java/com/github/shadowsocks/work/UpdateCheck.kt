@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 
 class UpdateCheck(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     val url =context.getResources().getString(R.string.update_check_url)
-    //"https://raw.githubusercontent.com/bannedbook/ssvpn/master/update.json" //google play 发布，禁止自主更新
+    val update_uri =context.getResources().getString(R.string.update_uri)
     companion object {
         fun enqueue() = WorkManager.getInstance(Core.deviceStorage).enqueueUniquePeriodicWork(
                 "UpdateCheck", ExistingPeriodicWorkPolicy.KEEP,
@@ -43,7 +43,7 @@ class UpdateCheck(context: Context, workerParams: WorkerParameters) : CoroutineW
         val info = JsonStreamParser(json).asSequence().single().asJsonObject
         if (info["version"].asInt > BuildConfig.VERSION_CODE) {
             val nm = app.getSystemService<NotificationManager>()!!
-            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(info["uri"].asString))
+            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(update_uri))
             val builder = NotificationCompat.Builder(app as Context, "update")
                     .setColor(ContextCompat.getColor(app, R.color.material_primary_500))
                     .setContentIntent(PendingIntent.getActivity(app, 0, intent, 0))
