@@ -271,7 +271,6 @@ object Core {
     fun stopService() = app.sendBroadcast(Intent(Action.CLOSE).setPackage(app.packageName))
     fun startServiceForTest() {
         val currprofileType = ProfileManager.getProfile(DataStore.profileId)?.profileType
-        Log.e("startServiceForTest", currprofileType)
         if ("vmess" == currprofileType) {
             Log.e("startServiceForTest", "start V2RayTestService")
             app.startService(Intent(app, V2RayTestService::class.java))

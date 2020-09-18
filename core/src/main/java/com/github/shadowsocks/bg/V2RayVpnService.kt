@@ -59,27 +59,6 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     private lateinit var mInterface: ParcelFileDescriptor
     val fd: Int get() = mInterface.fd
 
-    /**
-        * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
-        *
-        * This makes doing a requestNetwork with REQUEST necessary so that we don't get ALL possible networks that
-        * satisfies default network capabilities but only THE default network. Unfortunately we need to have
-        * android.permission.CHANGE_NETWORK_STATE to be able to call requestNetwork.
-        *
-        * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
-        */
-    private val defaultNetworkRequest by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            NetworkRequest.Builder()
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-                    .build()
-        } else {
-            null
-        }
-    }
-
-
     private val connectivity by lazy { getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager }
 
     private val defaultNetworkCallback by lazy {
@@ -88,7 +67,7 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
                 override fun onAvailable(network: Network) {
                     setUnderlyingNetworks(arrayOf(network))
                 }
-                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities?) {
+                override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
                     // it's a good idea to refresh capabilities
                     setUnderlyingNetworks(arrayOf(network))
                 }
@@ -203,9 +182,22 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
         } catch (ignored: Exception) {
         }
 
+        /**
+         * Unfortunately registerDefaultNetworkCallback is going to return our VPN interface: https://android.googlesource.com/platform/frameworks/base/+/dda156ab0c5d66ad82bdcf76cda07cbc0a9c8a2e
+         *
+         * This makes doing a requestNetwork with REQUEST necessary so that we don't get ALL possible networks that
+         * satisfies default network capabilities but only THE default network. Unfortunately we need to have
+         * android.permission.CHANGE_NETWORK_STATE to be able to call requestNetwork.
+         *
+         * Source: https://android.googlesource.com/platform/frameworks/base/+/2df4c7d/services/core/java/com/android/server/ConnectivityService.java#887
+         */
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback)
+            val defaultNetworkRequest = NetworkRequest.Builder()
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
+                    .build()
+            connectivity.requestNetwork(defaultNetworkRequest, defaultNetworkCallback!!)
             listeningForDefaultNetwork = true
         }
 
@@ -223,19 +215,21 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(packagePath(applicationContext), "sock_path").absolutePath
-
+        Log.e("sendFd","path is $path")
         GlobalScope.launch {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
                 Log.d(packageName, "sendFd tries: " + tries.toString())
                 LocalSocket().use { localSocket ->
+                    Log.e("sendFd ","FILESYSTEM is "+ LocalSocketAddress.Namespace.FILESYSTEM.toString())
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
                     localSocket.outputStream.write(42)
                 }
                 break
             } catch (e: Exception) {
+                e.printStackTrace()
                 Log.d(packageName, e.toString())
                 if (tries > 5) break
                 tries += 1
@@ -315,7 +309,7 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     private fun stopV2Ray(isForced: Boolean = true) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (listeningForDefaultNetwork) {
-                connectivity.unregisterNetworkCallback(defaultNetworkCallback)
+                connectivity.unregisterNetworkCallback(defaultNetworkCallback!!)
                 listeningForDefaultNetwork = false
             }
         }

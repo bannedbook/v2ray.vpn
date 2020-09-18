@@ -29,6 +29,7 @@ import android.content.pm.ActivityInfo
 import android.net.VpnService
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import android.util.Log
 import android.view.*
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         printLog(t)
     }
 
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
     private val connection = ShadowsocksConnection(handler, true)
     fun getShadowsocksConnection():ShadowsocksConnection{return connection}
     override fun onServiceConnected(service: IShadowsocksService) = changeState(try {
