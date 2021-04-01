@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 31,
-    "identityHash": "8fcae3c5aa02caabb6da9a7bd9683555",
+    "version": 32,
+    "identityHash": "efd217c4d0b68d66bcc9cc6273138cd2",
     "entities": [
       {
         "tableName": "Profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `host` TEXT NOT NULL, `remotePort` INTEGER NOT NULL, `password` TEXT NOT NULL, `method` TEXT NOT NULL, `route` TEXT NOT NULL, `remoteDns` TEXT NOT NULL, `proxyApps` INTEGER NOT NULL, `bypass` INTEGER NOT NULL, `udpdns` INTEGER NOT NULL, `url_group` TEXT NOT NULL, `ipv6` INTEGER NOT NULL, `metered` INTEGER NOT NULL, `individual` TEXT NOT NULL, `plugin` TEXT, `udpFallback` INTEGER, `subscription` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `elapsed` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `profileType` TEXT NOT NULL, `alterId` INTEGER NOT NULL, `network` TEXT NOT NULL, `headerType` TEXT NOT NULL, `requestHost` TEXT NOT NULL, `path` TEXT NOT NULL, `streamSecurity` TEXT NOT NULL, `allowInsecure` INTEGER NOT NULL, `SNI` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `host` TEXT NOT NULL, `remotePort` INTEGER NOT NULL, `password` TEXT NOT NULL, `method` TEXT NOT NULL, `route` TEXT NOT NULL, `remoteDns` TEXT NOT NULL, `proxyApps` INTEGER NOT NULL, `bypass` INTEGER NOT NULL, `udpdns` INTEGER NOT NULL, `url_group` TEXT NOT NULL, `ipv6` INTEGER NOT NULL, `metered` INTEGER NOT NULL, `individual` TEXT NOT NULL, `plugin` TEXT, `udpFallback` INTEGER, `subscription` INTEGER NOT NULL, `tx` INTEGER NOT NULL, `rx` INTEGER NOT NULL, `elapsed` INTEGER NOT NULL, `userOrder` INTEGER NOT NULL, `profileType` TEXT NOT NULL, `alterId` INTEGER NOT NULL, `network` TEXT NOT NULL, `headerType` TEXT NOT NULL, `requestHost` TEXT NOT NULL, `path` TEXT NOT NULL, `xtlsflow` TEXT NOT NULL, `streamSecurity` TEXT NOT NULL, `allowInsecure` TEXT NOT NULL, `SNI` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -177,6 +177,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "xtlsflow",
+            "columnName": "xtlsflow",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "streamSecurity",
             "columnName": "streamSecurity",
             "affinity": "TEXT",
@@ -185,7 +191,7 @@
           {
             "fieldPath": "allowInsecure",
             "columnName": "allowInsecure",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -278,7 +284,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8fcae3c5aa02caabb6da9a7bd9683555')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'efd217c4d0b68d66bcc9cc6273138cd2')"
     ]
   }
 }

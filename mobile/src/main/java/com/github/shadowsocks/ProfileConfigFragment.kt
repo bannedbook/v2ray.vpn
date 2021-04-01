@@ -85,21 +85,62 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
     private lateinit var sitekey: EditTextPreference
     private lateinit var sitekeyTitle: CharSequence
 
-    private fun switchVmessSS(profileTypeValue:String){
+    private lateinit var streamSecurity: SimpleMenuPreference
+    private lateinit var xtlsflow: SimpleMenuPreference
+    private lateinit var allowInsecure: SimpleMenuPreference
+    private lateinit var SNI: EditTextPreference
+
+
+    private fun switchVmessSS(profileTypeValue:String,profile:Profile){
         Log.e("switchVmessSS",profileTypeValue)
         if (profileTypeValue=="vmess"){
             route.setEntries(R.array.route_entry_v2ray)
             route.setEntryValues(R.array.route_value_v2ray)
             //route.value="all"
             route.isEnabled=true
+
             encMethod.setEntries(R.array.vmess_enc_method)
             encMethod.setEntryValues(R.array.vmess_enc_method)
             var  encMethodList  = resources.getStringArray(R.array.vmess_enc_method)
             if(!encMethodList.contains(encMethod.value))encMethod.value=encMethodList[2] //auto
+
+            streamSecurity.setEntries(R.array.v2rayStreamsecuritys)
+            streamSecurity.setEntryValues(R.array.v2rayStreamsecuritys)
+
+            allowInsecure.setEntries(R.array.allowInsecure)
+            allowInsecure.setEntryValues(R.array.allowInsecure)
+
             pluginCategory.isVisible=false
+            xtlsflow.isVisible=false
             v2rayMoreCat.isVisible=true
             sitekey.title="id"
 
+        }
+        else if(profileTypeValue=="vless"){
+            route.setEntries(R.array.route_entry_v2ray)
+            route.setEntryValues(R.array.route_value_v2ray)
+            //route.value="all"
+            route.isEnabled=true
+
+            encMethod.setEntries(R.array.vless_enc_method)
+            encMethod.setEntryValues(R.array.vless_enc_method)
+            encMethod.value="none"
+
+            xtlsflow.setEntries(R.array.xtlsflow)
+            xtlsflow.setEntryValues(R.array.xtlsflow)
+            xtlsflow.value=profile.xtlsflow
+            xtlsflow.isVisible=true
+
+            streamSecurity.setEntries(R.array.xrayStreamsecuritys)
+            streamSecurity.setEntryValues(R.array.xrayStreamsecuritys)
+
+            allowInsecure.setEntries(R.array.allowInsecure)
+            allowInsecure.setEntryValues(R.array.allowInsecure)
+
+            pluginCategory.isVisible=false
+            v2rayMoreCat.isVisible=true
+            v2rayMoreCat.findPreference<EditTextPreference>(Key.alterId)?.isVisible=false
+            sitekey.title="id"
         }
         else{
             route.setEntries(R.array.route_entry)
@@ -129,16 +170,22 @@ class ProfileConfigFragment : PreferenceFragmentCompat(),
         profileType=findPreference(Key.profileType)!!
         encMethod=findPreference(Key.method)!!
         sitekey=findPreference(Key.password)!!
+
+        xtlsflow=findPreference(Key.xtlsflow)!!
+        allowInsecure=findPreference(Key.allowInsecure)!!
+        SNI=findPreference(Key.SNI)!!
+        streamSecurity=findPreference(Key.streamSecurity)!!
+
         sitekeyTitle=sitekey.title
         pluginCategory = findPreference("pluginCategory")!!
         v2rayMoreCat = findPreference("v2ray_more_cat")!!
 
         //if (profile.profileType=="vmess")profile.route="all"  //暂且强制v2ray全局路由模式
 
-        switchVmessSS(profile.profileType)
+        switchVmessSS(profile.profileType,profile)
         profileType.setOnPreferenceChangeListener { _, newValue ->
             //profile.profileType=newValue.toString()
-            switchVmessSS(newValue.toString())
+            switchVmessSS(newValue.toString(),profile)
             true
         }
         if(profile.isBuiltin()){

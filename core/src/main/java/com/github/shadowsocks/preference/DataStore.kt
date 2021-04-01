@@ -82,14 +82,14 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         return try {
             //val userCountry=Locale.getDefault().country
             //publicStore.getBoolean(Key.is_get_free_servers, "CN" != userCountry)
-            publicStore.getBoolean(Key.is_get_free_servers, true)
+            publicStore.getBoolean(Key.is_get_free_servers, false)
         }catch (t:Throwable){
-            publicStore.getBoolean(Key.is_get_free_servers, true)
+            publicStore.getBoolean(Key.is_get_free_servers, false)
         }
     }
-    val serviceVmess :Boolean get() {
+    val serviceV2ray :Boolean get() {
         val activeProfile= ProfileManager.getProfile(profileId) ?: return true
-        return activeProfile.profileType=="vmess"
+        return activeProfile.profileType=="vmess" || activeProfile.profileType=="vless"
     }
     val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"

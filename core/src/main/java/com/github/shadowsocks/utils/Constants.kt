@@ -73,6 +73,10 @@ object Key {
     const val remotePort = "remotePortNum"
     const val remoteDns = "remoteDns"
 
+    const val allowInsecure = "allowInsecure"
+    const val SNI = "SNI"
+    const val xtlsflow = "xtlsflow"
+
     const val plugin = "plugin"
     const val pluginConfigure = "plugin.configure"
     const val udpFallback = "udpFallback"

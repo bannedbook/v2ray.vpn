@@ -55,10 +55,11 @@ object AppConfig {
     const val MSG_TEST_SUCCESS = 51
 
     object EConfigType {
-        val Vmess = 1
-        val Custom = 2
-        val Shadowsocks = 3
-        val Socks = 4
+        val vmess = "vmess"
+        val custom = "custom"
+        val shadowsocks = "shadowsocks"
+        val socks = "socks"
+        val vless = "vless"
     }
 
 }

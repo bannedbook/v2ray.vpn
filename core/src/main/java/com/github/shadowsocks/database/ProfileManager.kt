@@ -54,7 +54,7 @@ object ProfileManager {
 
     @Throws(SQLException::class)
     fun createProfile(profile: Profile = Profile()): Profile {
-        var existOne=PrivateDatabase.profileDao.getByHostAndPort(profile.host,profile.remotePort)
+        var existOne=PrivateDatabase.profileDao.getSameProfile(profile.host,profile.remotePort,profile.path,profile.profileType,profile.streamSecurity,profile.SNI)
         if (existOne==null) {
             profile.id = 0
             profile.userOrder = PrivateDatabase.profileDao.nextOrder() ?: 0
@@ -100,11 +100,7 @@ object ProfileManager {
 
         val lazyClear = lazy { clear() }
 
-        var profilesSet:MutableSet<Profile> = LinkedHashSet()
-        val ssPofiles = Profile.findAllSSUrls(text, feature)
-        val v2Profiles= Profile.findAllVmessUrls(text, feature)
-        profilesSet.addAll(ssPofiles)
-        profilesSet.addAll(v2Profiles)
+        var profilesSet:MutableSet<Profile> = Profile.findAllUrls(text, feature)
         var newProfiles:List<Profile> = profilesSet.toList()
         if (newProfiles.isNotEmpty()){
             newProfiles.asIterable().forEachTry {
@@ -197,7 +193,7 @@ object ProfileManager {
     fun serializeToJsonIgnoreVPN(profiles: List<Profile>? = getAllProfilesIgnoreGroup(VpnEncrypt.vpnGroupName)): JSONArray? {
         if (profiles == null) return null
         val lookup = LongSparseArray<Profile>(profiles.size).apply { profiles.forEach { put(it.id, it) } }
-        return JSONArray(profiles.filter{it.profileType=="ss"}.map { it.toJson(lookup) }.toTypedArray())
+        return JSONArray(profiles.filter{it.profileType== AppConfig.EConfigType.shadowsocks || it.profileType=="ss"}.map { it.toJson(lookup) }.toTypedArray())
     }
 
     /**
@@ -263,7 +259,7 @@ object ProfileManager {
         null
     }
 
-    fun getActiveSSProfiles(): List<Profile>? = getAllProfiles()?.filter { it.profileType=="ss" }
+    fun getActiveSSProfiles(): List<Profile>? = getAllProfiles()?.filter {it.profileType== AppConfig.EConfigType.shadowsocks || it.profileType=="ss" }
 
     @Throws(IOException::class)
     fun getProfilesOrderlySpeed(): List<Profile>? = try {
@@ -319,6 +315,7 @@ object ProfileManager {
 
     fun profileToVmessBean(profile: Profile): VmessBean {
         var vmess = VmessBean()
+        vmess.configType=profile.profileType
         vmess.guid=profile.id.toString()
         vmess.remoteDns=profile.remoteDns
         vmess.address=profile.host
@@ -332,6 +329,9 @@ object ProfileManager {
         vmess.requestHost=profile.requestHost
         vmess.security=profile.method
         vmess.streamSecurity=profile.streamSecurity
+        vmess.allowInsecure=profile.allowInsecure
+        vmess.SNI=profile.SNI
+        vmess.flow = profile.xtlsflow
         vmess.subid=profile.url_group
         vmess.testResult=profile.elapsed.toString()
 

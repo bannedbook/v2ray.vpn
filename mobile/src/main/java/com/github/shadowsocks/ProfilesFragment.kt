@@ -28,6 +28,7 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -49,7 +50,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.aidl.TrafficStats
 import com.github.shadowsocks.bg.BaseService
 import com.github.shadowsocks.database.Profile
@@ -172,7 +172,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 })
             }
         } catch (e: WriterException) {
-            Crashlytics.logException(e)
+            printLog(e)
             (activity as MainActivity).snackbar().setText(e.readableMessage).show()
             dismiss()
             null
@@ -215,7 +215,7 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             TooltipCompat.setTooltipText(share, share.contentDescription)
         }
 
-        fun populateUnifiedNativeAdView(nativeAd: UnifiedNativeAd, adView: UnifiedNativeAdView) {
+/*        fun populateUnifiedNativeAdView(nativeAd: UnifiedNativeAd, adView: UnifiedNativeAdView) {
             // Set other ad assets.
             adView.headlineView = adView.findViewById(R.id.ad_headline)
             adView.bodyView = adView.findViewById(R.id.ad_body)
@@ -271,6 +271,19 @@ class ProfilesFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             //adView.setBackgroundColor(Color.WHITE) //Adding dividing line for ads
             adContainer.setPadding(0,1,0,0)  //Adding dividing line for ads
             adContainer.addView(adView)
+            adHost = this
+        }*/
+        fun populateUnifiedNativeAdView(nativeAd: UnifiedNativeAd, adView: UnifiedNativeAdView) {
+            val imageBannerView = ImageView(activity)
+            imageBannerView.setImageResource(R.drawable.v2free)
+            imageBannerView.setOnClickListener{
+                val intent = Intent()
+                intent.action = Intent.ACTION_VIEW
+                intent.addCategory(Intent.CATEGORY_BROWSABLE)
+                intent.data = Uri.parse("https://github.com/bannedbook/fanqiang/wiki/V2ray%E6%9C%BA%E5%9C%BA")
+                startActivity(intent)
+            }
+            adContainer.addView(imageBannerView)
             adHost = this
         }
 

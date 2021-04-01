@@ -70,13 +70,29 @@
             app:useSimpleSummaryProvider="true"/>
         <EditTextPreference
             app:key="path"
-            app:title="path(ws path/h2 path)/QUIC key"
+            app:title="path(ws path/h2 path)/QUIC key/kcp seed"
             app:useSimpleSummaryProvider="true"/>
         <com.takisoft.preferencex.SimpleMenuPreference
             app:key="streamSecurity"
-            app:entries="@array/streamsecuritys"
-            app:entryValues="@array/streamsecuritys"
+            app:entries="@array/v2rayStreamsecuritys"
+            app:entryValues="@array/v2rayStreamsecuritys"
             app:title="tls"
+            app:useSimpleSummaryProvider="true"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="allowInsecure"
+            app:entries="@array/allowInsecure"
+            app:entryValues="@array/allowInsecure"
+            app:title="allowInsecure"
+            app:useSimpleSummaryProvider="true"/>
+        <EditTextPreference
+            app:key="SNI"
+            app:title="SNI"
+            app:useSimpleSummaryProvider="true"/>
+        <com.takisoft.preferencex.SimpleMenuPreference
+            app:key="xtlsflow"
+            app:entries="@array/xtlsflow"
+            app:entryValues="@array/xtlsflow"
+            app:title="xtls flow"
             app:useSimpleSummaryProvider="true"/>
     </PreferenceCategory>
 

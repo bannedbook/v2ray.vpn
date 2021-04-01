@@ -43,7 +43,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceDataStore
-import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.acl.CustomRulesFragment
 import com.github.shadowsocks.aidl.IShadowsocksService
 import com.github.shadowsocks.aidl.ShadowsocksConnection
@@ -164,7 +163,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
             resultCode == Activity.RESULT_OK -> Core.startService()
             else -> {
                 snackbar().setText(R.string.vpn_permission_denied).show()
-                Crashlytics.log(Log.ERROR, TAG, "Failed to start VpnService from onActivityResult: $data")
+                printLog("Failed to start VpnService from onActivityResult: $data")
             }
         }
     }
@@ -266,7 +265,6 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
                 }
                 R.id.about -> {
                     userActionAds()
-                    Core.analytics.logEvent("about", Bundle())
                     displayFragment(AboutFragment())
                 }
                 R.id.faq -> {

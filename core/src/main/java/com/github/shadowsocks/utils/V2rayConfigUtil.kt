@@ -42,13 +42,13 @@ object V2rayConfigUtil {
 //                return result
 //            }
 
-            if (vmess.configType == AppConfig.EConfigType.Vmess) {
+            if (vmess.configType == AppConfig.EConfigType.vmess || vmess.configType == AppConfig.EConfigType.vless) {
                 result = getV2rayConfigType1(app, vmess,isTest)
-            } else if (vmess.configType == AppConfig.EConfigType.Custom) {
+            } else if (vmess.configType == AppConfig.EConfigType.custom) {
                 result = getV2rayConfigType2(app, vmess)
-            } else if (vmess.configType == AppConfig.EConfigType.Shadowsocks) {
+            } else if (vmess.configType == AppConfig.EConfigType.shadowsocks) {
                 result = getV2rayConfigType1(app, vmess)
-            } else if (vmess.configType == AppConfig.EConfigType.Socks) {
+            } else if (vmess.configType == AppConfig.EConfigType.socks) {
                 result = getV2rayConfigType1(app, vmess)
             }
 
@@ -94,6 +94,21 @@ object V2rayConfigUtil {
                 customRemoteDns(vmess, v2rayConfig, app)
             //}
 
+
+            v2rayConfig.outbounds.forEach {
+                if("freedom" == it.protocol){
+                    it.mux=null
+                    it.settings=null
+                }
+                else if ("blackhole" == it.protocol){
+                    it.mux=null
+                    it.settings?.servers=null
+                    it.settings?.vnext=null
+                }
+                else{
+                    it.settings?.response=null
+                }
+            }
             val finalConfig = GsonBuilder().setPrettyPrinting().create().toJson(v2rayConfig)
 
             result.status = true
@@ -167,7 +182,29 @@ object V2rayConfigUtil {
             val outbound = v2rayConfig.outbounds[0]
 
             when (vmess.configType) {
-                AppConfig.EConfigType.Vmess -> {
+                AppConfig.EConfigType.vless -> {
+                    outbound.settings?.servers = null
+                    val vnext = v2rayConfig.outbounds[0].settings?.vnext?.get(0)
+                    vnext?.address = vmess.address
+                    vnext?.port = vmess.port
+                    val user = vnext?.users?.get(0)
+                    user?.id = vmess.id
+                    user?.encryption = vmess.security
+                    user?.flow = vmess.flow
+                    user?.alterId = 0
+                    user?.security = "auto"
+                    user?.level = 8
+
+                    //Mux
+                    val muxEnabled = false//app.defaultDPreference.getPrefBoolean(SettingsActivity.PREF_MUX_ENABLED, false)
+                    outbound.mux?.enabled = muxEnabled
+
+                    //远程服务器底层传输配置
+                    outbound.streamSettings = boundStreamSettings(vmess)
+
+                    outbound.protocol = vmess.configType
+                }
+                AppConfig.EConfigType.vmess -> {
                     outbound.settings?.servers = null
 
                     val vnext = v2rayConfig.outbounds[0].settings?.vnext?.get(0)
@@ -186,9 +223,9 @@ object V2rayConfigUtil {
                     //远程服务器底层传输配置
                     outbound.streamSettings = boundStreamSettings(vmess)
 
-                    outbound.protocol = "vmess"
+                    outbound.protocol = vmess.configType
                 }
-                AppConfig.EConfigType.Shadowsocks -> {
+                AppConfig.EConfigType.shadowsocks -> {
                     outbound.settings?.vnext = null
 
                     val server = outbound.settings?.servers?.get(0)
@@ -204,7 +241,7 @@ object V2rayConfigUtil {
 
                     outbound.protocol = "shadowsocks"
                 }
-                AppConfig.EConfigType.Socks -> {
+                AppConfig.EConfigType.socks -> {
                     outbound.settings?.vnext = null
 
                     val server = outbound.settings?.servers?.get(0)
@@ -245,6 +282,14 @@ object V2rayConfigUtil {
             streamSettings.network = vmess.network
             streamSettings.security = vmess.streamSecurity
 
+            val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
+            tlssettings.allowInsecure = vmess.allowInsecure.toBoolean()
+            tlssettings.serverName=vmess.SNI
+            if ("xtls" ==  vmess.streamSecurity)
+                streamSettings.xtlsSettings = tlssettings
+            else
+                streamSettings.tlsSettings = tlssettings
+
             //streamSettings
             when (streamSettings.network) {
                 "kcp" -> {
@@ -255,14 +300,14 @@ object V2rayConfigUtil {
                     kcpsettings.downlinkCapacity = 100
                     kcpsettings.congestion = false
                     kcpsettings.readBufferSize = 1
+                    kcpsettings.seed = vmess.path.trim()
                     kcpsettings.writeBufferSize = 1
                     kcpsettings.header = V2rayConfig.OutboundBean.StreamSettingsBean.KcpsettingsBean.HeaderBean()
                     kcpsettings.header.type = vmess.headerType
-                    streamSettings.kcpsettings = kcpsettings
+                    streamSettings.kcpSettings = kcpsettings
                 }
                 "ws" -> {
                     val wssettings = V2rayConfig.OutboundBean.StreamSettingsBean.WssettingsBean()
-                    wssettings.connectionReuse = true
                     val host = vmess.requestHost.trim()
                     val path = vmess.path.trim()
 
@@ -273,14 +318,7 @@ object V2rayConfigUtil {
                     if (!TextUtils.isEmpty(path)) {
                         wssettings.path = path
                     }
-                    streamSettings.wssettings = wssettings
-
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
-                    tlssettings.allowInsecure = true
-					if (!TextUtils.isEmpty(host)) {
-                        tlssettings.serverName = host
-                    }
-                    streamSettings.tlssettings = tlssettings
+                    streamSettings.wsSettings = wssettings
                 }
                 "h2" -> {
                     val httpsettings = V2rayConfig.OutboundBean.StreamSettingsBean.HttpsettingsBean()
@@ -292,10 +330,6 @@ object V2rayConfigUtil {
                     }
                     httpsettings.path = path
                     streamSettings.httpsettings = httpsettings
-
-                    val tlssettings = V2rayConfig.OutboundBean.StreamSettingsBean.TlssettingsBean()
-                    tlssettings.allowInsecure = true
-                    streamSettings.tlssettings = tlssettings
                 }
                 "quic" -> {
                     val quicsettings = V2rayConfig.OutboundBean.StreamSettingsBean.QuicsettingBean()

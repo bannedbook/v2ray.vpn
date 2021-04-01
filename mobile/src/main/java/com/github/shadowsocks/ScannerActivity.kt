@@ -37,7 +37,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.getSystemService
 import androidx.core.util.forEach
-import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.database.Profile
 import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.utils.*
@@ -109,7 +108,7 @@ class ScannerActivity : AppCompatActivity(), BarcodeRetriever {
     }
     override fun onRetrievedMultiple(closetToClick: Barcode?, barcode: MutableList<BarcodeGraphic>?) = check(false)
     override fun onBitmapScanned(sparseArray: SparseArray<Barcode>?) { }
-    override fun onRetrievedFailed(reason: String?) = Crashlytics.log(Log.WARN, TAG, reason)
+    override fun onRetrievedFailed(reason: String?) = printLog(reason)
     override fun onPermissionRequestDenied() {
         Toast.makeText(this, R.string.add_profile_scanner_permission_required, Toast.LENGTH_SHORT).show()
         startImport()

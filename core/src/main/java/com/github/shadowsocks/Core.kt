@@ -42,7 +42,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.acl.Acl
 import com.github.shadowsocks.aidl.ShadowsocksConnection
 import com.github.shadowsocks.bg.BaseService
@@ -58,13 +57,14 @@ import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.subscription.SubscriptionService
 import com.github.shadowsocks.utils.*
 import com.github.shadowsocks.work.UpdateCheck
-import com.google.firebase.FirebaseApp
-import com.google.firebase.analytics.FirebaseAnalytics
-import io.fabric.sdk.android.Fabric
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import kotlinx.coroutines.DEBUG_PROPERTY_NAME
 import kotlinx.coroutines.DEBUG_PROPERTY_VALUE_ON
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import me.dozen.dpreference.DPreference
 import java.io.File
 import java.io.IOException
@@ -85,7 +85,6 @@ object Core {
     val notification by lazy { app.getSystemService<NotificationManager>()!! }
     val packageInfo: PackageInfo by lazy { getPackageInfo(app.packageName) }
     val deviceStorage by lazy { if (Build.VERSION.SDK_INT < 24) app else DeviceStorageApp(app) }
-    val analytics: FirebaseAnalytics by lazy { FirebaseAnalytics.getInstance(deviceStorage) }
     val directBootSupported by lazy {
         Build.VERSION.SDK_INT >= 24 && app.getSystemService<DevicePolicyManager>()?.storageEncryptionStatus ==
                 DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER
@@ -141,6 +140,13 @@ object Core {
                 val builtinSub = SSRSubManager.createSSSub(builtinSubUrls[i], VpnEncrypt.vpnGroupName)
                 if (builtinSub != null) break
             }
+
+            val builtinGlobalUrls = app.resources.getStringArray(R.array.builtinGlobalUrls)
+            for (i in 0 until builtinGlobalUrls.size) {
+                val addSuccess = SSRSubManager.addProfiles(builtinGlobalUrls[i], VpnEncrypt.vpnGroupName)
+                if (addSuccess) break
+            }
+
             if (DataStore.is_get_free_servers) importFreeSubs()
             app.startService(Intent(app, SubscriptionService::class.java))
         }
@@ -181,12 +187,20 @@ object Core {
 
         // overhead of debug mode is minimal: https://github.com/Kotlin/kotlinx.coroutines/blob/f528898/docs/debugging.md#debug-mode
         System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
-        Fabric.with(deviceStorage, Crashlytics())   // multiple processes needs manual set-up
-        FirebaseApp.initializeApp(deviceStorage)
-        WorkManager.initialize(deviceStorage, Configuration.Builder().apply {
-            setExecutor { GlobalScope.launch { it.run() } }
-            setTaskExecutor { GlobalScope.launch { it.run() } }
-        }.build())
+        Firebase.initialize(deviceStorage)  // multiple processes needs manual set-up
+        Timber.plant(object : Timber.DebugTree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                if (t == null) {
+                    if (priority != Log.DEBUG || BuildConfig.DEBUG) Log.println(priority, tag, message)
+                    FirebaseCrashlytics.getInstance().log("${"XXVDIWEF".getOrElse(priority) { 'X' }}/$tag: $message")
+                } else {
+                    if (priority >= Log.WARN || priority == Log.DEBUG) Log.println(priority, tag, message)
+                    if (priority >= Log.INFO) FirebaseCrashlytics.getInstance().recordException(t)
+                }
+            }
+        })
+        val config:Configuration  =  Configuration.Builder().build()
+        WorkManager.initialize(app.applicationContext, config)
         UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
 
         // handle data restored/crash
@@ -271,7 +285,7 @@ object Core {
     fun stopService() = app.sendBroadcast(Intent(Action.CLOSE).setPackage(app.packageName))
     fun startServiceForTest() {
         val currprofileType = ProfileManager.getProfile(DataStore.profileId)?.profileType
-        if ("vmess" == currprofileType) {
+        if ("vmess" == currprofileType || "vless" == currprofileType) {
             Log.e("startServiceForTest", "start V2RayTestService")
             app.startService(Intent(app, V2RayTestService::class.java))
         } else {

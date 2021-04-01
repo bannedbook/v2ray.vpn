@@ -28,7 +28,6 @@ import android.os.*
 import android.util.Log
 import androidx.core.content.getSystemService
 import androidx.core.os.bundleOf
-import com.crashlytics.android.Crashlytics
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.Core.app
@@ -41,6 +40,9 @@ import com.github.shadowsocks.net.HostsFile
 import com.github.shadowsocks.preference.DataStore
 import com.github.shadowsocks.utils.*
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.IOException
@@ -230,7 +232,7 @@ object BaseService {
             when {
                 s == State.Stopped -> startRunner()
                 s.canStop -> stopRunner(true)
-                else -> Crashlytics.log(Log.WARN, tag, "Illegal state when invoking use: $s")
+                else -> printLog("Illegal state when invoking use: $s")
             }
         }
 
@@ -269,7 +271,7 @@ object BaseService {
             // channge the state
             data.changeState(State.Stopping)
             GlobalScope.launch(Dispatchers.Main.immediate) {
-                Core.analytics.logEvent("stop", bundleOf(Pair(FirebaseAnalytics.Param.METHOD, tag)))
+                Firebase.analytics.logEvent("stop") { param(FirebaseAnalytics.Param.METHOD, tag) }
                 data.connectingJob?.cancelAndJoin() // ensure stop connecting first
                 this@Interface as Service
                 // we use a coroutineScope here to allow clean-up in parallel
