@@ -189,6 +189,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         setContentView(R.layout.layout_main)
 
         MobileAds.initialize(this) {}
+        MobileAds.setAppMuted(true)
 //        mAdView = findViewById(R.id.adView)
 //        val adRequest = AdRequest.Builder().build()
 //        mAdView.loadAd(adRequest)

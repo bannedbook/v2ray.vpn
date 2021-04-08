@@ -86,6 +86,7 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         v2rayPoint.packageName = packagePath(applicationContext)
+        v2rayPoint.vpnMode=true
         Seq.setContext(applicationContext)
     }
 
@@ -349,8 +350,8 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
             }
         }
 
-        override fun prepare(): Long {
-            return 0
+        override fun prepare(): String {
+            return applicationInfo.nativeLibraryDir
         }
 
         override fun protect(l: Long) = (if (this@V2RayVpnService.protect(l.toInt())) 0 else 1).toLong()

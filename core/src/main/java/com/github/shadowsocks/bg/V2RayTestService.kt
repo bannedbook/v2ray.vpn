@@ -46,6 +46,7 @@ class V2RayTestService : Service() , BaseService.Interface {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         v2rayPoint.packageName = packagePath(applicationContext)
+        v2rayPoint.vpnMode=false
         Seq.setContext(applicationContext)
     }
 
@@ -186,8 +187,8 @@ class V2RayTestService : Service() , BaseService.Interface {
             }
         }
 
-        override fun prepare(): Long {
-            return 0
+        override fun prepare(): String {
+            return ""
         }
 
         override fun protect(l: Long) = 1.toLong()
