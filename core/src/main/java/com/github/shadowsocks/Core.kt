@@ -148,7 +148,12 @@ object Core {
             }
 
             if (DataStore.is_get_free_servers) importFreeSubs()
-            app.startService(Intent(app, SubscriptionService::class.java))
+            try {
+                app.startService(Intent(app, SubscriptionService::class.java))
+            }
+            catch (e:Throwable){
+                e.printStackTrace()
+            }
         }
     }
 
