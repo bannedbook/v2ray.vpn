@@ -82,6 +82,23 @@ class V2RayVpnService : VpnService() , BaseService.Interface{
     private var listeningForDefaultNetwork = false
     lateinit var activeProfile: Profile
     override fun onCreate() {
+        /* https://stackoverflow.com/questions/44425584/context-startforegroundservice-did-not-then-call-service-startforeground
+
+Why this issue is happening is because Android framework can't guarantee your service get started within 5 second but on the other hand framework does have strict limit on foreground notification must be fired within 5 seconds, without checking if framework had tried to start the service.
+
+This is definitely a framework issue, but not all developers facing this issue are doing their best:
+
+startForeground a notification must be in both onCreate and onStartCommand, because if your service is already created and somehow your activity is trying to start it again, onCreate won't be called.
+
+notification ID must not be 0 otherwise same crash will happen even it's not same reason.
+
+stopSelf must not be called before startForeground.
+
+With all above 3 this issue can be reduced a bit but still not a fix, the real fix or let's say workaround is to downgrade your target sdk version to 25.
+
+And note that most likely Android P will still carry this issue because Google refuses to even understand what is going on and does not believe this is their fault, read #36 and #56 for more information
+         */
+        data.notification = createNotification(getString(R.string.app_name))
         super.onCreate()
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
