@@ -42,6 +42,10 @@
     <!-- feature category -->
     <string name="ipv6">"IPv6 路由"</string>
     <string name="ipv6_summary">"向遠端重新導向 IPv6 流量"</string>
+      <string name="ss_route_summary">"SS默認路由，並重置所有SS節點路由"</string>
+<string name="v2_route_summary">"v2ray默認路由，並重置所有v2ray節點路由"</string>
+<string name="ss_route_list">Shadowsocks路由</string>
+<string name="v2_route_list">"V2ray路由"</string>
     <string name="route_list">"路由"</string>
     <string name="route_entry_gfwlist">"GFW List"</string>
     <string name="proxied_apps">"個別應用程式的 VPN"</string>
@@ -238,5 +242,5 @@
     </body>
     </html>
   ]]>"</string>
-    <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/ssvpn/master/update-zh.json</string>
+    <string name="update_check_url">https://raw.githubusercontent.com/bannedbook/v2ray.vpn/master/update-zh.json</string>
 </resources>

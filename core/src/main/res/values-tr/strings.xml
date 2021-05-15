@@ -38,6 +38,10 @@
     <string name="sitekey">"Şifre"</string>
     <string name="enc_method">"Şifreleme Methodu"</string>
     <string name="ipv6_summary">"IPv6 trafiğini remote'a yönlendir"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks Rota</string>
+<string name="v2_route_list">"V2ray Rota"</string>
     <string name="route_list">"Rota"</string>
     <string name="route_entry_gfwlist">"GFW Listesi"</string>
     <string name="proxied_apps">"Uygulamalar VPN modu"</string>

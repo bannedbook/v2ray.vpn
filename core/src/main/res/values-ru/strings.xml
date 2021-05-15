@@ -42,6 +42,10 @@
     <!-- feature category -->
     <string name="ipv6">"IPv6 Маршрут"</string>
     <string name="ipv6_summary">"Перенаправлять трафик IPv6 на удалённый сервер"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks Маршрут</string>
+<string name="v2_route_list">"V2ray Маршрут"</string>
     <string name="route_list">"Маршрут"</string>
     <string name="route_entry_gfwlist">"Список GFW"</string>
     <string name="proxied_apps">"Режим VPN для выбранных приложений"</string>

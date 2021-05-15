@@ -20,5 +20,5 @@ data class VmessBean(var guid: String = "123456",
                      var testResult: String = "",
                      var subid: String = "",
                      var remoteDns: String = "1.1.1.1",
-                     var route:String = "3"  // 3,绕过局域网和大陆地址
+                     var route:String = "0"  // 0,全局
 )

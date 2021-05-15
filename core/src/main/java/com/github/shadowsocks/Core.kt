@@ -91,7 +91,12 @@ object Core {
     }
 
     const val appName = BuildConfig.FLAVOR
-    val applicationId = if (appName === "v2free") "free.v2ray.proxy.VPN" else "free.shadowsocks.proxy.VPN"
+    val applicationId = when (appName) {
+            "ssvpn" -> "free.shadowsocks.proxy.VPN"
+            "v2vpn" -> "free.v2ray.proxy.VPN"
+            "v2free" -> "v2free.app"
+            else -> ""
+        }
 
     val activeProfileIds
         get() = ProfileManager.getProfile(DataStore.profileId).let {
@@ -135,19 +140,23 @@ object Core {
     //Import built-in subscription
     fun updateBuiltinServers() {
         GlobalScope.launch {
-            val builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
-            for (i in 0 until builtinSubUrls.size) {
-                val builtinSub = SSRSubManager.createSSSub(builtinSubUrls[i], VpnEncrypt.vpnGroupName)
-                if (builtinSub != null) break
-            }
+            if (applicationId!="v2free.app") {
+                val builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
+                for (i in 0 until builtinSubUrls.size) {
+                    val builtinSub =
+                        SSRSubManager.createSSSub(builtinSubUrls[i], VpnEncrypt.vpnGroupName)
+                    if (builtinSub != null) break
+                }
 
-            val builtinGlobalUrls = app.resources.getStringArray(R.array.builtinGlobalUrls)
-            for (i in 0 until builtinGlobalUrls.size) {
-                val addSuccess = SSRSubManager.addProfiles(builtinGlobalUrls[i], VpnEncrypt.vpnGroupName)
-                if (addSuccess) break
-            }
+                val builtinGlobalUrls = app.resources.getStringArray(R.array.builtinGlobalUrls)
+                for (i in 0 until builtinGlobalUrls.size) {
+                    val addSuccess =
+                        SSRSubManager.addProfiles(builtinGlobalUrls[i], VpnEncrypt.vpnGroupName)
+                    if (addSuccess) break
+                }
 
-            if (DataStore.is_get_free_servers) importFreeSubs()
+                if (DataStore.is_get_free_servers) importFreeSubs()
+            }
             try {
                 app.startService(Intent(app, SubscriptionService::class.java))
             }

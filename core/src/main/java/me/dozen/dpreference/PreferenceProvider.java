@@ -22,8 +22,20 @@ import com.github.shadowsocks.core.BuildConfig;
  */
 public class PreferenceProvider extends ContentProvider {
 
-    private static final String TAG = PreferenceProvider.class.getSimpleName();
-    private static final String applicationId= BuildConfig.FLAVOR=="v2free"?"free.v2ray.proxy.VPN":"free.shadowsocks.proxy.VPN";
+    private static String applicationId="";
+    static {
+        switch(BuildConfig.FLAVOR) {
+            case "ssvpn":
+                applicationId="free.shadowsocks.proxy.VPN";
+                break;
+            case "v2vpn":
+                applicationId="free.v2ray.proxy.VPN";
+                break;
+            case "v2free":
+                applicationId="v2free.app";
+                break;
+        }
+    }
     private static final String AUTHORITY = applicationId+".dpreference";
 
     public static final String CONTENT_PREF_BOOLEAN_URI = "content://" + AUTHORITY + "/boolean/";

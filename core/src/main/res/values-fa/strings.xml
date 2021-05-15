@@ -36,6 +36,10 @@
     <!-- feature category -->
     <string name="ipv6">"مسیر IPv6"</string>
     <string name="ipv6_summary">"ترافیک IPv6 را به سرور هدایت کن"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks روت</string>
+<string name="v2_route_list">"V2ray روت"</string>
     <string name="route_list">"روت"</string>
     <string name="route_entry_gfwlist">"فهرست فیلترینگ"</string>
     <string name="proxied_apps">"حالت "</string>

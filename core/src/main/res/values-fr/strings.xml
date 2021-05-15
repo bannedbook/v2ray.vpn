@@ -42,6 +42,10 @@ Reçu : \t\t\t%4$s\t↓\t%2$s"</string>
     <!-- feature category -->
     <string name="ipv6">"Route IPv6"</string>
     <string name="ipv6_summary">"Rediriger le trafic IPv6 vers le serveur distant"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks Route</string>
+<string name="v2_route_list">"V2ray Route"</string>
     <string name="route_list">"Route"</string>
     <string name="route_entry_gfwlist">"Liste GFW"</string>
     <string name="proxied_apps">"Mode VPN Apps"</string>

@@ -56,22 +56,29 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = DataStore.publicStore
         DataStore.initGlobal()
         addPreferencesFromResource(R.xml.pref_global)
-
-        findPreference<SwitchPreference>(Key.isAutoUpdateServers)!!.setOnPreferenceChangeListener { _, value ->
-            DataStore.publicStore.putBoolean(Key.isAutoUpdateServers,  value as Boolean)
-            true
-        }
-        findPreference<SwitchPreference>(Key.is_get_free_servers)!!.setOnPreferenceChangeListener { _, value ->
-            DataStore.publicStore.putBoolean(Key.is_get_free_servers,  value as Boolean)
-            if(value)Core.importFreeSubs()
-            if(!value){
-                val freesub= PrivateDatabase.ssrSubDao.getByGroup(VpnEncrypt.freesubGroupName)
-                if (freesub!=null) {
-                    SSRSubManager.deletProfiles(freesub)
-                    SSRSubManager.delSSRSub(freesub.id)
-                }
+        val isAutoPref = findPreference<SwitchPreference>(Key.isAutoUpdateServers)!!
+        val isGetFreeSubPref=findPreference<SwitchPreference>(Key.is_get_free_servers)!!
+        if(Core.applicationId!="v2free.app") {
+            isAutoPref.setOnPreferenceChangeListener { _, value ->
+                DataStore.publicStore.putBoolean(Key.isAutoUpdateServers, value as Boolean)
+                true
             }
-            true
+            isGetFreeSubPref.setOnPreferenceChangeListener { _, value ->
+                DataStore.publicStore.putBoolean(Key.is_get_free_servers, value as Boolean)
+                if (value) Core.importFreeSubs()
+                if (!value) {
+                    val freesub = PrivateDatabase.ssrSubDao.getByGroup(VpnEncrypt.freesubGroupName)
+                    if (freesub != null) {
+                        SSRSubManager.deletProfiles(freesub)
+                        SSRSubManager.delSSRSub(freesub.id)
+                    }
+                }
+                true
+            }
+        }
+        else{
+            isAutoPref.isVisible=false
+            isGetFreeSubPref.isVisible=false
         }
         findPreference<SwitchPreference>(Key.persistAcrossReboot)!!.setOnPreferenceChangeListener { _, value ->
             BootReceiver.enabled = value as Boolean
@@ -116,6 +123,21 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
         val portHttpProxy = findPreference<EditTextPreference>(Key.portHttpProxy)!!
         portHttpProxy.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         portHttpProxy.isEnabled=false
+
+        val v2route = findPreference<Preference>(Key.v2route)!!
+        v2route.setOnPreferenceChangeListener { _, newValue ->
+            DataStore.v2route=newValue.toString()
+            true
+        }
+        v2route.isEnabled = (activity as MainActivity).state == BaseService.State.Stopped
+
+        val ssroute = findPreference<Preference>(Key.ssroute)!!
+        ssroute.setOnPreferenceChangeListener { _, newValue ->
+            DataStore.ssroute=newValue.toString()
+            true
+        }
+        ssroute.isEnabled = (activity as MainActivity).state == BaseService.State.Stopped
+
         val onServiceModeChange = Preference.OnPreferenceChangeListener { _, newValue ->
             val (enabledLocalDns, enabledTransproxy) = when (newValue as String?) {
                 Key.modeProxy -> Pair(false, false)
@@ -133,6 +155,8 @@ class GlobalSettingsPreferenceFragment : PreferenceFragmentCompat() {
             tfo.isEnabled = stopped
             serviceMode.isEnabled = stopped
             shareOverLan.isEnabled = stopped
+            v2route.isEnabled = stopped
+            ssroute.isEnabled = stopped
             //portProxy.isEnabled = stopped
             if (stopped) onServiceModeChange.onPreferenceChange(null, DataStore.serviceMode) else {
                 hosts.isEnabled = false

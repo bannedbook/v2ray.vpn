@@ -11,6 +11,21 @@
         app:icon="@drawable/ic_baseline_autorenew"
         app:summary="@string/get_free_servers_summary"
         app:title="@string/get_free_servers"/>
+    <com.takisoft.preferencex.SimpleMenuPreference
+        app:key="v2route"
+        app:icon="@drawable/ic_maps_directions"
+        app:entries="@array/route_entry_v2ray"
+        app:entryValues="@array/route_value_v2ray"
+        app:defaultValue="all"
+        app:title="@string/v2_route_list"
+        app:summary="@string/v2_route_summary"/>
+    <com.takisoft.preferencex.SimpleMenuPreference
+        app:key="ssroute"
+        app:icon="@drawable/ic_maps_directions"
+        app:entries="@array/route_entry"
+        app:entryValues="@array/route_value"
+        app:title="@string/ss_route_list"
+        app:summary="@string/ss_route_summary"/>
     <SwitchPreference
         app:key="isAutoConnect"
         app:icon="@drawable/ic_communication_phonelink_ring"

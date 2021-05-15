@@ -38,23 +38,27 @@ class UpdateCheck(context: Context, workerParams: WorkerParameters) : CoroutineW
     }
 
     override suspend fun doWork(): Result = try {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        val json = connection.useCancellable { inputStream.bufferedReader() }
-        val info = JsonStreamParser(json).asSequence().single().asJsonObject
-        if (info["version"].asInt > BuildConfig.VERSION_CODE) {
-            val nm = app.getSystemService<NotificationManager>()!!
-            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(update_uri))
-            val builder = NotificationCompat.Builder(app as Context, "update")
+        if(update_uri!="") {
+            val connection = URL(url).openConnection() as HttpURLConnection
+            val json = connection.useCancellable { inputStream.bufferedReader() }
+            val info = JsonStreamParser(json).asSequence().single().asJsonObject
+            if (info["version"].asInt > BuildConfig.VERSION_CODE) {
+                val nm = app.getSystemService<NotificationManager>()!!
+                val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(update_uri))
+                val builder = NotificationCompat.Builder(app as Context, "update")
                     .setColor(ContextCompat.getColor(app, R.color.material_primary_500))
                     .setContentIntent(PendingIntent.getActivity(app, 0, intent, 0))
-                    .setVisibility(if (DataStore.canToggleLocked) NotificationCompat.VISIBILITY_PUBLIC
-                    else NotificationCompat.VISIBILITY_PRIVATE)
+                    .setVisibility(
+                        if (DataStore.canToggleLocked) NotificationCompat.VISIBILITY_PUBLIC
+                        else NotificationCompat.VISIBILITY_PRIVATE
+                    )
                     .setSmallIcon(R.drawable.ic_service_active)
                     .setCategory(NotificationCompat.CATEGORY_STATUS)
                     .setContentTitle(info["title"].asString)
                     .setContentText(info["text"].asString)
                     .setAutoCancel(true)
-            nm.notify(62, builder.build())
+                nm.notify(62, builder.build())
+            }
         }
         Result.success()
     } catch (e: Exception) {

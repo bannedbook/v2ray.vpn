@@ -42,6 +42,10 @@ Recibido: \t%4$s\t↓\t%2$s"</string>
     <!-- feature category -->
     <string name="ipv6">"Ruta IPv6"</string>
     <string name="ipv6_summary">"Redireccionar tráfico IPv6 a ruta"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks Ruta</string>
+<string name="v2_route_list">"V2ray Ruta"</string>
     <string name="route_list">"Ruta"</string>
     <string name="route_entry_gfwlist">"Lista GFW"</string>
     <string name="proxied_apps">"Apps en modo VPN"</string>

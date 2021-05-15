@@ -35,21 +35,32 @@ android {
             resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/4292721507"
             resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/8267385919"
             resValue 'string', 'chaye_adUnitId', "ca-app-pub-2194043486084479/4460118091"
-            resValue 'string', 'update_uri', "https://play.google.com/store/apps/details?id=free.shadowsocks.proxy.VPN"
+            resValue 'string', 'update_uri', "https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN"
         }
-        v2free {
+        v2vpn {
             dimension "encryption"
-            resValue 'string', 'app_name', "V2free"
-            resValue 'string', 'about_title', "V2free %s"
+            resValue 'string', 'app_name', "V2ray VPN"
+            resValue 'string', 'about_title', "V2ray VPN %s"
             resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~8520668797"
             resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/7710984154"
             resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/5507178325"
             resValue 'string', 'chaye_adUnitId', "ca-app-pub-2194043486084479/6292074516"
             resValue 'string', 'update_uri', "https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN"
         }
+        v2free {
+            dimension "encryption"
+            resValue 'string', 'app_name', "V2free"
+            resValue 'string', 'about_title', "V2free %s"
+            resValue 'string', 'admob_appid', "ca-app-pub-2194043486084479~4911675390"
+            resValue 'string', 'banner_adUnitId', "ca-app-pub-2194043486084479/7346267044"
+            resValue 'string', 'native_adUnitId', "ca-app-pub-2194043486084479/2088881566"
+            resValue 'string', 'chaye_adUnitId', "ca-app-pub-2194043486084479/2281642621"
+            resValue 'string', 'update_uri', ""
+        }
     }
     sourceSets {
         ssvpn.setRoot('src/ssvpn')
+        v2vpn.setRoot('src/v2vpn')
         v2free.setRoot('src/v2free')
     }
     compileOptions {

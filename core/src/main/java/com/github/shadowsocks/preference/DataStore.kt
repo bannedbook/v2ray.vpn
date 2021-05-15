@@ -26,6 +26,7 @@ import androidx.preference.PreferenceDataStore
 import com.github.shadowsocks.BootReceiver
 import com.github.shadowsocks.Core
 import com.github.shadowsocks.aidl.ShadowsocksConnection
+import com.github.shadowsocks.database.AppConfig
 import com.github.shadowsocks.database.PrivateDatabase
 import com.github.shadowsocks.database.ProfileManager
 import com.github.shadowsocks.database.PublicDatabase
@@ -33,6 +34,7 @@ import com.github.shadowsocks.net.TcpFastOpen
 import com.github.shadowsocks.utils.DirectBoot
 import com.github.shadowsocks.utils.Key
 import com.github.shadowsocks.utils.parsePort
+import com.google.android.material.snackbar.Snackbar
 import java.net.InetSocketAddress
 import java.util.*
 
@@ -92,6 +94,34 @@ object DataStore : OnPreferenceDataStoreChangeListener {
         return activeProfile.profileType=="vmess" || activeProfile.profileType=="vless"
     }
     val serviceMode get() = publicStore.getString(Key.serviceMode) ?: Key.modeVpn
+    var v2route:String
+        get() = publicStore.getString(Key.v2route) ?: "all"
+        set(value) {
+            publicStore.putString(Key.v2route, value)
+            val profiles = ProfileManager.getAllProfiles()
+            if (!profiles.isNullOrEmpty()) {
+                profiles.forEach {
+                    if(it.profileType==AppConfig.EConfigType.vmess||it.profileType==AppConfig.EConfigType.vless){
+                        it.route = value
+                        ProfileManager.updateProfile(it)
+                    }
+                }
+            }
+        }
+    var ssroute:String
+        get() = publicStore.getString(Key.ssroute) ?: "all"
+        set(value) {
+            publicStore.putString(Key.ssroute, value)
+            val profiles = ProfileManager.getAllProfiles()
+            if (!profiles.isNullOrEmpty()) {
+                profiles.forEach {
+                    if(it.profileType == AppConfig.EConfigType.shadowsocks){
+                        it.route = value
+                        ProfileManager.updateProfile(it)
+                    }
+                }
+            }
+        }
     val listenAddress get() = if (publicStore.getBoolean(Key.shareOverLan, false)) "0.0.0.0" else "127.0.0.1"
     var portProxy: Int = VpnEncrypt.SOCK_PROXY_PORT
         //get() = getLocalPort(Key.portProxy, VpnEncrypt.SOCK_PROXY_PORT)

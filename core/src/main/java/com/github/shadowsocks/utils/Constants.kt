@@ -55,6 +55,8 @@ object Key {
     const val portHttpProxy = "portHttpProxy"
 
     const val route = "route"
+    const val v2route = "v2route"
+    const val ssroute = "ssroute"
 
     const val isAutoUpdateServers = "isAutoUpdateServers"
     const val is_get_free_servers = "is_get_free_servers"

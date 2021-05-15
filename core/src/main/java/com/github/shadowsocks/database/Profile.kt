@@ -62,7 +62,6 @@ data class Profile(
         var password: String = "",
         var method: String = "aes-256-cfb",
 
-        var route: String = "bypass-lan-china", // "all"
         var remoteDns: String = "1.1.1.1",
         var proxyApps: Boolean = false,
         var bypass: Boolean = false,
@@ -82,7 +81,8 @@ data class Profile(
         var elapsed: Long = 0,
         var userOrder: Long = 0,
 
-        var profileType: String="shadowsocks",   // vmess|shadowsocks|vless
+        var profileType: String=AppConfig.EConfigType.vless,   // vmess|shadowsocks|vless
+        var route: String = DataStore.v2route, // "all"
         //for v2ray
         var alterId: Int = 64,
         var network: String = "tcp",  //tcp,kcp,ws,h2,quic,grpc
@@ -385,6 +385,7 @@ data class Profile(
                     if (match != null) {
                         val profile = Profile()
                         feature?.copyFeatureSettingsTo(profile)
+                        profile.profileType= AppConfig.EConfigType.shadowsocks
                         profile.method = match.groupValues[1]
                         profile.password = match.groupValues[2]
                         // bug in Android: https://code.google.com/p/android/issues/detail?id=192855
@@ -551,7 +552,11 @@ data class Profile(
     val formattedName get() = if (name.isNullOrEmpty()) formattedAddress else name!!
 
     fun copyFeatureSettingsTo(profile: Profile) {
-        profile.route = route
+        if (profile.profileType == AppConfig.EConfigType.shadowsocks)
+            profile.route=DataStore.ssroute
+        else
+            profile.route=DataStore.v2route
+
         profile.ipv6 = ipv6
         profile.metered = metered
         profile.proxyApps = proxyApps
@@ -750,8 +755,8 @@ data class Profile(
         individual = DataStore.individual
         plugin = DataStore.plugin
         udpFallback = DataStore.udpFallback
-        //add for vmess begin
-        profileType=DataStore.privateStore.getString(Key.profileType) ?: AppConfig.EConfigType.shadowsocks
+        //add for v2ray begin
+        profileType=DataStore.privateStore.getString(Key.profileType) ?: AppConfig.EConfigType.vless
         alterId=(DataStore.privateStore.getString(Key.alterId)?: "64").toInt()
         network=DataStore.privateStore.getString(Key.network) ?: "tcp"
         headerType=DataStore.privateStore.getString(Key.headerType) ?: ""
@@ -761,7 +766,7 @@ data class Profile(
         allowInsecure=DataStore.privateStore.getString(Key.allowInsecure) ?: "false"
         SNI=DataStore.privateStore.getString(Key.SNI) ?: ""
         xtlsflow=DataStore.privateStore.getString(Key.xtlsflow) ?: ""
-        //add for vmess end
+        //add for v2ray end
     }
     fun isBuiltin(): Boolean {
         return VpnEncrypt.vpnGroupName == url_group

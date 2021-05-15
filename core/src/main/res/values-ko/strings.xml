@@ -41,6 +41,10 @@
     <!-- feature category -->
     <string name="ipv6">"IPv6 라우팅"</string>
     <string name="ipv6_summary">"IPv6 트래픽도 원격으로 리다이렉트 합니다"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks 라우팅 대상</string>
+<string name="v2_route_list">"V2ray 라우팅 대상"</string>
     <string name="route_list">"라우팅 대상"</string>
     <string name="route_entry_gfwlist">"GFW 리스트"</string>
 

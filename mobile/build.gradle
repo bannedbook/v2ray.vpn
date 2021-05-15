@@ -36,14 +36,20 @@ android {
             applicationId "free.shadowsocks.proxy.VPN"
             resValue 'string', 'applicationId', applicationId
         }
-        v2free {
+        v2vpn {
             dimension "encryption"
             applicationId "free.v2ray.proxy.VPN"
+            resValue 'string', 'applicationId', applicationId
+        }
+        v2free {
+            dimension "encryption"
+            applicationId "v2free.app"
             resValue 'string', 'applicationId', applicationId
         }
     }
     sourceSets {
         ssvpn.setRoot('src/ssvpn')
+        v2vpn.setRoot('src/v2vpn')
         v2free.setRoot('src/v2free')
     }
 

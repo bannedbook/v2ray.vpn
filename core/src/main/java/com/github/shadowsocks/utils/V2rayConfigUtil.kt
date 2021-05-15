@@ -407,7 +407,7 @@ object V2rayConfigUtil {
 
             v2rayConfig.routing.domainStrategy = VpnEncrypt.PREF_ROUTING_DOMAIN_STRATEGY
             //val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
-            var routingMode = vmess.route  //强制全局模式，"3"时启动很慢
+            var routingMode = vmess.route
             if (isTest)routingMode="0" //测试时强制全局模式，"3"时启动很慢
 
             // Hardcode googleapis.cn
@@ -428,8 +428,8 @@ object V2rayConfigUtil {
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
                 "3" -> {
-                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
+                    routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
             }
@@ -443,15 +443,6 @@ object V2rayConfigUtil {
     private fun routingGeo(ipOrDomain: String, code: String, tag: String, v2rayConfig: V2rayConfig) {
         try {
             if (!TextUtils.isEmpty(code)) {
-                //IP
-                if (ipOrDomain == "ip" || ipOrDomain == "") {
-                    val rulesIP = V2rayConfig.RoutingBean.RulesBean()
-                    rulesIP.type = "field"
-                    rulesIP.outboundTag = tag
-                    rulesIP.ip = ArrayList<String>()
-                    rulesIP.ip?.add("geoip:$code")
-                    v2rayConfig.routing.rules.add(rulesIP)
-                }
 
                 if (ipOrDomain == "domain" || ipOrDomain == "") {
                     //Domain
@@ -461,6 +452,16 @@ object V2rayConfigUtil {
                     rulesDomain.domain = ArrayList<String>()
                     rulesDomain.domain?.add("geosite:$code")
                     v2rayConfig.routing.rules.add(rulesDomain)
+                }
+
+                //IP
+                if (ipOrDomain == "ip" || ipOrDomain == "") {
+                    val rulesIP = V2rayConfig.RoutingBean.RulesBean()
+                    rulesIP.type = "field"
+                    rulesIP.outboundTag = tag
+                    rulesIP.ip = ArrayList<String>()
+                    rulesIP.ip?.add("geoip:$code")
+                    v2rayConfig.routing.rules.add(rulesIP)
                 }
             }
         } catch (e: Exception) {

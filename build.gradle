@@ -16,8 +16,8 @@ buildscript {
         junitVersion = '4.13'
         androidTestVersion = '1.2.0'
         androidEspressoVersion = '3.2.0'
-        versionCode = 5001098
-        versionName = '6.0.3'
+        versionCode = 5001118
+        versionName = '6.0.6'
         resConfigs = ['ar', 'es', 'fa', 'fr', 'ja', 'ko', 'ru', 'tr', 'zh-rCN', 'zh-rTW']
     }
 
@@ -27,7 +27,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0-alpha16'
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.2'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'

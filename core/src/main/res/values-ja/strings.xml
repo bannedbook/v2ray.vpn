@@ -44,6 +44,10 @@
     <!-- feature category -->
     <string name="ipv6">"IPv6 プロキシ"</string>
     <string name="ipv6_summary">"リモートサーバーに IPv6 パケットを転送"</string>
+      <string name="ss_route_summary">"Default SS route,reset all SS profiles route"</string>
+<string name="v2_route_summary">"Default v2ray route,reset all v2ray profiles route"</string>
+<string name="ss_route_list">Shadowsocks プロキシ方式</string>
+<string name="v2_route_list">"V2ray プロキシ方式"</string>
     <string name="route_list">"プロキシ方式"</string>
     <string name="route_entry_gfwlist">"中国本土からアクセス不可なアドレス以外を迂回する"</string>
     <string name="proxied_apps">"アプリ別のVPNモードを使用"</string>

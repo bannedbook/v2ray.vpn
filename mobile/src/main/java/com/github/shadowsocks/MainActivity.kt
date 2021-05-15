@@ -171,6 +171,8 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
     lateinit var mInterstitialAd: InterstitialAd
 
     fun userActionAds(){
+        if(Core.applicationId=="v2free.app")return
+
         if (newsClickCount%3==2L)mInterstitialAd.loadAd(AdRequest.Builder().build())
         if (newsClickCount%3==1L && mInterstitialAd.isLoaded) {
             Log.e("ads", "click count is $newsClickCount ,show ad.")
@@ -233,7 +235,7 @@ class MainActivity : AppCompatActivity(), ShadowsocksConnection.Callback, OnPref
         DataStore.publicStore.registerChangeListener(this)
         //updateBuiltinServers
         if(DataStore.isAutoUpdateServers){
-            Core.updateBuiltinServers()
+            if(Core.applicationId!="v2free.app")Core.updateBuiltinServers()
         }
         //Log.e("user-country", Locale.getDefault().country)
     }
