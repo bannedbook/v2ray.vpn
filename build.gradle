@@ -3,10 +3,9 @@
 apply plugin: 'com.github.ben-manes.versions'
 
 buildscript {
-    ext.kotlin_version = '1.4.30'
+    ext.kotlin_version = '1.5.10'
     ext {
         javaVersion = JavaVersion.VERSION_1_8
-        kotlinVersion = '1.4.10'
         minSdkVersion = 21
         sdkVersion = 30
         compileSdkVersion = 30
@@ -16,8 +15,8 @@ buildscript {
         junitVersion = '4.13'
         androidTestVersion = '1.2.0'
         androidEspressoVersion = '3.2.0'
-        versionCode = 5001118
-        versionName = '6.0.6'
+        versionCode = 5001128
+        versionName = '6.0.8'
         resConfigs = ['ar', 'es', 'fa', 'fr', 'ja', 'ko', 'ru', 'tr', 'zh-rCN', 'zh-rTW']
     }
 
@@ -27,13 +26,12 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.2'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
         classpath 'com.google.gms:google-services:4.3.4'
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.9.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

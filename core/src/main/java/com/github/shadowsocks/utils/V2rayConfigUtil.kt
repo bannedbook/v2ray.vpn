@@ -84,11 +84,11 @@ object V2rayConfigUtil {
 //                return result
 //            }
 
-            inbounds(vmess, v2rayConfig, app)
+            inbounds(v2rayConfig)
 
             outbounds(vmess, v2rayConfig, app)
 
-            routing(vmess, v2rayConfig, app,isTest)
+            routing(vmess, v2rayConfig, isTest)
 
             //if (VpnEncrypt.enableLocalDns) {customLocalDns(vmess, v2rayConfig, app) } else {
                 customRemoteDns(vmess, v2rayConfig, app)
@@ -142,7 +142,7 @@ object V2rayConfigUtil {
     /**
      *
      */
-    private fun inbounds(vmess: VmessBean, v2rayConfig: V2rayConfig, app: Application): Boolean {
+    private fun inbounds(v2rayConfig: V2rayConfig): Boolean {
         try {
             v2rayConfig.inbounds.forEach { curInbound ->
                 if (!DataStore.publicStore.getBoolean(Key.shareOverLan, false)) {
@@ -399,7 +399,7 @@ object V2rayConfigUtil {
     /**
      * routing
      */
-    private fun routing(vmess: VmessBean, v2rayConfig: V2rayConfig, app: Application,isTest:Boolean=false): Boolean {
+    private fun routing(vmess: VmessBean, v2rayConfig: V2rayConfig, isTest:Boolean=false): Boolean {
         try {
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_AGENT, ""), AppConfig.TAG_AGENT, v2rayConfig)
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""), AppConfig.TAG_DIRECT, v2rayConfig)

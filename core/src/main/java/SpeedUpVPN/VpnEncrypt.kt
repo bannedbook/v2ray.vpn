@@ -55,7 +55,7 @@ private object AES256{
     fun encrypt(str:String, secretKey:String):String{
         val encrypted = cipher(Cipher.ENCRYPT_MODE, secretKey).doFinal(str.toByteArray(Charsets.UTF_8))
         var encstr: String
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || isWindows())
+        if ( isWindows() || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O )
             encstr = java.util.Base64.getEncoder().encodeToString(encrypted)
         else
             encstr = android.util.Base64.encodeToString(encrypted, android.util.Base64.DEFAULT)
@@ -64,7 +64,7 @@ private object AES256{
     }
     fun decrypt(str:String, secretKey:String):String{
         val byteStr : ByteArray
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || isWindows())
+        if (isWindows() || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O  )
             byteStr=java.util.Base64.getDecoder().decode(str.toByteArray(Charsets.UTF_8))
         else
             byteStr=android.util.Base64.decode(str.toByteArray(Charsets.UTF_8), android.util.Base64.DEFAULT)

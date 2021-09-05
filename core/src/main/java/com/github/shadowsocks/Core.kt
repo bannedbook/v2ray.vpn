@@ -141,12 +141,12 @@ object Core {
     fun updateBuiltinServers() {
         GlobalScope.launch {
             if (applicationId!="v2free.app") {
-                val builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
+/*                val builtinSubUrls = app.resources.getStringArray(R.array.builtinSubUrls)
                 for (i in 0 until builtinSubUrls.size) {
                     val builtinSub =
                         SSRSubManager.createSSSub(builtinSubUrls[i], VpnEncrypt.vpnGroupName)
                     if (builtinSub != null) break
-                }
+                }*/
 
                 val builtinGlobalUrls = app.resources.getStringArray(R.array.builtinGlobalUrls)
                 for (i in 0 until builtinGlobalUrls.size) {
