@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-  <color name="material_green_800">#00A191</color>
+  <color name="material_green_800">#12a3eb</color>
   <color name="material_green_700">#388E3C</color>
   <color name="material_green_a700">#00C853</color>
   <color name="material_blue_grey_100">#CFD8DC</color>
   <color name="material_blue_grey_300">#90A4AE</color>
-  <color name="material_blue_grey_500">#607D8B</color>
+  <color name="material_blue_grey_500">#12a3eb</color>
   <color name="material_blue_grey_600">#546E7A</color>
-  <color name="material_blue_grey_700">#455A64</color>
+  <color name="material_blue_grey_700">#1285ff</color>
   <color name="material_primary_100">@color/material_blue_grey_100</color>
   <color name="material_primary_300">@color/material_blue_grey_300</color>
   <color name="material_primary_500">@color/material_blue_grey_500</color>
