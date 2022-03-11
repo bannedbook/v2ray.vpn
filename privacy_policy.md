@@ -1,6 +1,6 @@
 ## Privacy Policy
 
-The shadowsocks-android  is built as an Open Source software. This app is provided by Shadowsocks Team at no cost and is intended for use as is.
+The V2ray VPN  is built as an Open Source software. 
 
 This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our app.
 
