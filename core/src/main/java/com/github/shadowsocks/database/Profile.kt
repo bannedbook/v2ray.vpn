@@ -302,14 +302,14 @@ data class Profile(
 
         fun findAllUrls(response: CharSequence?, feature: Profile? = null):MutableSet<Profile> {
             var profilesSet:MutableSet<Profile> = LinkedHashSet<Profile>()
-            val ssrProfiles = findAllSSRUrls(response, feature)
+            //val ssrProfiles = findAllSSRUrls(response, feature)
             val ssPofiles = findAllSSUrls(response, feature)
             val vmessProfiles= findAllVmessUrls(response, feature)
             val vlessProfiles= findAllVlessUrls(response, feature)
             if(vlessProfiles.count()>0)profilesSet.addAll(vlessProfiles)
             if(vmessProfiles.count()>0)profilesSet.addAll(vmessProfiles)
             if(ssPofiles.count()>0)profilesSet.addAll(ssPofiles)
-            if(ssrProfiles.count()>0)profilesSet.addAll(ssrProfiles)
+            //if(ssrProfiles.count()>0)profilesSet.addAll(ssrProfiles)
             return profilesSet
         }
         fun findAllVlessUrls(data: CharSequence?, feature: Profile? = null) = pattern_vless.findAll(data ?: "").map {
