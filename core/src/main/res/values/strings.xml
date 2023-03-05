@@ -206,8 +206,8 @@
     </body>
     </html>
   ]]>"</string>
-    <string-array name="builtinSubUrls">
-    <item>https://your-builtin-sub-url</item>
+    <string-array name="builtinGlobalUrls">
+    <item>https://builtinGlobalUrls</item>
     </string-array>
     <string-array name="freesuburl">
     <item>https://your-free-sub-url</item>

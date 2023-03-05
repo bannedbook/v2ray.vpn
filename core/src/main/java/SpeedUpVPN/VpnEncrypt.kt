@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec
 
 object VpnEncrypt{
     private const val theKey="your key"
+    const val ssKey="sskey"
     const val vpnGroupName="SpeedUp.VPN"
     //const val v2vpnRemark="v2ray.vpn"
     const val freesubGroupName="https://git.io/jmsfq"
