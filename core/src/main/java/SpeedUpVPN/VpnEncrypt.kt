@@ -20,7 +20,6 @@ object VpnEncrypt{
     const val HTTP_PROXY_PORT = 58300
     const val enableLocalDns =  false
     const val enableSniffing = true
-    const val PREF_ROUTING_DOMAIN_STRATEGY = "IPIfNonMatch"
     const val enableSpeed = false
     @JvmStatic fun aesEncrypt(v:String, secretKey:String=theKey) = AES256.encrypt(v, secretKey)
     @JvmStatic fun aesDecrypt(v:String, secretKey:String=theKey) = AES256.decrypt(v, secretKey)

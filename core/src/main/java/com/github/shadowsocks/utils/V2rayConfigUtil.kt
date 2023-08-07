@@ -405,7 +405,6 @@ object V2rayConfigUtil {
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_DIRECT, ""), AppConfig.TAG_DIRECT, v2rayConfig)
             routingUserRule(Core.defaultDPreference.getPrefString(AppConfig.PREF_V2RAY_ROUTING_BLOCKED, ""), AppConfig.TAG_BLOCKED, v2rayConfig)
 
-            v2rayConfig.routing.domainStrategy = VpnEncrypt.PREF_ROUTING_DOMAIN_STRATEGY
             //val routingMode = Core.defaultDPreference.getPrefString(vmess.route, "0")
             var routingMode = vmess.route
             if (isTest)routingMode="0" //测试时强制全局模式，"3"时启动很慢
@@ -419,15 +418,20 @@ object V2rayConfigUtil {
 
             when (routingMode) {
                 "0" -> {
+                    v2rayConfig.routing.domainStrategy = "AsIs"
                 }
                 "1" -> {
+                    routingGeo("domain", "geolocation-!cn", AppConfig.TAG_AGENT, v2rayConfig)
+                    routingGeo("domain", "cn", AppConfig.TAG_AGENT, v2rayConfig)
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                 }
                 "2" -> {
+                    routingGeo("domain", "geolocation-!cn", AppConfig.TAG_AGENT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)
                 }
                 "3" -> {
+                    routingGeo("domain", "geolocation-!cn", AppConfig.TAG_AGENT, v2rayConfig)
                     routingGeo("", "cn", AppConfig.TAG_DIRECT, v2rayConfig)
                     routingGeo("ip", "private", AppConfig.TAG_DIRECT, v2rayConfig)
                     v2rayConfig.routing.rules.add(0, googleapisRoute)

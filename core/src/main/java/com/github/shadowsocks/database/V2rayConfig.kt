@@ -123,7 +123,7 @@ data class V2rayConfig(
                                var domains: List<String>?)
     }
 
-    data class RoutingBean(var domainStrategy: String="",
+    data class RoutingBean(var domainStrategy: String="IPIfNonMatch",
                            var rules: ArrayList<RulesBean> =arrayListOf(RulesBean())) {
 
         data class RulesBean(var type: String = "",

@@ -22,7 +22,7 @@
             <meta-data android:name="com.github.shadowsocks.plugin.executable_path"
                        android:value="libobfs-local.so"/>
         </provider>
-        <activity android:name=".ConfigActivity">
+        <activity android:name=".ConfigActivity" android:exported="false">
             <intent-filter>
                 <action android:name="com.github.shadowsocks.plugin.ACTION_CONFIGURE"/>
                 <category android:name="android.intent.category.DEFAULT"/>

@@ -7,16 +7,15 @@ buildscript {
     ext {
         javaVersion = JavaVersion.VERSION_1_8
         minSdkVersion = 21
-        sdkVersion = 30
-        compileSdkVersion = 30
-        buildToolsVersion = '30.0.1'
+        sdkVersion = 31
+        compileSdkVersion = 31
         lifecycleVersion = '2.2.0'
         desugarLibsVersion = '1.0.9'
         junitVersion = '4.13'
         androidTestVersion = '1.2.0'
         androidEspressoVersion = '3.2.0'
-        versionCode = 5001188
-        versionName = '6.2.0'
+        versionCode = 5001199
+        versionName = '6.2.1'
         resConfigs = ['ar', 'es', 'fa', 'fr', 'ja', 'ko', 'ru', 'tr', 'zh-rCN', 'zh-rTW']
     }
 
