@@ -82,10 +82,12 @@ class ServiceNotification(private val service: BaseService.Interface, profileNam
 
     init {
         service as Context
+        var intentFlad=0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) intentFlad=PendingIntent.FLAG_IMMUTABLE
         val closeAction = NotificationCompat.Action.Builder(
                 R.drawable.ic_navigation_close,
                 service.getText(R.string.stop),
-                PendingIntent.getBroadcast(service, 0, Intent(Action.CLOSE).setPackage(service.packageName), 0)).apply {
+                PendingIntent.getBroadcast(service, 0, Intent(Action.CLOSE).setPackage(service.packageName), intentFlad)).apply {
             setShowsUserInterface(false)
         }.build()
         if (Build.VERSION.SDK_INT < 24) builder.addAction(closeAction) else builder.addInvisibleAction(closeAction)

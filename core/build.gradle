@@ -103,6 +103,7 @@ dependencies {
     api "androidx.room:room-runtime:2.2.5"
     kapt "androidx.room:room-compiler:2.2.5"
     api "androidx.work:work-runtime-ktx:2.4.0"
+    implementation 'androidx.work:work-runtime:2.7.1'
     api "androidx.work:work-gcm:2.4.0"
     api 'com.google.firebase:firebase-analytics-ktx:19.0.0'
     api 'com.google.firebase:firebase-config-ktx:21.0.0'

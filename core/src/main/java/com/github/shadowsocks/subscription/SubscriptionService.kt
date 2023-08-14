@@ -26,6 +26,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -80,11 +81,13 @@ class SubscriptionService : Service(), CoroutineScope {
                 val notification = NotificationCompat.Builder(this@SubscriptionService, NOTIFICATION_CHANNEL).apply {
                     color = ContextCompat.getColor(this@SubscriptionService, R.color.material_primary_500)
                     priority = NotificationCompat.PRIORITY_LOW
+                    var intentFlad=0
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) intentFlad=PendingIntent.FLAG_IMMUTABLE
                     addAction(NotificationCompat.Action.Builder(
                             R.drawable.ic_navigation_close,
                             getText(R.string.stop),
                             PendingIntent.getBroadcast(this@SubscriptionService, 0,
-                                    Intent(Action.ABORT).setPackage(packageName), 0)).apply {
+                                    Intent(Action.ABORT).setPackage(packageName), intentFlad)).apply {
                         setShowsUserInterface(false)
                     }.build())
                     setCategory(NotificationCompat.CATEGORY_PROGRESS)

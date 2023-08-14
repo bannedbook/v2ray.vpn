@@ -98,23 +98,6 @@ public class PolipoService extends Service {
         //stopForeground(true);
     }
 
-    private void createNotification() {
-
-        Intent notificationIntent = new Intent(this, mContext.getClass());
-        //notificationIntent.setData(Uri.parse("http://127.0.0.1:8123"));
-        //notificationIntent.setClassName(this,mContext.getClass().getName());
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,notificationIntent, 0);
-
-        Notification notification = new Notification.Builder(this).
-                setContentTitle("JWProxy").
-                setContentText("JWProxy - 禁闻代理正在运行。").
-                setSmallIcon(android.R.drawable.ic_media_play).
-                setOngoing(true).
-                setContentIntent(pendingIntent).
-                build();
-        startForeground(ONGOING_NOTIFICATION, notification);
-    }
-
     private void copyAssets(String configFile, String toPath) {
         AssetManager assetManager = getAssets();
         Log.e("---", "Copy file:  " + configFile);

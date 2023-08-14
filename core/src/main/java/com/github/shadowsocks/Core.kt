@@ -186,7 +186,11 @@ object Core {
     fun init(app: Application, configureClass: KClass<out Any>) {
         this.app = app
         this.configureIntent = {
-            PendingIntent.getActivity(it, 0, Intent(it, configureClass.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                PendingIntent.getActivity(it, 0, Intent(it, configureClass.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT), PendingIntent.FLAG_IMMUTABLE)
+            else
+                PendingIntent.getActivity(it, 0, Intent(it, configureClass.java)
                     .setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT), 0)
         }
 
@@ -213,9 +217,11 @@ object Core {
                 }
             }
         })
-        val config:Configuration  =  Configuration.Builder().build()
-        WorkManager.initialize(app.applicationContext, config)
-        UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
+/*        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            val config: Configuration = Configuration.Builder().build()
+            WorkManager.initialize(app.applicationContext, config)
+            UpdateCheck.enqueue() //google play Publishing, prohibiting self-renewal
+        }*/
 
         // handle data restored/crash
         if (Build.VERSION.SDK_INT >= 24 && DataStore.directBootAware &&

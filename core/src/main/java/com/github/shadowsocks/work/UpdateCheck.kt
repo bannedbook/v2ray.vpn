@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -45,9 +46,11 @@ class UpdateCheck(context: Context, workerParams: WorkerParameters) : CoroutineW
             if (info["version"].asInt > BuildConfig.VERSION_CODE) {
                 val nm = app.getSystemService<NotificationManager>()!!
                 val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(update_uri))
+                var intentFlad=0
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) intentFlad=PendingIntent.FLAG_IMMUTABLE
                 val builder = NotificationCompat.Builder(app as Context, "update")
                     .setColor(ContextCompat.getColor(app, R.color.material_primary_500))
-                    .setContentIntent(PendingIntent.getActivity(app, 0, intent, 0))
+                    .setContentIntent(PendingIntent.getActivity(app, 0, intent, intentFlad))
                     .setVisibility(
                         if (DataStore.canToggleLocked) NotificationCompat.VISIBILITY_PUBLIC
                         else NotificationCompat.VISIBILITY_PRIVATE
