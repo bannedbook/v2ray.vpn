@@ -1,14 +1,15 @@
 # Gradle & Android Studio
-local.properties
 .gradle/
 .externalNativeBuild/
-build/
+
 captures/
 release/
 
 .idea/
 *.iml
 .gradle
+.idea
+.vscode
 /.idea
 /local.properties
 /.idea/libraries
@@ -16,10 +17,23 @@ release/
 /.idea/workspace.xml
 .DS_Store
 /build
+build/
 /captures
 .externalNativeBuild
-
+.cxx
+local.properties
 # release apks
+/app/libs/
+/app/src/main/assets/sing-box
+/app/src/main/java/SpeedUpVPN
+/service_account_credentials.json
+jniLibs/
+/library/libcore_build/
+.idea/deploymentTargetDropDown.xml
+/nkmr
+
+# submodules
+/external
 *.apk
 *.bak
 gitupdate.*

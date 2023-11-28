@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="simple_obfs_name">Simple obfuscation</string>
-    <string name="simple_obfs_method">Obfuscation wrapper</string>
-    <string name="simple_obfs_hostname">Obfuscation hostname</string>
-    <string name="simple_obfs_uri">Obfuscation uri</string>
-</resources>

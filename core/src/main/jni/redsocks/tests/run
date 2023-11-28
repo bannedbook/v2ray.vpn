@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec py.test -v "$@"

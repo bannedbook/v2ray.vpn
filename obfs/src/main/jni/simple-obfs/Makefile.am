@@ -1,7 +1,0 @@
-SUBDIRS = libcork src
-
-if ENABLE_DOCUMENTATION
-SUBDIRS += doc
-endif
-
-ACLOCAL_AMFLAGS = -I m4

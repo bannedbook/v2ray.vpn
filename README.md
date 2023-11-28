@@ -12,40 +12,17 @@ https://www.youtube.com/watch?v=JE8xRj7_eBQ
 
 更多翻墙信息，请访问[bannedbook翻墙主页](https://github.com/bannedbook/fanqiang/wiki)。
 
-### PREREQUISITES
-
-* JDK 1.8
-* Android SDK
-  - Android NDK
-
-### BUILD
-
-You can check whether the latest commit builds under UNIX environment by checking Travis status.
-
-* Clone the repo using `git clone --recurse-submodules <repo>` or update submodules using `git submodule update --init --recursive`
-* Build it using Android Studio or gradle script
-
-## OPEN SOURCE LICENSES
-
-<ul>
- 	<li>Shadowsocks-android: <a href="https://github.com/shadowsocks/shadowsocks-android/blob/master/LICENSE">GPLv3</a></li>
- 	<li>ShadowsocksRb: <a href="https://github.com/shadowsocksRb/shadowsocksRb-android/blob/master/LICENSE">GPLv3</a></li>
- 	<li>Polipo: <a href="https://github.com/jech/polipo/blob/master/COPYING">MIT</a></li>
-  <li>V2rayNG: <a href="https://github.com/2dust/v2rayNG/blob/master/LICENSE">GPLv3</a></li>
-</ul>
-
 ### LICENSE
+
 Copyright (C) [bannedbook fanqiang](https://github.com/bannedbook/fanqiang/wiki)
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+### Credits
+
+https://github.com/MatsuriDayo/NekoBoxForAndroid
