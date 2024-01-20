@@ -1,2 +1,2 @@
 include(":app")
-rootProject.name = "NB4A"
+rootProject.name = "v2ray.vpn"

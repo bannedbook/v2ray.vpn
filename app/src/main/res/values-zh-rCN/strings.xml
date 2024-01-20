@@ -355,7 +355,8 @@
     <string name="group_order_origin">原始</string>
     <string name="group_order_by_name">以名称</string>
     <string name="group_order_by_delay">以延时</string>
-    <string name="plugin_exists_but_on_shit_system">配置 %s 需要插件 %s，但你的专有设备供应商（通常也是监视资本主义巨头和恶意软件制造商）篡改了你的安卓系统，使该插件无法使用。</string>
+    <string name="plugin_exists_but_on_shit_system">配置 %s 需要插件
+        %s，但你的专有设备供应商（通常也是监视资本主义巨头和恶意软件制造商）篡改了你的安卓系统，使该插件无法使用。</string>
     <string name="shadowsocks_plugin_v2ray">V2Ray （Shadowsocks Android 插件）</string>
     <string name="shadowsocks_plugin_simple_obfs">Simple Obfs （Shadowsocks Android 插件）</string>
     <string name="menu_traffic">流量</string>
@@ -489,6 +490,8 @@
     <string name="http_upgrade_path">HTTPUpgrade 路径</string>
     <string name="update_current_subscription">更新当前组订阅</string>
     <string name="group_not_subscription">组类型不是订阅</string>
+    <string name="allow_insecure_on_request_sum">更新订阅的时候允许不安全的连接</string>
+    <string name="global_allow_insecure">总是跳过 TLS 证书验证</string>
     <string name="recommended_site_1">"<![CDATA[
 <html xmlns='http://www.w3.org/1999/xhtml' dir='ltr' lang='zh-CN'>
 <head profile='http://gmpg.org/xfn/11'>

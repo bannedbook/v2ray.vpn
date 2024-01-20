@@ -61,6 +61,9 @@ object RawUpdater : GroupUpdater() {
                     "1.3" -> restrictedTLS()
                 }
             }.newRequest().apply {
+                if (DataStore.allowInsecureOnRequest) {
+                    allowInsecure()
+                }
                 setURL(subscription.link)
                 setUserAgent(subscription.customUserAgent.takeIf { it.isNotBlank() } ?: USER_AGENT)
             }.execute()

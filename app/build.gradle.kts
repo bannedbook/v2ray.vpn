@@ -24,6 +24,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        aidl = true
     }
     namespace = "io.nekohasekai.sagernet"
 }
