@@ -152,6 +152,12 @@ class ConfigurationFragment @JvmOverloads constructor(
         if (searchView != null) {
             searchView.setOnQueryTextListener(this)
             searchView.maxWidth = Int.MAX_VALUE
+
+	    searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    cancelSearch(searchView)
+                }
+            }
         }
 
         groupPager = view.findViewById(R.id.group_pager)
@@ -361,6 +367,10 @@ class ConfigurationFragment @JvmOverloads constructor(
 
             R.id.action_new_trojan_go -> {
                 startActivity(Intent(requireActivity(), TrojanGoSettingsActivity::class.java))
+            }
+
+            R.id.action_new_mieru -> {
+                startActivity(Intent(requireActivity(), MieruSettingsActivity::class.java))
             }
 
             R.id.action_new_naive -> {
@@ -1723,6 +1733,11 @@ class ConfigurationFragment @JvmOverloads constructor(
 
                 }
             }
+        }
+
+	private fun cancelSearch(searchView: SearchView) {
+            searchView.onActionViewCollapsed()
+            searchView.clearFocus()
         }
 
 }
