@@ -95,11 +95,11 @@ class MainActivity : ThemedActivity(),
         )
     }
     fun userActionAds(){
-        if (newsClickCount%3==2L){
+        if (newsClickCount%4==0L){
             Log.e("ads", "click count is $newsClickCount, try to load ad.")
             loadinterstitialAd()
         }
-        else if (newsClickCount%3==1L && mInterstitialAd!= null) {
+        else if (newsClickCount%4==2L && mInterstitialAd!= null) {
             Log.e("ads", "click count is $newsClickCount ,show ad.")
             mInterstitialAd?.show(this)
         } else {
