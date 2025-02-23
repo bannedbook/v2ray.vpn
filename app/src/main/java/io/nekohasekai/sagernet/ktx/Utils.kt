@@ -106,11 +106,20 @@ fun Context.listenForPackageChanges(onetime: Boolean = true, callback: () -> Uni
             if (onetime) context.unregisterReceiver(this)
         }
     }.apply {
-        registerReceiver(this, IntentFilter().apply {
-            addAction(Intent.ACTION_PACKAGE_ADDED)
-            addAction(Intent.ACTION_PACKAGE_REMOVED)
-            addDataScheme("package")
-        })
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            }, Context.RECEIVER_EXPORTED)
+        }
+        else {
+            registerReceiver(this, IntentFilter().apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addAction(Intent.ACTION_PACKAGE_REMOVED)
+                addDataScheme("package")
+            })
+        }
     }
 
 val PackageInfo.signaturesCompat

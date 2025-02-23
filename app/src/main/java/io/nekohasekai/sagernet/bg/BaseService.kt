@@ -328,16 +328,29 @@ class BaseService {
             data.proxy = proxy
             BootReceiver.enabled = DataStore.persistAcrossReboot
             if (!data.closeReceiverRegistered) {
-                registerReceiver(data.receiver, IntentFilter().apply {
-                    addAction(Action.RELOAD)
-                    addAction(Intent.ACTION_SHUTDOWN)
-                    addAction(Action.CLOSE)
-                    // addAction(Action.SWITCH_WAKE_LOCK)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
-                    }
-                    addAction(Action.RESET_UPSTREAM_CONNECTIONS)
-                }, "$packageName.SERVICE", null)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    registerReceiver(data.receiver, IntentFilter().apply {
+                        addAction(Action.RELOAD)
+                        addAction(Intent.ACTION_SHUTDOWN)
+                        addAction(Action.CLOSE)
+                        // addAction(Action.SWITCH_WAKE_LOCK)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                        }
+                        addAction(Action.RESET_UPSTREAM_CONNECTIONS)
+                    }, "$packageName.SERVICE", null, Context.RECEIVER_EXPORTED)
+                }else {
+                    registerReceiver(data.receiver, IntentFilter().apply {
+                        addAction(Action.RELOAD)
+                        addAction(Intent.ACTION_SHUTDOWN)
+                        addAction(Action.CLOSE)
+                        // addAction(Action.SWITCH_WAKE_LOCK)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+                        }
+                        addAction(Action.RESET_UPSTREAM_CONNECTIONS)
+                    }, "$packageName.SERVICE", null)
+                }
                 data.closeReceiverRegistered = true
             }
 

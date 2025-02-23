@@ -477,7 +477,7 @@ class MainActivity : ThemedActivity(),
                 return false
             }
             R.id.nav_tuiguang -> {
-                launchCustomTab("https://matsuricom.pages.dev/")
+                launchCustomTab("https://neko-box.pages.dev/喵")
                 return false
             }*/
 

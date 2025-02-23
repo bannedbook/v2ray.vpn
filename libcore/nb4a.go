@@ -12,7 +12,7 @@ import (
 
 	"github.com/matsuridayo/libneko/neko_common"
 	"github.com/matsuridayo/libneko/neko_log"
-	"github.com/matsuridayo/sing-box-extra/boxmain"
+	boxmain "github.com/sagernet/sing-box/cmd/sing-box"
 	"github.com/sagernet/sing-box/nekoutils"
 )
 
@@ -58,7 +58,7 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	neko_log.LogWriterDisable = !logEnable
 	neko_log.TruncateOnStart = isBgProcess
 	neko_log.SetupLog(int(maxLogSizeKb)*1024, filepath.Join(cachePath, "neko.log"))
-	boxmain.DisableColor()
+	boxmain.SetDisableColor(true)
 
 	// nekoutils
 	nekoutils.Selector_OnProxySelected = intfNB4A.Selector_OnProxySelected

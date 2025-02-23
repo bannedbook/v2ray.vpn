@@ -95,10 +95,10 @@ fun Project.requireTargetAbi(): String {
 fun Project.setupCommon() {
     android.apply {
         //buildToolsVersion = "30.0.3"
-        compileSdk = 33
+        compileSdk = 34
         defaultConfig {
             minSdk = 21
-            targetSdk = 33
+            targetSdk = 34
         }
         buildTypes {
             getByName("release") {
@@ -203,7 +203,8 @@ fun Project.setupAppCommon() {
 fun Project.setupApp() {
     val pkgName = requireMetadata().getProperty("PACKAGE_NAME")
     val verName = requireMetadata().getProperty("VERSION_NAME")
-    val verCode = (requireMetadata().getProperty("VERSION_CODE").toInt()) * 5
+    //不知为什么改了nb4a.properties ，这个却总是不变，只能这样直接改了
+    val verCode = 25008390  //(requireMetadata().getProperty("VERSION_CODE").toInt()) * 5
     android.apply {
         defaultConfig {
             applicationId = pkgName

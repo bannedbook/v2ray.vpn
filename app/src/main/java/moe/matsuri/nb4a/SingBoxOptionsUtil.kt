@@ -8,21 +8,21 @@ import moe.matsuri.nb4a.SingBoxOptions.RuleSet
 object SingBoxOptionsUtil {
 
     fun domainStrategy(tag: String): String {
-        fun auto2AsIs(key: String): String {
-            return (DataStore.configurationStore.getString(key) ?: "").replace("auto", "")
+        fun auto2(key: String, newS: String): String {
+            return (DataStore.configurationStore.getString(key) ?: "").replace("auto", newS)
         }
         return when (tag) {
             "dns-remote" -> {
-                auto2AsIs("domain_strategy_for_remote")
+                auto2("domain_strategy_for_remote", "")
             }
 
             "dns-direct" -> {
-                auto2AsIs("domain_strategy_for_direct")
+                auto2("domain_strategy_for_direct", "")
             }
 
             // server
             else -> {
-                auto2AsIs("domain_strategy_for_server")
+                auto2("domain_strategy_for_server", "prefer_ipv4")
             }
         }
     }
@@ -30,14 +30,14 @@ object SingBoxOptionsUtil {
 }
 
 fun SingBoxOptions.DNSRule_DefaultOptions.makeSingBoxRule(list: List<String>) {
-    geosite = mutableListOf<String>()
+    rule_set = mutableListOf<String>()
     domain = mutableListOf<String>()
     domain_suffix = mutableListOf<String>()
     domain_regex = mutableListOf<String>()
     domain_keyword = mutableListOf<String>()
     list.forEach {
         if (it.startsWith("geosite:")) {
-            geosite.plusAssign(it.removePrefix("geosite:"))
+            rule_set.plusAssign(it)
         } else if (it.startsWith("full:")) {
             domain.plusAssign(it.removePrefix("full:").lowercase())
         } else if (it.startsWith("domain:")) {
@@ -47,16 +47,15 @@ fun SingBoxOptions.DNSRule_DefaultOptions.makeSingBoxRule(list: List<String>) {
         } else if (it.startsWith("keyword:")) {
             domain_keyword.plusAssign(it.removePrefix("keyword:").lowercase())
         } else {
-            // https://github.com/SagerNet/sing-box/commit/5d41e328d4a9f7549dd27f11b4ccc43710a73664
-            domain.plusAssign(it.lowercase())
+            domain_suffix.plusAssign(it.lowercase())
         }
     }
-    geosite?.removeIf { it.isNullOrBlank() }
+    rule_set?.removeIf { it.isNullOrBlank() }
     domain?.removeIf { it.isNullOrBlank() }
     domain_suffix?.removeIf { it.isNullOrBlank() }
     domain_regex?.removeIf { it.isNullOrBlank() }
     domain_keyword?.removeIf { it.isNullOrBlank() }
-    if (geosite?.isEmpty() == true) geosite = null
+    if (rule_set?.isEmpty() == true) rule_set = null
     if (domain?.isEmpty() == true) domain = null
     if (domain_suffix?.isEmpty() == true) domain_suffix = null
     if (domain_regex?.isEmpty() == true) domain_regex = null
@@ -64,7 +63,7 @@ fun SingBoxOptions.DNSRule_DefaultOptions.makeSingBoxRule(list: List<String>) {
 }
 
 fun SingBoxOptions.DNSRule_DefaultOptions.checkEmpty(): Boolean {
-    if (geosite?.isNotEmpty() == true) return false
+    if (rule_set?.isNotEmpty() == true) return false
     if (domain?.isNotEmpty() == true) return false
     if (domain_suffix?.isNotEmpty() == true) return false
     if (domain_regex?.isNotEmpty() == true) return false
@@ -73,8 +72,8 @@ fun SingBoxOptions.DNSRule_DefaultOptions.checkEmpty(): Boolean {
     return true
 }
 
-fun SingBoxOptions.Rule_DefaultOptions.generateRuleSet(ruleSet: MutableList<RuleSet>) {
-    rule_set?.forEach {
+fun generateRuleSet(ruleSetString: List<String>, ruleSet: MutableList<RuleSet>) {
+    ruleSetString.forEach {
         when {
             it.startsWith("geoip") -> {
                 val geoipPath = GeoipUtils.generateRuleSet(country = it.removePrefix("geoip:"))
@@ -114,7 +113,7 @@ fun SingBoxOptions.Rule_DefaultOptions.makeSingBoxRule(list: List<String>, isIP:
         if (isIP) {
             if (it.startsWith("geoip:")) {
                 rule_set.plusAssign(it)
-                rule_set_ipcidr_match_source = true
+                rule_set_ipcidr_match_source = false
             } else {
                 ip_cidr.plusAssign(it)
             }

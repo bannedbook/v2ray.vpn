@@ -44,17 +44,29 @@ object SendLog {
         logFile.appendText("\n")
         logFile.appendBytes(getNekoLog(0))
 
+        val logFileUri = FileProvider.getUriForFile(
+            context, BuildConfig.APPLICATION_ID + ".cache", logFile
+        )
+
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/x-log"
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            putExtra(Intent.EXTRA_STREAM, logFileUri)
+        }
+
+        // 授予目标应用访问 URI 的权限
+        val resolveInfoList = context.packageManager.queryIntentActivities(sendIntent, 0)
+        for (resolveInfo in resolveInfoList) {
+            val packageName = resolveInfo.activityInfo.packageName
+            context.grantUriPermission(packageName, logFileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
         context.startActivity(
             Intent.createChooser(
-                Intent(Intent.ACTION_SEND).setType("text/x-log")
-                    .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    .putExtra(
-                        Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                            context, BuildConfig.APPLICATION_ID + ".cache", logFile
-                        )
-                    ), context.getString(R.string.abc_shareactionprovider_share_with)
+                sendIntent, context.getString(R.string.abc_shareactionprovider_share_with)
             )
         )
+
     }
 
     // Get log bytes from neko.log

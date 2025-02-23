@@ -4,8 +4,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.DeadObjectException
 import android.os.IBinder
 import android.os.RemoteException
+import android.util.Log
 import io.nekohasekai.sagernet.Action
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.aidl.ISagerNetService
@@ -162,8 +164,16 @@ class SagerConnection(
         unregisterCallback()
         if (connectionActive) try {
             context.unbindService(this)
-        } catch (_: IllegalArgumentException) {
-        }   // ignore
+        } catch (e: IllegalArgumentException) {
+            // 服务可能已经未绑定或不存在
+            Log.e("UnbindService", "Service not bound: ${e.message}")
+        } catch (e: DeadObjectException) {
+            // 目标服务已经死亡
+            Log.e("UnbindService", "Dead object when unbinding service: ${e.message}")
+        } catch (e: Exception) {
+            // 其他异常
+            Log.e("UnbindService", "Exception when unbinding service: ${e.message}")
+        } // ignore
         connectionActive = false
         if (listenForDeath) try {
             binder?.unlinkToDeath(this, 0)

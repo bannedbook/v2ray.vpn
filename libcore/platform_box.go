@@ -11,9 +11,11 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/matsuridayo/libneko/neko_log"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/process"
 	"github.com/sagernet/sing-box/experimental/libbox/platform"
+	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	tun "github.com/sagernet/sing-tun"
 	"github.com/sagernet/sing/common/control"
@@ -90,8 +92,12 @@ func (w *boxPlatformInterfaceWrapper) UsePlatformInterfaceGetter() bool {
 	return false
 }
 
-func (w *boxPlatformInterfaceWrapper) Interfaces() ([]platform.NetworkInterface, error) {
+func (w *boxPlatformInterfaceWrapper) Interfaces() ([]control.Interface, error) {
 	return nil, errors.New("wtf")
+}
+
+func (w *boxPlatformInterfaceWrapper) IncludeAllNetworks() bool {
+	return false
 }
 
 // Android not using
@@ -142,4 +148,20 @@ func (w *boxPlatformInterfaceWrapper) Write(p []byte) (n int, err error) {
 		log.Print(string(p))
 	}
 	return len(p), nil
+}
+
+// 日志
+
+type boxPlatformLogWriterWrapper struct {
+}
+
+var boxPlatformLogWriter sblog.PlatformWriter = &boxPlatformLogWriterWrapper{}
+
+func (w *boxPlatformLogWriterWrapper) DisableColors() bool { return true }
+
+func (w *boxPlatformLogWriterWrapper) WriteMessage(level uint8, message string) {
+	if !strings.HasSuffix(message, "\n") {
+		message += "\n"
+	}
+	neko_log.LogWriter.Write([]byte(message))
 }

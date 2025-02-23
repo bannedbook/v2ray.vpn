@@ -593,12 +593,6 @@ fun buildSingBoxOutboundStreamSettings(bean: StandardV2RayBean): V2RayTransportO
         }
     }
 
-//    if (needKeepAliveInterval) {
-//        sockopt = StreamSettingsObject.SockoptObject().apply {
-//            tcpKeepAliveInterval = keepAliveInterval
-//        }
-//    }
-
     return null
 }
 
@@ -626,10 +620,14 @@ fun buildSingBoxOutboundTLS(bean: StandardV2RayBean): OutboundTLSOptions? {
             }
         }
         if (bean.enableECH) {
-            ech.enabled = true
-            ech.pq_signature_schemes_enabled = bean.enablePqSignature
-            ech.dynamic_record_sizing_disabled = bean.disabledDRS
-            ech.config = bean.echConfig.lines()
+            ech = OutboundECHOptions().apply {
+                enabled = true
+                pq_signature_schemes_enabled = bean.enablePqSignature
+                dynamic_record_sizing_disabled = bean.disabledDRS
+                if (bean.echConfig.isNotBlank()) {
+                    config = bean.echConfig.lines()
+                }
+            }
         }
     }
 }
