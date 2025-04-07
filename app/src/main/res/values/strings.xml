@@ -216,7 +216,7 @@
     <string name="action_trojan_go" translatable="false">Trojan Go</string>
     <string name="action_mieru" translatable="false">Mieru</string>
     <string name="action_naive" translatable="false">Naïve</string>
-    <string name="action_ping_tunnel" translatable="false">Ping Tunnel</string>
+    <string name="action_anytls" translatable="false">AnyTLS</string>
     <string name="action_hysteria" translatable="false">Hysteria</string>
     <string name="action_ssh" translatable="false">SSH</string>
     <string name="action_wireguard" translatable="false">WireGuard</string>
@@ -560,13 +560,7 @@
     <string name="enable_ech">Enable ECH</string>
     <string name="enable_ech_sum">Enable Encrypted Client Hello</string>
     <string name="ech_settings">ECH Settings</string>
-    <string name="pq_signature_schemes_enabled">Enable post-quantum peer certificate signature
-        supports</string>
-    <string name="dynamic_record_sizing_disabled">Disables adaptive sizing of TLS records</string>
     <string name="ech_config">ECH Config</string>
-    <string name="dynamic_record_sizing_sum">If enable, the largest possible TLS record size is
-        always used. When disable, the size of TLS records may be adjusted in an attempt to improve
-        latency.</string>
     <string name="http_upgrade_host">HTTPUpgrade Host</string>
     <string name="http_upgrade_path">HTTPUpgrade Path</string>
     <string name="update_current_subscription">Update current Group\'s subscription</string>
@@ -574,6 +568,11 @@
     <string name="allow_insecure_on_request_sum">Disable certificate checking when updating
         subscriptions</string>
     <string name="global_allow_insecure">Always allow insecure</string>
+    <string name="mux_preference">Mulitplex</string>
+    <string name="padding">Padding</string>
+    <string name="network_change_reset_connections">Reset outbound connections when network changes</string>
+    <string name="wake_reset_connections">Reset outbound connections when device wake from sleep</string>
+
     <string name="recommended_site_1">"<![CDATA[
 <html xmlns='http://www.w3.org/1999/xhtml'>
 <head profile='http://gmpg.org/xfn/11'>

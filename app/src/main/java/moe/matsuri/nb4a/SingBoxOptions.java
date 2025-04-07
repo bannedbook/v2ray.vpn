@@ -449,9 +449,9 @@ public class SingBoxOptions {
 
         public OutboundTLSOptions tls;
 
-        public String hop_ports;
+        public List<String> server_ports;
 
-        public Integer hop_interval;
+        public String hop_interval;
 
     }
 
@@ -575,9 +575,9 @@ public class SingBoxOptions {
 
         public OutboundTLSOptions tls;
 
-        public String hop_ports;
+        public List<String> server_ports;
 
-        public Integer hop_interval;
+        public String hop_interval;
 
     }
 
@@ -1879,10 +1879,6 @@ public class SingBoxOptions {
 
         public Boolean enabled;
 
-        public Boolean pq_signature_schemes_enabled;
-
-        public Boolean dynamic_record_sizing_disabled;
-
         // Generate note: Listable
         public List<String> key;
 
@@ -1893,10 +1889,6 @@ public class SingBoxOptions {
     public static class OutboundECHOptions extends SingBoxOption {
 
         public Boolean enabled;
-
-        public Boolean pq_signature_schemes_enabled;
-
-        public Boolean dynamic_record_sizing_disabled;
 
         // Generate note: Listable
         public List<String> config;
@@ -3910,9 +3902,9 @@ public class SingBoxOptions {
 
         public OutboundTLSOptions tls;
 
-        public String hop_ports;
+        public List<String> server_ports;
 
-        public Integer hop_interval;
+        public String hop_interval;
 
     }
 
@@ -4284,9 +4276,9 @@ public class SingBoxOptions {
 
         public OutboundTLSOptions tls;
 
-        public String hop_ports;
+        public List<String> server_ports;
 
-        public Integer hop_interval;
+        public String hop_interval;
 
     }
 
@@ -4343,7 +4335,6 @@ public class SingBoxOptions {
 
         public Boolean source_ip_is_private;
 
-        public Boolean rule_set_ipcidr_match_source;
         public Boolean ip_is_private;
 
         // Generate note: Listable
@@ -4382,6 +4373,8 @@ public class SingBoxOptions {
         public String clash_mode;
 
         public Boolean invert;
+
+        public String action;
 
         public String outbound;
 
@@ -4514,6 +4507,59 @@ public class SingBoxOptions {
 
         public String path;
 
+
+    }
+
+    // sing-box Options 生成器已经坏了，以下是从 husi 抄的
+
+    public static class Outbound_AnyTLSOptions extends Outbound {
+
+        // Generate note: nested type DialerOptions
+        public String detour;
+
+        public String bind_interface;
+
+        public String inet4_bind_address;
+
+        public String inet6_bind_address;
+
+        public String protect_path;
+
+        public Integer routing_mark;
+
+        public Boolean reuse_addr;
+
+        public String connect_timeout;
+
+        public Boolean tcp_fast_open;
+
+        public Boolean tcp_multi_path;
+
+        public Boolean udp_fragment;
+
+        public String domain_strategy;
+
+        public String network_strategy;
+
+        public List<String> network_type;
+
+        public List<String> fallback_network_type;
+
+        public String fallback_delay;
+
+        // Generate note: nested type ServerOptions
+        public String server;
+
+        public Integer server_port;
+
+        // Generate note: nested type OutboundTLSOptionsContainer
+        public OutboundTLSOptions tls;
+
+        public String password;
+
+        public String idle_session_check_interval;
+
+        public String idle_session_timeout;
 
     }
 

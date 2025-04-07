@@ -29,6 +29,8 @@ import io.nekohasekai.sagernet.utils.PackageCache
 import moe.matsuri.nb4a.*
 import moe.matsuri.nb4a.SingBoxOptions.*
 import moe.matsuri.nb4a.plugin.Plugins
+import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
+import moe.matsuri.nb4a.proxy.anytls.buildSingBoxOutboundAnyTLSBean
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.proxy.shadowtls.ShadowTLSBean
 import moe.matsuri.nb4a.proxy.shadowtls.buildSingBoxOutboundShadowTLSBean
@@ -43,9 +45,6 @@ const val TAG_PROXY = "proxy"
 const val TAG_DIRECT = "direct"
 const val TAG_BYPASS = "bypass"
 const val TAG_BLOCK = "block"
-
-const val TAG_DNS_IN = "dns-in"
-const val TAG_DNS_OUT = "dns-out"
 
 const val LOCALHOST = "127.0.0.1"
 
@@ -183,12 +182,6 @@ fun buildConfig(
         }
 
         dns = DNSOptions().apply {
-            // TODO nb4a hosts?
-//            hosts = DataStore.hosts.split("\n")
-//                .filter { it.isNotBlank() }
-//                .associate { it.substringBefore(" ") to it.substringAfter(" ") }
-//                .toMutableMap()
-
             servers = mutableListOf()
             rules = mutableListOf()
             independent_cache = true
@@ -375,6 +368,9 @@ fun buildConfig(
                         is SSHBean ->
                             buildSingBoxOutboundSSHBean(bean).asMap()
 
+                        is AnyTLSBean ->
+                            buildSingBoxOutboundAnyTLSBean(bean).asMap()
+
                         else -> throw IllegalStateException("can't reach")
                     }
 
@@ -383,18 +379,12 @@ fun buildConfig(
 //                        val keepAliveInterval = DataStore.tcpKeepAliveInterval
 //                        val needKeepAliveInterval = keepAliveInterval !in intArrayOf(0, 15)
 
-                        if (!muxApplied && proxyEntity.needCoreMux()) {
-                            muxApplied = true
-                            currentOutbound["multiplex"] = MultiplexOptions().apply {
-                                enabled = true
-                                padding = Protocols.shouldEnableMux("padding")
-                                max_streams = DataStore.muxConcurrency
-                                protocol = when (DataStore.muxType) {
-                                    1 -> "smux"
-                                    2 -> "yamux"
-                                    else -> "h2mux"
-                                }
-                            }.asMap()
+                        if (!muxApplied) {
+                            val muxObj = proxyEntity.singMux()
+                            if (muxObj != null && muxObj.enabled) {
+                                muxApplied = true
+                                currentOutbound["multiplex"] = muxObj.asMap()
+                            }
                         }
                     }
                 }
@@ -617,37 +607,26 @@ fun buildConfig(
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
+                    // block 改用新的写法
+                    if (ruleObj.outbound == TAG_BLOCK) {
+                        ruleObj.outbound = null
+                        ruleObj.action = "reject"
+                    }
                     route.rules.add(ruleObj)
                     route.rule_set.addAll(ruleSets)
                 }
             }
         }
 
+        // 对 rule_set tag 去重
+        if (route.rule_set != null) {
+            route.rule_set = route.rule_set.distinctBy { it.tag }
+        }
+
         for (freedom in arrayOf(TAG_DIRECT, TAG_BYPASS)) outbounds.add(Outbound().apply {
             tag = freedom
             type = "direct"
         }.asMap())
-
-        outbounds.add(Outbound().apply {
-            tag = TAG_BLOCK
-            type = "block"
-        }.asMap())
-
-        if (!forTest) {
-            inbounds.add(0, Inbound_DirectOptions().apply {
-                type = "direct"
-                tag = TAG_DNS_IN
-                listen = bind
-                listen_port = DataStore.localDNSPort
-                override_address = "8.8.8.8"
-                override_port = 53
-            })
-
-            outbounds.add(Outbound().apply {
-                type = "dns"
-                tag = TAG_DNS_OUT
-            }.asMap())
-        }
 
         // Bypass Lookup for the first profile
         bypassDNSBeans.forEach {
@@ -680,7 +659,8 @@ fun buildConfig(
 
         // remote dns obj
         remoteDns.firstOrNull().let {
-            dns.servers.add(DNSServerOptions().apply {
+            // Always use direct DNS for urlTest
+            if (!forTest) dns.servers.add(DNSServerOptions().apply {
                 address = it ?: throw Exception("No remote DNS, check your settings!")
                 tag = "dns-remote"
                 address_resolver = "dns-direct"
@@ -716,18 +696,16 @@ fun buildConfig(
         }
 
         if (forTest) {
-            // Always use direct DNS for urlTest
-            dns.servers.removeAt(0)
             dns.rules = listOf()
         } else {
             // built-in DNS rules
             route.rules.add(0, Rule_DefaultOptions().apply {
-                inbound = listOf(TAG_DNS_IN)
-                outbound = TAG_DNS_OUT
+                protocol = listOf("dns")
+                action = "hijack-dns"
             })
             route.rules.add(0, Rule_DefaultOptions().apply {
                 port = listOf(53)
-                outbound = TAG_DNS_OUT
+                action = "hijack-dns"
             })
             if (DataStore.bypassLanInCore) {
                 route.rules.add(Rule_DefaultOptions().apply {
@@ -739,7 +717,7 @@ fun buildConfig(
             route.rules.add(Rule_DefaultOptions().apply {
                 ip_cidr = listOf("224.0.0.0/3", "ff00::/8")
                 source_ip_cidr = listOf("224.0.0.0/3", "ff00::/8")
-                outbound = TAG_BLOCK
+                action = "reject"
             })
             // FakeDNS obj
             if (useFakeDns) {

@@ -61,7 +61,7 @@ object CrashHandler : Thread.UncaughtExceptionHandler {
 
     fun buildReportHeader(): String {
         var report = ""
-        report += "NekoBox for Andoird ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.FLAVOR.uppercase()}\n"
+        report += "V2ray VPN ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.FLAVOR.uppercase()}\n"
         report += "Date: ${getCurrentMilliSecondUTCTimeStamp()}\n\n"
         report += "OS_VERSION: ${getSystemPropertyWithAndroidAPI("os.version")}\n"
         report += "SDK_INT: ${Build.VERSION.SDK_INT}\n"

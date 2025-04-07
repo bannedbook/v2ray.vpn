@@ -38,13 +38,13 @@ object Key {
     const val ALLOW_ACCESS = "allowAccess"
     const val SPEED_INTERVAL = "speedInterval"
     const val SHOW_DIRECT_SPEED = "showDirectSpeed"
-    const val LOCAL_DNS_PORT = "portLocalDns"
 
     const val APPEND_HTTP_PROXY = "appendHttpProxy"
 
     const val CONNECTION_TEST_URL = "connectionTestURL"
 
-    const val TCP_KEEP_ALIVE_INTERVAL = "tcpKeepAliveInterval"
+    const val NETWORK_CHANGE_RESET_CONNECTIONS = "networkChangeResetConnections"
+    const val WAKE_RESET_CONNECTIONS = "wakeResetConnections"
     const val RULES_PROVIDER = "rulesProvider"
     const val LOG_LEVEL = "logLevel"
     const val LOG_BUF_SIZE = "logBufSize"
@@ -52,9 +52,6 @@ object Key {
     const val ALWAYS_SHOW_ADDRESS = "alwaysShowAddress"
 
     // Protocol Settings
-    const val MUX_TYPE = "muxType"
-    const val MUX_PROTOCOLS = "mux"
-    const val MUX_CONCURRENCY = "muxConcurrency"
     const val GLOBAL_ALLOW_INSECURE = "globalAllowInsecure"
 
     const val ACQUIRE_WAKE_LOCK = "acquireWakeLock"

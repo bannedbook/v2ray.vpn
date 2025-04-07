@@ -8,7 +8,11 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.SparseBooleanArray
-import android.view.*
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.annotation.UiThread
@@ -35,7 +39,6 @@ import io.nekohasekai.sagernet.ktx.crossFadeFrom
 import io.nekohasekai.sagernet.ktx.onMainDispatcher
 import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
-import io.nekohasekai.sagernet.widget.ListHolderListener
 import io.nekohasekai.sagernet.widget.ListListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -103,9 +106,9 @@ class AppManagerActivity : ThemedActivity() {
         var filteredApps = apps
 
         suspend fun reload() {
-            apps = cachedApps.map { (packageName, packageInfo) ->
+            apps = cachedApps.mapNotNull { (packageName, packageInfo) ->
                 coroutineContext[Job]!!.ensureActive()
-                ProxiedApp(packageManager, packageInfo.applicationInfo, packageName)
+                packageInfo.applicationInfo?.let { ProxiedApp(packageManager, it, packageName) }
             }.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
         }
 
@@ -164,8 +167,11 @@ class AppManagerActivity : ThemedActivity() {
     private fun initProxiedUids(str: String = DataStore.individual) {
         proxiedUids.clear()
         val apps = cachedApps
-        for (line in str.lineSequence()) proxiedUids[(apps[line]
-            ?: continue).applicationInfo.uid] = true
+        for (line in str.lineSequence()) {
+            val app = (apps[line] ?: continue)
+            val uid = app.applicationInfo?.uid ?: continue
+            proxiedUids[uid] = true
+        }
     }
 
     private fun isProxiedApp(app: ProxiedApp) = proxiedUids[app.uid]
@@ -188,7 +194,6 @@ class AppManagerActivity : ThemedActivity() {
         binding = LayoutAppsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ListHolderListener.setup(this)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setTitle(R.string.proxied_apps)
@@ -325,14 +330,19 @@ class AppManagerActivity : ThemedActivity() {
                     proxiedUids.clear()
                     for (app in cachedApps) {
                         val needProxy =
-                            needProxyAppsList.contains(app.key) || app.value.applicationInfo.uid == 1000
+                            needProxyAppsList.contains(app.key) || (app.value.applicationInfo?.uid
+                                ?: 0) == 1000
                         if (needProxy) {
                             if (!bypass) {
-                                proxiedUids[app.value.applicationInfo.uid] = true
+                                app.value.applicationInfo?.apply {
+                                    proxiedUids[uid] = true
+                                }
                             }
                         } else {
                             if (bypass) {
-                                proxiedUids[app.value.applicationInfo.uid] = true
+                                app.value.applicationInfo?.apply {
+                                    proxiedUids[uid] = true
+                                }
                             }
                         }
                     }

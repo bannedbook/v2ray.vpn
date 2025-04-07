@@ -23,6 +23,7 @@ import io.nekohasekai.sagernet.fmt.wireguard.WireGuardBean
 import io.nekohasekai.sagernet.ktx.*
 import libcore.Libcore
 import moe.matsuri.nb4a.Protocols
+import moe.matsuri.nb4a.proxy.anytls.AnyTLSBean
 import moe.matsuri.nb4a.proxy.config.ConfigBean
 import moe.matsuri.nb4a.utils.Util
 import org.ini4j.Ini
@@ -255,6 +256,7 @@ object RawUpdater : GroupUpdater() {
                                 setTLS(proxy["tls"]?.toString() == "true")
                                 sni = proxy["sni"]?.toString()
                                 name = proxy["name"]?.toString()
+                                allowInsecure = proxy["name"]?.toString() == "true"
                             })
                         }
 
@@ -422,6 +424,20 @@ object RawUpdater : GroupUpdater() {
                                                 realityOpt.value.toString()
                                         }
                                     }
+
+                                    "smux" -> for (smuxOpt in (opt.value as Map<String, Any>)) {
+                                        when (smuxOpt.key.lowercase()) {
+                                            "enabled" -> bean.enableMux =
+                                                smuxOpt.value.toString() == "true"
+
+                                            "max-streams" -> bean.muxConcurrency =
+                                                smuxOpt.value.toString().toInt()
+
+                                            "padding" -> bean.muxPadding =
+                                                smuxOpt.value.toString() == "true"
+                                        }
+                                    }
+
                                 }
                             }
                             if (isHttpUpgrade) {
@@ -481,10 +497,48 @@ object RawUpdater : GroupUpdater() {
                                                 grpcOpt.value.toString()
                                         }
                                     }
+
+                                    "smux" -> for (smuxOpt in (opt.value as Map<String, Any>)) {
+                                        when (smuxOpt.key.lowercase()) {
+                                            "enabled" -> bean.enableMux =
+                                                smuxOpt.value.toString() == "true"
+
+                                            "max-streams" -> bean.muxConcurrency =
+                                                smuxOpt.value.toString().toInt()
+
+                                            "padding" -> bean.muxPadding =
+                                                smuxOpt.value.toString() == "true"
+                                        }
+                                    }
                                 }
                             }
                             if (isHttpUpgrade) {
                                 bean.type = "httpupgrade"
+                            }
+                            proxies.add(bean)
+                        }
+
+                        "anytls" -> {
+                            val bean = AnyTLSBean()
+                            for (opt in proxy) {
+                                if (opt.value == null) continue
+                                when (opt.key.replace("_", "-")) {
+                                    "name" -> bean.name = opt.value.toString()
+                                    "server" -> bean.serverAddress = opt.value as String
+                                    "port" -> bean.serverPort = opt.value.toString().toInt()
+                                    "password" -> bean.password = opt.value.toString()
+                                    "client-fingerprint" -> bean.utlsFingerprint =
+                                        opt.value as String
+
+                                    "sni" -> bean.sni = opt.value.toString()
+                                    "skip-cert-verify" -> bean.allowInsecure =
+                                        opt.value.toString() == "true"
+
+                                    "alpn" -> {
+                                        val alpn = (opt.value as? (List<String>))
+                                        bean.alpn = alpn?.joinToString("\n")
+                                    }
+                                }
                             }
                             proxies.add(bean)
                         }
@@ -739,9 +793,25 @@ object RawUpdater : GroupUpdater() {
                 }
 
                 json.has("outbounds") -> {
-                    return listOf(ConfigBean().applyDefaultValues().apply {
-                        config = json.toStringPretty()
-                    })
+                    return json.getJSONArray("outbounds")
+                        .filterIsInstance<JSONObject>()
+                        .mapNotNull {
+                            val ty = it.getStr("type")
+                            if (ty == null || ty == "" ||
+                                ty == "dns" || ty == "block" || ty == "direct" || ty == "selector" || ty == "urltest"
+                            ) {
+                                null
+                            } else {
+                                it
+                            }
+                        }.map {
+                            ConfigBean().apply {
+                                applyDefaultValues()
+                                type = 1
+                                config = it.toStringPretty()
+                                name = it.getStr("tag")
+                            }
+                        }
                 }
 
                 json.has("server") && json.has("server_port") -> {

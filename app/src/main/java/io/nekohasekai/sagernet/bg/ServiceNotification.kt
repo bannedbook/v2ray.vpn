@@ -6,8 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ServiceInfo
-
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.text.format.Formatter
 import androidx.core.app.NotificationCompat
@@ -137,19 +136,10 @@ class ServiceNotification(
         Theme.apply(service)
         builder.color = service.getColorAttr(R.attr.colorPrimary)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            service.registerReceiver(this, IntentFilter().apply {
-                addAction(Intent.ACTION_SCREEN_ON)
-                addAction(Intent.ACTION_SCREEN_OFF)
-            }, Context.RECEIVER_EXPORTED)
-        }
-        else{
-            service.registerReceiver(this, IntentFilter().apply {
-                addAction(Intent.ACTION_SCREEN_ON)
-                addAction(Intent.ACTION_SCREEN_OFF)
-            })
-        }
-
+        service.registerReceiver(this, IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+        })
 
         runOnMainDispatcher {
             updateActions()
@@ -195,10 +185,13 @@ class ServiceNotification(
 
     private suspend fun show() =
         useBuilder {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                (service as Service).startForeground(notificationId, it.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-            }
-            else{
+            if (Build.VERSION.SDK_INT >= 34) {
+                (service as Service).startForeground(
+                    notificationId,
+                    it.build(),
+                    FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                )
+            } else {
                 (service as Service).startForeground(notificationId, it.build())
             }
         }
@@ -209,7 +202,11 @@ class ServiceNotification(
 
     fun destroy() {
         listenPostSpeed = false
-        (service as Service).stopForeground(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            (service as Service).stopForeground(Service.STOP_FOREGROUND_REMOVE)
+        } else {
+            (service as Service).stopForeground(true)
+        }
         service.unregisterReceiver(this)
     }
 }

@@ -5,7 +5,6 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,7 +20,6 @@ import androidx.activity.addCallback
 import androidx.annotation.IdRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import androidx.preference.PreferenceDataStore
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -46,7 +44,6 @@ import io.nekohasekai.sagernet.fmt.PluginEntry
 import io.nekohasekai.sagernet.group.GroupInterfaceAdapter
 import io.nekohasekai.sagernet.group.GroupUpdater
 import io.nekohasekai.sagernet.ktx.*
-import io.nekohasekai.sagernet.widget.ListHolderListener
 import moe.matsuri.nb4a.utils.Util
 import java.util.*
 import com.google.android.gms.ads.MobileAds
@@ -109,10 +106,6 @@ class MainActivity : ThemedActivity(),
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        window?.apply {
-            statusBarColor = Color.TRANSPARENT
-        }
 
         binding = LayoutMainBinding.inflate(layoutInflater)
         binding.fab.initProgress(binding.fabProgress)
@@ -182,7 +175,7 @@ class MainActivity : ThemedActivity(),
             }
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.coordinator, ListHolderListener)
+
         changeState(BaseService.State.Idle)
         connection.connect(this, this)
         DataStore.configurationStore.registerChangeListener(this)

@@ -2,10 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="@string/general_settings">
-        <io.nekohasekai.sagernet.widget.AppListPreference
-            app:icon="@drawable/ic_baseline_android_24"
-            app:key="nekoPlugins"
-            app:title="@string/neko_plugin" />
         <SwitchPreference
             app:defaultValue="false"
             app:icon="@drawable/ic_communication_phonelink_ring"
@@ -61,6 +57,13 @@
             app:summary="@string/profile_traffic_statistics_summary"
             app:title="@string/profile_traffic_statistics" />
         <SwitchPreference
+            app:defaultValue="true"
+            app:icon="@drawable/ic_baseline_speed_24"
+            app:key="showDirectSpeed"
+            app:summary="@string/show_direct_speed_sum"
+            app:title="@string/show_direct_speed"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
             app:key="showGroupInNotification"
             app:title="@string/show_group_in_notification" />
         <SwitchPreference
@@ -74,12 +77,10 @@
             app:summary="@string/metered_summary"
             app:title="@string/metered" />
         <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_baseline_speed_24"
-            app:key="showDirectSpeed"
-            app:summary="@string/show_direct_speed_sum"
-            app:title="@string/show_direct_speed"
-            app:useSimpleSummaryProvider="true" />
+            app:icon="@drawable/baseline_developer_board_24"
+            app:key="acquireWakeLock"
+            app:summary="@string/acquire_wake_lock_summary"
+            app:title="@string/acquire_wake_lock" />
         <moe.matsuri.nb4a.ui.LongClickListPreference
             app:defaultValue="0"
             app:entries="@array/log_level"
@@ -88,6 +89,10 @@
             app:key="logLevel"
             app:title="@string/log_level"
             app:useSimpleSummaryProvider="true" />
+        <io.nekohasekai.sagernet.widget.AppListPreference
+            app:icon="@drawable/ic_baseline_android_24"
+            app:key="nekoPlugins"
+            app:title="@string/neko_plugin" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/cag_route">
@@ -134,34 +139,6 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/protocol_settings">
-        <MultiSelectListPreference
-            app:defaultValue="@array/mux_select_init"
-            app:entries="@array/mux_select_init"
-            app:entryValues="@array/mux_select_init"
-            app:icon="@drawable/ic_baseline_compare_arrows_24"
-            app:key="mux"
-            app:summary="@string/mux_sum"
-            app:title="@string/enable_mux" />
-        <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="0"
-            app:entries="@array/mux_type"
-            app:entryValues="@array/int_array_3"
-            app:key="muxType"
-            app:title="@string/mux_type"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:defaultValue="8"
-            app:icon="@drawable/ic_baseline_low_priority_24"
-            app:key="muxConcurrency"
-            app:title="@string/mux_concurrency"
-            app:useSimpleSummaryProvider="true" />
-        <SwitchPreference
-            app:key="globalAllowInsecure"
-            app:icon="@drawable/ic_action_lock_open"
-            app:title="@string/global_allow_insecure" />
-    </PreferenceCategory>
-
     <PreferenceCategory app:title="@string/cag_dns">
         <EditTextPreference
             app:defaultValue="https://dns.google/dns-query"
@@ -177,7 +154,7 @@
             app:title="@string/domain_strategy_for_remote"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
-            app:defaultValue="local"
+            app:defaultValue="https://223.5.5.5/dns-query"
             app:icon="@drawable/ic_action_dns"
             app:key="directDns"
             app:title="@string/direct_dns"
@@ -215,10 +192,6 @@
             app:key="mixedPort"
             app:title="@string/port_proxy"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
-            app:key="portLocalDns"
-            app:title="@string/port_local_dns"
-            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             app:defaultValue="false"
             app:key="appendHttpProxy"
@@ -239,21 +212,27 @@
             app:title="@string/connection_test_url"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreference
-            app:icon="@drawable/baseline_developer_board_24"
-            app:key="acquireWakeLock"
-            app:summary="@string/acquire_wake_lock_summary"
-            app:title="@string/acquire_wake_lock" />
-        <SwitchPreference
             app:icon="@drawable/baseline_construction_24"
             app:key="enableClashAPI"
             app:summary="@string/enable_clash_api_summary"
             app:title="@string/enable_clash_api" />
-        <EditTextPreference
-            app:defaultValue="15"
+        <SwitchPreference
+            app:defaultValue="true"
             app:icon="@drawable/ic_baseline_flip_camera_android_24"
-            app:key="tcpKeepAliveInterval"
-            app:title="@string/tcp_keep_alive_interval"
+            app:key="networkChangeResetConnections"
+            app:title="@string/network_change_reset_connections"
             app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:key="wakeResetConnections"
+            app:title="@string/wake_reset_connections"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreference
+            app:icon="@drawable/ic_action_lock_open"
+            app:key="globalAllowInsecure"
+            app:title="@string/global_allow_insecure" />
+        <SwitchPreference
+            app:key="allowInsecureOnRequest"
+            app:title="@string/allow_insecure_on_request_sum" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="1.2"
             app:entries="@array/app_tls_version"
@@ -264,8 +243,5 @@
         <SwitchPreference
             app:key="showBottomBar"
             app:title="@string/show_bottom_bar" />
-        <SwitchPreference
-            app:key="allowInsecureOnRequest"
-            app:title="@string/allow_insecure_on_request_sum" />
     </PreferenceCategory>
 </PreferenceScreen>

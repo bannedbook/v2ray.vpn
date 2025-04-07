@@ -45,9 +45,12 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     private val realityShortId = pbm.add(PreferenceBinding(Type.Text, "realityShortId"))
 
     private val enableECH = pbm.add(PreferenceBinding(Type.Bool, "enableECH"))
-    private val enablePqSignature = pbm.add(PreferenceBinding(Type.Bool, "enablePqSignature"))
-    private val disabledDRS = pbm.add(PreferenceBinding(Type.Bool, "disabledDRS"))
     private val echConfig = pbm.add(PreferenceBinding(Type.Text, "echConfig"))
+
+    private val enableMux = pbm.add(PreferenceBinding(Type.Bool, "enableMux"))
+    private val muxPadding = pbm.add(PreferenceBinding(Type.Bool, "muxPadding"))
+    private val muxType = pbm.add(PreferenceBinding(Type.TextToInt, "muxType"))
+    private val muxConcurrency = pbm.add(PreferenceBinding(Type.TextToInt, "muxConcurrency"))
 
     override fun StandardV2RayBean.init() {
         if (this is TrojanBean) {
@@ -111,7 +114,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
 
         encryption.preference.apply {
             this as SimpleMenuPreference
-            if (tmpBean!!.isVLESS) {
+            if (isVless) {
                 title = resources.getString(R.string.xtls_flow)
                 setIcon(R.drawable.ic_baseline_stream_24)
                 setEntries(R.array.xtls_flow_value)
@@ -160,6 +163,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
                 host.preference.isVisible = true
                 path.preference.isVisible = true
             }
+
             "ws" -> {
                 host.preference.setTitle(R.string.ws_host)
                 path.preference.setTitle(R.string.ws_path)

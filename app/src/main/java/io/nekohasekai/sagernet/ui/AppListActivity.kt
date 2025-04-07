@@ -6,11 +6,17 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.util.SparseBooleanArray
-import android.view.*
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import androidx.annotation.UiThread
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.util.contains
 import androidx.core.util.set
 import androidx.core.view.ViewCompat
@@ -30,9 +36,12 @@ import io.nekohasekai.sagernet.SagerNet
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.databinding.LayoutAppListBinding
 import io.nekohasekai.sagernet.databinding.LayoutAppsItemBinding
-import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.ktx.crossFadeFrom
+import io.nekohasekai.sagernet.ktx.launchCustomTab
+import io.nekohasekai.sagernet.ktx.onMainDispatcher
+import io.nekohasekai.sagernet.ktx.runOnDefaultDispatcher
+import io.nekohasekai.sagernet.ktx.runOnIoDispatcher
 import io.nekohasekai.sagernet.utils.PackageCache
-import io.nekohasekai.sagernet.widget.ListHolderListener
 import io.nekohasekai.sagernet.widget.ListListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,7 +88,12 @@ class AppListActivity : ThemedActivity() {
                 binding.desc.text = "$packageName ($ver)"
                 //
                 binding.button.isVisible = true
-                binding.button.setImageDrawable(getDrawable(R.drawable.ic_baseline_info_24))
+                binding.button.setImageDrawable(
+                    AppCompatResources.getDrawable(
+                        this@AppListActivity,
+                        R.drawable.ic_baseline_info_24
+                    )
+                )
                 binding.button.setOnClickListener {
                     runOnIoDispatcher {
                         val jsi = NekoJSInterface(packageName)
@@ -139,9 +153,9 @@ class AppListActivity : ThemedActivity() {
         var filteredApps = apps
 
         suspend fun reload() {
-            apps = getCachedApps().map { (packageName, packageInfo) ->
+            apps = getCachedApps().mapNotNull { (packageName, packageInfo) ->
                 coroutineContext[Job]!!.ensureActive()
-                ProxiedApp(packageManager, packageInfo.applicationInfo, packageName)
+                packageInfo.applicationInfo?.let { ProxiedApp(packageManager, it, packageName) }
             }.sortedWith(compareBy({ !isProxiedApp(it) }, { it.name.toString() }))
         }
 
@@ -200,8 +214,11 @@ class AppListActivity : ThemedActivity() {
     private fun initProxiedUids(str: String = DataStore.routePackages) {
         proxiedUids.clear()
         val apps = getCachedApps()
-        for (line in str.lineSequence()) proxiedUids[(apps[line]
-            ?: continue).applicationInfo.uid] = true
+        for (line in str.lineSequence()) {
+            val app = (apps[line] ?: continue)
+            val uid = app.applicationInfo?.uid ?: continue
+            proxiedUids[uid] = true
+        }
     }
 
     private fun isProxiedApp(app: ProxiedApp) = proxiedUids[app.uid]
@@ -235,7 +252,6 @@ class AppListActivity : ThemedActivity() {
         binding = LayoutAppListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ListHolderListener.setup(this)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setTitle(R.string.select_apps)
@@ -306,6 +322,7 @@ class AppListActivity : ThemedActivity() {
 
                 return true
             }
+
             R.id.action_clear_selections -> {
                 runOnDefaultDispatcher {
                     proxiedUids.clear()
@@ -316,6 +333,7 @@ class AppListActivity : ThemedActivity() {
                     }
                 }
             }
+
             R.id.action_export_clipboard -> {
                 val success = SagerNet.trySetPrimaryClip("false\n${DataStore.routePackages}")
                 Snackbar.make(
@@ -325,6 +343,7 @@ class AppListActivity : ThemedActivity() {
                 ).show()
                 return true
             }
+
             R.id.action_import_clipboard -> {
                 val proxiedAppString =
                     SagerNet.clipboard.primaryClip?.getItemAt(0)?.text?.toString()
@@ -344,6 +363,7 @@ class AppListActivity : ThemedActivity() {
                 }
                 Snackbar.make(binding.list, R.string.action_import_err, Snackbar.LENGTH_LONG).show()
             }
+
             R.id.uninstall_all -> {
                 runOnDefaultDispatcher {
                     proxiedUids.clear()
