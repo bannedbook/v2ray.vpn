@@ -1,31 +1,31 @@
-## V2free for android
+## V2ray VPN for Android
 
-V2free for android, a V2ray and  Shadowsocks client with many builtin free servers.
+基于 [v2rayNG 2.3.15](https://github.com/2dust/v2rayNG/releases/tag/2.3.15) 定制的 V2ray / Shadowsocks 客户端，内置免费节点订阅。
 
-功能和使用简介
+功能和使用简介：  
 https://www.youtube.com/watch?v=JE8xRj7_eBQ
 
-minSdk = 21
-targetSdk = 33
-
-<p><a href="https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Google_Play_Store_badge_EN.svg/270px-Google_Play_Store_badge_EN.svg.png" alt="从Google Play下载" style="max-width:100%"></a></p>
+Google Play：  
+https://play.google.com/store/apps/details?id=free.v2ray.proxy.VPN
 
 ### Feedback
-<a target="_blank" href="https://github.com/bannedbook/v2ray.vpn/issues">Issues</a>、<a target="_blank" href="https://t.me/fqchat">Telegram Group</a>
 
-更多翻墙信息，请访问[bannedbook翻墙主页](https://github.com/bannedbook/fanqiang/wiki)。
+- [Issues](https://github.com/bannedbook/v2ray.vpn/issues)
+- [Telegram Group](https://t.me/fqchat)
+
+更多翻墙信息： [bannedbook 翻墙主页](https://github.com/bannedbook/fanqiang/wiki)
+
+### 工程说明
+
+- Android 工程目录：`V2rayNG/`
+- 包名：`free.v2ray.proxy.VPN`
+- 版本：`7.2.0`（versionCode `5007200`）
+- 离线订阅加密工具模块：`V2rayNG/encrypt-tool`
 
 ### LICENSE
 
 Copyright (C) [bannedbook fanqiang](https://github.com/bannedbook/fanqiang/wiki)
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+本程序基于 GPL-3.0，上游项目：
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
-
-### Credits
-
-https://github.com/MatsuriDayo/NekoBoxForAndroid
+- https://github.com/2dust/v2rayNG
