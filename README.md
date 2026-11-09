@@ -1,6 +1,6 @@
 ## V2ray VPN for Android
 
-基于 [v2rayNG](https://github.com/2dust/v2rayNG) 定制的 V2ray / Shadowsocks 客户端，内置免费节点订阅。
+基于 xray/v2ray/shadowsocks 的VPN客户端，内置免费节点订阅。
 
 功能和使用简介：  
 https://www.youtube.com/watch?v=JE8xRj7_eBQ
