@@ -157,7 +157,7 @@ object AppConfig {
 
     fun isBuiltinSubscription(remarks: String?, subscriptionId: String? = null): Boolean =
         remarks == BUILTIN_SUBSCRIPTION_REMARKS || subscriptionId == BUILTIN_SUBSCRIPTION_ID
-    const val DELAY_TEST_URL = "https://www.gstatic.com/generate_204"
+    const val DELAY_TEST_URL = "http://cp.cloudflare.com/generate_204"
     const val DELAY_TEST_URL2 = "https://www.google.com/generate_204"
     const val OBSERVATORY_LEAST_PING_INTERVAL = "3m"
     const val OBSERVATORY_LEAST_LOAD_INTERVAL = "5m"

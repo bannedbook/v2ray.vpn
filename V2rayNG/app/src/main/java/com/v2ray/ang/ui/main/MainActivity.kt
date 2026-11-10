@@ -126,8 +126,22 @@ class MainActivity : HelperBaseComponentActivity() {
                             MainAction.LocateSelectedServer -> mainViewModel.triggerLocateSelectedServer()
                             is MainAction.SelectServer -> setSelectServer(action.guid)
                             is MainAction.EditServer -> editServer(action.guid, action.profile)
-                            is MainAction.ShareClipboard -> shareToClipboard(action.guid)
-                            is MainAction.ShareFullContent -> shareFullContentAsync(action.guid)
+                            is MainAction.ShareClipboard -> {
+                                if (AngConfigManager.isBuiltinServerGuid(action.guid)) {
+                                    toastError(R.string.toast_action_not_allowed)
+                                } else if (!shareToClipboard(action.guid)) {
+                                    toastError(R.string.toast_failure)
+                                } else {
+                                    toastSuccess(R.string.toast_success)
+                                }
+                            }
+                            is MainAction.ShareFullContent -> {
+                                if (AngConfigManager.isBuiltinServerGuid(action.guid)) {
+                                    toastError(R.string.toast_action_not_allowed)
+                                } else {
+                                    shareFullContentAsync(action.guid)
+                                }
+                            }
                             is MainAction.OpenSubscriptionLink -> openSubscriptionLink(action.url)
                             else -> mainViewModel.onAction(action)
                         }

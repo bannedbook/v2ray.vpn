@@ -18,6 +18,7 @@ import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
@@ -294,8 +295,12 @@ class MainViewModel(
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             MainAction.LocateHandled -> consumeLocateTarget()
             is MainAction.ShareQRCode -> {
-                val bitmap = dataSource.share2QRCode(action.guid)
-                _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
+                if (AngConfigManager.isBuiltinServerGuid(action.guid)) {
+                    toastError(R.string.toast_action_not_allowed)
+                } else {
+                    val bitmap = dataSource.share2QRCode(action.guid)
+                    _uiState.update { it.copy(shareQRCodeBitmap = bitmap) }
+                }
             }
 
             MainAction.DismissQRCodeDialog -> {
